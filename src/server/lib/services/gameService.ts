@@ -47,7 +47,7 @@ const gameService = new GameServiceServer({
             config.setPlayer(player);
             config.setFoodList(store.getMaze().food.toArray());
             config.setPowerList(store.getMaze().power.toArray());
-            
+            config.setScoresList(store.getLeaderBoard());
             playersProcessor.onNext(player);
             
             store.setPlayer(player);
