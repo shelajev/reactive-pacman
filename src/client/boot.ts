@@ -7,7 +7,7 @@ import { MapServiceServer } from '../shared/service_rsocket_pb';
 import { Map } from '../shared/map_pb';
 import GameScene from './game';
 import Menu from './menu';
-import Compass from './compass';
+import Compass from './Compass/Scene';
 
 import * as $ from 'jquery';
 

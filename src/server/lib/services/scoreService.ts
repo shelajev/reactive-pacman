@@ -4,7 +4,7 @@ import scoreProcessor from '../processors/scoreProcessor';
 
 const ScoreService = new ExtraServiceServer({
     score(player: Player) {
-        return scoreProcessor;
+        return scoreProcessor ;
     }
 
 });
