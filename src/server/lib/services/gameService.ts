@@ -2,12 +2,12 @@ const { DirectProcessor } = require('reactor-core-js/flux');
 
 import { Single } from 'rsocket-flowable';
 
-import { GameServiceServer } from '../../../shared/service_rsocket_pb';
-import { Nickname } from '../../../shared/player_pb';
-import { Config } from '../../../shared/config_pb';
-import { Player } from '../../../shared/player_pb';
-import { Location } from '../../../shared/location_pb';
-import { Point } from '../../../shared/point_pb';
+import { GameServiceServer } from '@shared/service_rsocket_pb';
+import { Nickname } from '@shared/player_pb';
+import { Config } from '@shared/config_pb';
+import { Player } from '@shared/player_pb';
+import { Location } from '@shared/location_pb';
+import { Point } from '@shared/point_pb';
 import getNewPlayerType from '../generatePlayerType';
 import store from '../../store';
 import { playersProcessor } from '../processors';

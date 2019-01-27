@@ -3,6 +3,7 @@
     "outDir": "./dist/",
     "noImplicitAny": true,
     "module": "commonjs",
+    "moduleResolution": "node",
     "target": "es5",
     "allowJs": true,
     "typeRoots": [
@@ -14,6 +15,10 @@
       "scripthost",
       "dom"
     ],
+    "baseUrl": "./",
+    "paths": {
+      "@shared/*": ["src/shared/*"]
+    }
   },
   "include": [
     "src/**/*"

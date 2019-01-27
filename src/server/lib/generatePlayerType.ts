@@ -1,4 +1,4 @@
-import { Player } from '../../shared/player_pb';
+import { Player } from '@shared/player_pb';
 import store from '../store';
 
 function getNewPlayerType() {

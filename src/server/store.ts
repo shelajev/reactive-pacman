@@ -1,4 +1,4 @@
-import { Player } from '../shared/player_pb';
+import { Player } from '@shared/player_pb';
 import Maze from './maze';
 
 const store = {

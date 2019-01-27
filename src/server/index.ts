@@ -6,12 +6,12 @@ import RSocketWebSocketServer from 'rsocket-websocket-server'
 import { RequestHandlingRSocket } from 'rsocket-rpc-core'
 import { Server } from 'http';
 
-import { MapServiceClient } from '../shared/service_rsocket_pb'
-import { Tail } from '../shared/tail_pb'
-import { Size } from '../shared/size_pb'
-import { Map } from '../shared/map_pb'
-import { Point } from '../shared/point_pb';
-import { Player } from '../shared/player_pb';
+import { MapServiceClient } from '@shared/service_rsocket_pb'
+import { Tail } from '@shared/tail_pb'
+import { Size } from '@shared/size_pb'
+import { Map } from '@shared/map_pb'
+import { Point } from '@shared/point_pb';
+import { Player } from '@shared/player_pb';
 import Maze from './maze';
 import { extraService, gameService, playerService } from './lib/services/';
 import { playersProcessor } from './lib/processors';
@@ -20,16 +20,14 @@ import store from './store';
 const app = express();
 
 
-() => {
 let maze = new Maze();
-const mazeData = maze.generate();
-const map = new Map();
+maze.generate();
 store.setMaze(maze);
-};
+const map = new Map();
 
 const players: { [e: string]: Player } = {};
 let sockets: any = {};
-mazeData.tiles.forEach((t:any) => {
+store.getMaze().tiles.forEach((t:any) => {
     const tail = new Tail();
     const point = new Point();
     point.setX(t.x);
@@ -39,8 +37,8 @@ mazeData.tiles.forEach((t:any) => {
     map.addTails(tail);
 });
 const size = new Size();
-size.setWidth(mazeData.width);
-size.setHeight(mazeData.height);
+size.setWidth(store.getMaze().width);
+size.setHeight(store.getMaze().height);
 map.setSize(size);
 
 const server = new Server(app);

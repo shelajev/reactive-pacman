@@ -52,6 +52,6 @@
     "webpack-dev-server": "^3.1.14"
   },
   "_moduleAliases": {
-    "@shared": "shared"
+    "@shared": "./src/shared"
   }
 }

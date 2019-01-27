@@ -11,7 +11,7 @@ function findBestStartingPosition(playerType: any) {
         Object.keys(store.getPlayers()).forEach(function (uuid:string, index) {
             let player = store.getPlayer(uuid);
             if (playerType != player.getType()) {
-                let dist = distance(player, start);
+                let dist = distance(player.toObject(), start);
                 if (closestPlayerDist == -1 || dist < closestPlayerDist) {
                     closestPlayerDist = dist;
                 }

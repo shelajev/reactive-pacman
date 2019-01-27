@@ -1,4 +1,4 @@
-import { ExtraServiceServer } from '../../../shared/service_rsocket_pb';
+import { ExtraServiceServer } from '@shared/service_rsocket_pb';
 import { foodProcessor, powerProcessor } from '../processors';
 
 

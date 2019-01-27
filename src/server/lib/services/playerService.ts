@@ -1,16 +1,16 @@
-import { PlayerServiceServer } from '../../../shared/service_rsocket_pb';
+import { PlayerServiceServer } from '@shared/service_rsocket_pb';
 
-import { Player } from '../../../shared/player_pb';
-import { Location } from '../../../shared/location_pb';
-import { Extra } from '../../../shared/extra_pb';
+import { Player } from '@shared/player_pb';
+import { Location } from '@shared/location_pb';
+import { Extra } from '@shared/extra_pb';
 import { playersProcessor, powerProcessor, foodProcessor } from '../processors';
 import store from '../../store';
+import scoreProcessor from '../processors/scoreProcessor';
 
 const playerService = new PlayerServiceServer({
     locate(location: Location, uuid: string) {
         const time = Date.now();
         const player = store.getPlayer(uuid);
-        let dt = time - player.getTimestamp();
 
         player.setTimestamp(time);
         player.setState(Player.State.ACTIVE);
@@ -20,6 +20,7 @@ const playerService = new PlayerServiceServer({
         if (collisionData) {
             if (collisionData.type == 1) {
                 player.setScore(player.getScore() + 1);
+                scoreProcessor.onNext({player, score: player.getScore() + 1});
                 // sockets[uuid].emit("score", players[uuid].score);
 
 
