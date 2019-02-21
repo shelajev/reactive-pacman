@@ -7,6 +7,7 @@ import { ReactiveSocket } from "rsocket-types";
 import { PlayerServiceClient } from "@shared/service_rsocket_pb";
 import { Point } from "@shared/point_pb";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
+import { Disposable } from "reactor-core-js";
 
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
     private service: any;
@@ -15,38 +16,28 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
         this.service = new PlayerServiceClient(rSocket);
     }
 
-    locate(location: Location.AsObject): Single<void> {
+    locate(locationStream: Flux<Location.AsObject>): Single<void> {
         return new Single(subject => {
-            let cancelled: boolean = false;
-            let cancelCallback = () => {
-                cancelled = true;
-            }
-
-            subject.onSubscribe(cancelCallback);
-
-            try {
-                if (!cancelled) {
+            let disposable: Disposable = locationStream
+                .map(location => {
                     const locationProto = new Location();
                     const positionProto = new Point();
 
                     positionProto.setX(location.position.x);
                     positionProto.setY(location.position.y);
                     locationProto.setPosition(positionProto);
-                    locationProto.setDirec(location.direc);
-                    locationProto.setFlipX(location.flipX);
-                    locationProto.setRotation(location.rotation);
+                    locationProto.setDirection(location.direction);
 
-                    this.service.locate(locationProto);
-                }
+                    return locationProto;
+                })
+                .compose(flux => this.service.locate(flux))
+                .consume(
+                    () => {},
+                    (e: Error) => subject.onError(e),
+                    () => subject.onComplete()
+                )
 
-                if (!cancelled) {
-                    subject.onComplete()
-                }
-            } catch (e) {
-                if (!cancelled) {
-                    subject.onError(e);
-                }
-            }
+            subject.onSubscribe(() => disposable.dispose);
         })
     }
 

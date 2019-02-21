@@ -1,9 +1,7 @@
-import foodProcessor from './foodProcessor';
 import playersProcessor from './playersProcessor';
-import powerProcessor from './powerProcessor';
+import extrasProcessor from './extrasProcessor';
 
 export {
-    foodProcessor,
     playersProcessor,
-    powerProcessor
+    extrasProcessor
 }

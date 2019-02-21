@@ -5,11 +5,13 @@ import { BufferEncoders } from 'rsocket-core';
 import { ReactiveSocket } from 'rsocket-types';
 import { MapServiceServer } from '../shared/service_rsocket_pb';
 import { Map } from '../shared/map_pb';
-import GameScene from './game';
+import { GameScene } from './Game';
 import Menu from './menu';
-import Compass from './Compass/Scene';
+import { CompassScene } from './Compass';
 
 import * as $ from 'jquery';
+import PlayerServiceClientSharedAdapter from './api/rsocket/PlayerServiceClientSharedAdapter';
+import GameServiceClientAdapter from './api/rsocket/GameServiceClientAdapter';
 
 export class Boot extends Scene {
 
@@ -50,7 +52,7 @@ export class Boot extends Scene {
                 setup: (map: Map) => {
                     console.log(map.toObject());
 
-                    this.scene.start('Menu', { rSocket, sizeData: config, maze: map.toObject() });
+                    this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new PlayerServiceClientSharedAdapter(rSocket), extrasService: new GameServiceClientAdapter(rSocket), gameService: new GameServiceClientAdapter(rSocket) });
                 }
             })
         });
@@ -95,7 +97,7 @@ export class Boot extends Scene {
                 debug: false
             }
         },
-        scene: [Boot, Menu, GameScene, Compass],
+        scene: [Boot, Menu, GameScene, CompassScene],
         // scene: [Boot, Menu, GameLoader, Game, Compass]
     });
     const sizeData = {

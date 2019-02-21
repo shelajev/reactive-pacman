@@ -1,19 +1,12 @@
 import { Scene } from "phaser";
-import MapMaker from "./map.maker";
 
 export default class GameLoader extends Scene {
 
-    private mapMaker: MapMaker;
-    private mapData: any;
-
     constructor() {
         super('GameLoader');
-        this.mapData = null;
     }
 
     init(config : any) {
-        this.mapData = config.maze;
-        
         // const socket = io(config.ip);/
 
         // socket.emit('nickname', config.nickname);
@@ -25,7 +18,7 @@ export default class GameLoader extends Scene {
         //     data.sizeData = config.sizeData;
         //     data.tiles = self.mapMaker;
         //     data.quadrantMode = config.quadrantMode;
-            self.scene.start('Game', config);
+        self.scene.start('Game', config);
         // });
 
         // socket.on('connect_error', function(error) {

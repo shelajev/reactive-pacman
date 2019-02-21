@@ -1,14 +1,13 @@
 import { Scene } from 'phaser';
-import { GameServiceClient } from '../shared/service_rsocket_pb';
-import { Nickname, Player } from '../shared/player_pb';
 import { Config } from '../shared/config_pb';
 
 import * as $ from 'jquery';
+import GameService from './api/GameService';
 
 export default class Menu extends Scene {
     nickname: string;
     config: any;
-    gameService: any;
+    gameService: GameService;
 
     constructor() {
         super('Menu');
@@ -23,7 +22,7 @@ export default class Menu extends Scene {
     init(config: any) {
         this.nickname = localStorage.getItem("nickname");
         this.config = config;
-        this.gameService = new GameServiceClient(config.rSocket);
+        this.gameService = config.gameService;
     }
 
     create(config: any) {
@@ -106,19 +105,15 @@ export default class Menu extends Scene {
                             // quadrantMode: quadrantMode
                         // };
                         // socket.close();
-                        const nick = new Nickname()
-                        nick.setValue(this.nickname);
-                        this.gameService.start(nick)
-                                        .then((config: Config) => {
-                                            const objConfig = config.toObject();
-                                            console.log(objConfig);
+                        this.gameService.start({value: this.nickname})
+                                        .then((config: Config.AsObject) => {
+                                            console.log(config);
                                             this.scene.start('Game', { 
                                                 ...this.config,
                                                 quadrantMode,
-                                                player: objConfig.player,
-                                                players: objConfig.playersList,
-                                                food: objConfig.foodList,
-                                                power: objConfig.powerList,
+                                                player: config.player,
+                                                players: config.playersList,
+                                                extras: config.extrasList,
                                             });
                                         })
                     // });

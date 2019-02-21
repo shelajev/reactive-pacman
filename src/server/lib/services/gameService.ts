@@ -6,7 +6,7 @@ import { GameServiceServer } from '@shared/service_rsocket_pb';
 import { Nickname } from '@shared/player_pb';
 import { Config } from '@shared/config_pb';
 import { Player } from '@shared/player_pb';
-import { Location } from '@shared/location_pb';
+import { Location, Direction } from '@shared/location_pb';
 import { Point } from '@shared/point_pb';
 import getNewPlayerType from '../generatePlayerType';
 import store from '../../store';
@@ -32,7 +32,7 @@ const gameService = new GameServiceServer({
             playerPosition.setX(pos.x);
             playerPosition.setY(pos.y);
 
-            location.setDirec(3);
+            location.setDirection(Direction.RIGHT);
             location.setPosition(playerPosition);
 
             player.setLocation(location);
@@ -45,8 +45,7 @@ const gameService = new GameServiceServer({
             
             config.setPlayersList(Object.keys(store.getPlayers()).map(k => store.getPlayer(k)))
             config.setPlayer(player);
-            config.setFoodList(store.getMaze().food.toArray());
-            config.setPowerList(store.getMaze().power.toArray());
+            config.setExtrasList(store.getMaze().extras.toArray());
             
             playersProcessor.onNext(player);
             

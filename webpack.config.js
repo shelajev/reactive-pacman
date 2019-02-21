@@ -29,6 +29,9 @@ module.exports = {
         ]
     },
     resolve: {
+        alias: {
+            "@shared": "/Users/olehdokuka/Documents/Workspace/Java/dinoman-io/src/shared"
+        },
         extensions: ['.tsx', '.ts', '.js']
     },
     output: {

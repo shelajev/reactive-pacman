@@ -10,7 +10,6 @@ option java_multiple_files = true;
 
 message Config {
     repeated Player players = 1;
-    repeated int32 food = 2;
-    repeated int32 power = 3;
-    Player player = 4;
+    repeated int32 extras = 2;
+    Player player = 3;
 }

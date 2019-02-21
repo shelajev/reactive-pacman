@@ -9,7 +9,12 @@ option java_multiple_files = true;
 
 message Location {
     Point position = 1;
-    float rotation = 2;
-    bool flip_x = 3;
-    int32 direc = 4;
+    Direction direction = 2;
+}
+
+enum Direction {
+    UP = 0;
+    LEFT = 1;
+    DOWN = 2;
+    RIGHT = 3;
 }

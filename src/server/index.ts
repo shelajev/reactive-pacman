@@ -1,3 +1,4 @@
+import 'module-alias/register'
 import * as uuidv1 from 'uuid/v1';
 import * as express from 'express';
 
@@ -7,18 +8,19 @@ import { RequestHandlingRSocket } from 'rsocket-rpc-core'
 import { Server } from 'http';
 
 import { MapServiceClient } from '@shared/service_rsocket_pb'
-import { Tail } from '@shared/tail_pb'
+import { Tile } from '@shared/tile_pb'
 import { Size } from '@shared/size_pb'
 import { Map } from '@shared/map_pb'
 import { Point } from '@shared/point_pb';
 import { Player } from '@shared/player_pb';
 import Maze from './maze';
-import { extraService, gameService, playerService } from './lib/services/';
+import { extrasService, gameService, playerService } from './lib/services/';
 import { playersProcessor } from './lib/processors';
 import store from './store';
 
 const app = express();
 
+console.log("test");
 
 let maze = new Maze();
 maze.generate();
@@ -28,13 +30,13 @@ const map = new Map();
 const players: { [e: string]: Player } = {};
 let sockets: any = {};
 store.getMaze().tiles.forEach((t:any) => {
-    const tail = new Tail();
+    const tile = new Tile();
     const point = new Point();
     point.setX(t.x);
     point.setY(t.y);
-    t.walls.forEach((w:any) => tail.addWalls(w));
-    tail.setPoint(point);
-    map.addTails(tail);
+    t.walls.forEach((w:any) => tile.addWalls(w));
+    tile.setPoint(point);
+    map.addTiles(tile);
 });
 const size = new Size();
 size.setWidth(store.getMaze().width);
@@ -64,7 +66,7 @@ const rSocketServer = new RSocketServer({
 
         handler.addService('org.coinen.pacman.PlayerService', playerService);
 
-        handler.addService('org.coinen.pacman.ExtraService', extraService);
+        handler.addService('org.coinen.pacman.ExtrasService', extrasService);
 
         return handler;
     },
@@ -76,6 +78,7 @@ const rSocketServer = new RSocketServer({
     ),
 });
 rSocketServer.start();
+console.log("test2")
 // let io = require('socket.io')(server);
 
 app.get('/ip.json', function (req, res) {
@@ -103,7 +106,7 @@ if (process.env.Heroku) {
     reloadServer.watch([__dirname + "/public"]);
 }
 
-
+console.log(app);
 
 function collides(player1:any, player2:any) {
     let maxDist = 30;

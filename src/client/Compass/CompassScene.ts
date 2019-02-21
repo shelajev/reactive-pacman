@@ -1,9 +1,9 @@
 import { Scene } from 'phaser';
-import Config from './Config';
-import Model from './Model';
+import CompassConfig from './CompassConfig';
+import CompassService from './CompassService';
 
-export default class Compass extends Scene {
-    private model: Model;
+export default class CompassScene extends Scene {
+    private service: CompassService;
     private compass: Phaser.GameObjects.Image;
     private compassNeedle: Phaser.GameObjects.Image;
 
@@ -11,22 +11,17 @@ export default class Compass extends Scene {
         super('Compass');
     }
 
-    init(config : Config) {
-        this.model = config.model;
-    }
-
-    create(config : Config) {
+    create(config : CompassConfig) {
+        this.service = config.service;
         this.compass = this.add.image(60, 60, 'compass').setScale(0.6 * config.scale);
         this.compassNeedle = this.add.image(60, 60, 'compass-needle').setScale(0.6 * config.scale);
 
         this.scaleChildren(config.scale);
     }
 
-    // distance2(p1: Phaser.Physics.Arcade.Sprite, p2: Phaser.Physics.Arcade.Sprite) {
-    //     var d1 = p1.x - p2.x;
-    //     var d2 = p1.y - p2.y;
-    //     return d1 * d1 + d2 * d2;
-    // }
+    destroy() {
+        this.service.dispose()
+    }
 
     scaleChildren(scale: any) {
         var children = this.children.list;
@@ -37,7 +32,7 @@ export default class Compass extends Scene {
     }
 
     update() {
-        const { rotation } = this.model;
+        const { rotation } = this.service;
         // this.scaleChildren(1 / this.sizeData.scale);
 
         // Object.keys(this.players).forEach(function(key:any, index) {
@@ -54,7 +49,7 @@ export default class Compass extends Scene {
             this.compassNeedle.setRotation(Date.now() % 360);
         }
         else {
-            this.compassNeedle.setRotation(rotation);
+            this.compassNeedle.setRotation(rotation + Math.PI / 2);
         }
 
         // this.scaleChildren(this.sizeData.scale);

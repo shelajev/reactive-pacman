@@ -1,6 +1,6 @@
 declare module 'reactor-core-js/flux' {
     import { Disposable } from "reactor-core-js";
-    import { Publisher, Subscriber } from "reactor-core-js/reactive-streams-spec";
+    import { Publisher, Subscriber, Subscription } from "reactor-core-js/reactive-streams-spec";
     
     export class Flux<T> implements Publisher<T> {
         subscribe<S extends T>(s: Subscriber<S>): void;
@@ -14,13 +14,21 @@ declare module 'reactor-core-js/flux' {
         doOnNext(callback: (t: T) => void): Flux<T>;
 
 
+
+        compose<V>(transformer: (flux: Flux<T>) => Publisher<V>): Flux<V> 
+
         consume(): Disposable;
         consume(onNextCallback: (t: T) => void): Disposable;
         consume(onNextCallback: (t: T) => void, onErrorCallback: (e: Error) => void): Disposable;
         consume(onNextCallback: (t: T) => void, onErrorCallback: (e: Error) => void, onCompleteCallback: () => void): Disposable;
     }
 
-    export class DirectProcessor<T> extends Flux<T> {}
+    export class DirectProcessor<T> extends Flux<T> implements Subscriber<T> {
+        onSubscribe(s: Subscription): void;
+        onNext(t: T): void;
+        onError(t: Error): void;
+        onComplete(): void;
+    }
 // }
 
 // declare module 'reactor-core-js/mono' {

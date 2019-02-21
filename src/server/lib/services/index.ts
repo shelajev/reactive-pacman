@@ -1,9 +1,9 @@
-import extraService from './extraService';
+import extrasService from './extraService';
 import gameService from './gameService';
 import playerService from './playerService';
 
 export {
-    extraService,
+    extrasService,
     gameService,
     playerService
 }

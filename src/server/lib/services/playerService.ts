@@ -3,9 +3,9 @@ import { PlayerServiceServer } from '@shared/service_rsocket_pb';
 import { Player } from '@shared/player_pb';
 import { Location } from '@shared/location_pb';
 import { Extra } from '@shared/extra_pb';
-import { playersProcessor, powerProcessor, foodProcessor } from '../processors';
+import { playersProcessor, extrasProcessor } from '../processors';
 import store from '../../store';
-import scoreProcessor from '../processors/scoreProcessor';
+// import scoreProcessor from '../processors/scoreProcessor';
 
 const playerService = new PlayerServiceServer({
     locate(location: Location, uuid: string) {
@@ -16,15 +16,12 @@ const playerService = new PlayerServiceServer({
         player.setState(Player.State.ACTIVE);
         player.setLocation(location);
 
-        let collisionData = store.getMaze().collideFood(location.getPosition().getX(), location.getPosition().getY());
+        const collisionData = store.getMaze().collideFood(location.getPosition().getX(), location.getPosition().getY());
         if (collisionData) {
-            if (collisionData.type == 1) {
+            if (Math.sign(collisionData) === 1)  {
                 player.setScore(player.getScore() + 1);
-                scoreProcessor.onNext({player, score: player.getScore() + 1});
-                // sockets[uuid].emit("score", players[uuid].score);
-
-
-            } else if (collisionData.type == 2) {
+                // scoreProcessor.onNext({player, score: player.getScore() + 1});
+            } else {
                 let sec = 10;
                 store.setPowerUpEnd(Date.now() + sec * 1000);
             }
@@ -32,18 +29,10 @@ const playerService = new PlayerServiceServer({
             
             const extra = new Extra();
 
-            extra.setLast(collisionData.flattenPosition);
-            extra.setCurrent(addedFood.flattenPosition);
+            extra.setLast(collisionData);
+            extra.setCurrent(addedFood);
 
-            if (addedFood.type == 1) {
-                console.log("sent food");
-                foodProcessor.onNext(extra);
-            } else {
-                console.log("sent power");
-                powerProcessor.onNext(extra);
-            }
-            // sockets[uuid].emit("food", {newFood});
-            // sockets[uuid].broadcast.emit("food", newFood);
+            extrasProcessor.onNext(extra);
         }
         playersProcessor.onNext(player);
     },

@@ -10,8 +10,7 @@ export default class Maze {
     height: number;
     mainBounds: number;
     foodBorder: number;
-    food: RoaringBitmap32;
-    power: RoaringBitmap32;
+    extras: RoaringBitmap32;
     foodChance: number;
     size: any;
 
@@ -32,8 +31,7 @@ export default class Maze {
         this.foodChance = 0.3;
 
         // for (let i = 0 ; i < this.width ; i++) {
-            this.food = new RoaringBitmap32();
-            this.power = new RoaringBitmap32();
+            this.extras = new RoaringBitmap32();
         // }
     }
 
@@ -265,7 +263,7 @@ export default class Maze {
             let neighbor = null;
             do {
                 randomTile = this.getRandomIntInclusive(0, badTiles.length - 1);
-                let randDirec = this.getRandomIntInclusive(0, 3);
+                randDirec = this.getRandomIntInclusive(0, 3);
                 neighbor = this.getNeighbor(badTiles[randomTile], randDirec);
             } while (!neighbor.checked || neighbor.x < minX || neighbor.x > maxX || neighbor.y < minY || neighbor.y > maxY);
             this.removeWall(badTiles[randomTile], randDirec);
@@ -349,7 +347,7 @@ export default class Maze {
     setFood() {
         const iterations = (this.width - 2 * this.foodBorder) * (this.height - 2 * this.foodBorder) * (0.3 + Math.random() * 0.3) ; 
         for (let i = 0; i < iterations; i++) {
-            this.food.add(this.randomPosition());
+            this.extras.add(this.randomPosition());
         }
     }
 
@@ -361,53 +359,41 @@ export default class Maze {
         let nextPosition;
         do {
             nextPosition = this.randomPosition();
-        } while(this.food.has(nextPosition) || this.power.has(nextPosition));
+        } while(this.extras.has(nextPosition) || this.extras.has(-nextPosition));
 
 
         let powerupAllowed = false;
         const totalSpace = (this.width - 2 * this.foodBorder + 1) * (this.height - 2 * this.foodBorder + 1);
         if (playerCount <= 2) {
-            powerupAllowed = this.power.statistics().size < Math.ceil(totalSpace / 360);
+            powerupAllowed = this.extras.statistics().size < Math.ceil(totalSpace / 360);
         }
         else if (playerCount <= 4) {
-            powerupAllowed = this.power.statistics().size < Math.ceil(totalSpace / 900);
+            powerupAllowed = this.extras.statistics().size < Math.ceil(totalSpace / 900);
         }
         else {
-            powerupAllowed = this.power.statistics().size == 0 && Math.random() < 0.02;
+            powerupAllowed = this.extras.statistics().size == 0 && Math.random() < 0.02;
         }
 
         if (powerupAllowed) {
-            this.power.add(nextPosition);
-            return {
-                flattenPosition: nextPosition,
-                type : 2
-            }
+            this.extras.add(-nextPosition);
+            return -nextPosition
         }
         else {
-            this.food.add(nextPosition);
-            return {
-                flattenPosition: nextPosition,
-                type : 1
-            }
+            this.extras.add(nextPosition);
+            return nextPosition
         }
     }
 
     collideFood(x: number, y: number) {
-        let i = Math.round(x / this.tileSize);
-        let j = Math.round(y / this.tileSize);
+        let i = x;
+        let j = y;
 
         const flattenPosition = i + j * this.width;
 
-        if (this.food.delete(flattenPosition)) {
-            return {
-                flattenPosition,
-                type: 1
-            }
-        } else if(this.power.delete(flattenPosition)) {
-            return {
-                flattenPosition,
-                type: 2
-            }
+        if (this.extras.delete(flattenPosition)) {
+            return flattenPosition
+        } else if(this.extras.delete(-flattenPosition)) {
+            return -flattenPosition
         }
         
         return false;

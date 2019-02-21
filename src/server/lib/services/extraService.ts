@@ -1,15 +1,11 @@
-import { ExtraServiceServer } from '@shared/service_rsocket_pb';
-import { foodProcessor, powerProcessor } from '../processors';
+import { ExtrasServiceServer } from '@shared/service_rsocket_pb';
+import { extrasProcessor } from '../processors';
 
 
-const extraService = new ExtraServiceServer({
-    food() {
-        return foodProcessor;
-    },
-
-    power() {
-        return powerProcessor;
+const extrasService = new ExtrasServiceServer({
+    extras() {
+        return extrasProcessor;
     }
 });
 
-export default extraService;
+export default extrasService;

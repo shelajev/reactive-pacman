@@ -3,6 +3,5 @@ import { Extra } from "@shared/extra_pb";
 
 export default interface ExtraService {
     
-    food(): Flux<Extra.AsObject>;
-    power(): Flux<Extra.AsObject>;
+    extras(): Flux<Extra.AsObject>;
 }
