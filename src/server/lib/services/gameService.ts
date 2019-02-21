@@ -46,7 +46,7 @@ const gameService = new GameServiceServer({
             config.setPlayersList(Object.keys(store.getPlayers()).map(k => store.getPlayer(k)))
             config.setPlayer(player);
             config.setExtrasList(store.getMaze().extras.toArray());
-            
+            config.setScoresList(store.getLeaderBoard());
             playersProcessor.onNext(player);
             
             store.setPlayer(player);

@@ -3,6 +3,7 @@ syntax = "proto3";
 package org.coinen.pacman;
 
 import "player.proto";
+import "score.proto";
 
 option java_package = "org.coinen.pacman";
 option java_outer_classname = "Config";
@@ -12,4 +13,5 @@ message Config {
     repeated Player players = 1;
     repeated int32 extras = 2;
     Player player = 3;
+    repeated Score scores = 4;
 }
