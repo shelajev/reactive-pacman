@@ -7,7 +7,7 @@ import { playersProcessor, extrasProcessor } from '../processors';
 import store from '../../store';
 // import scoreProcessor from '../processors/scoreProcessor';
 
-const playerService = new PlayerServiceServer({
+const playerService = {
     locate(location: Location, uuid: string) {
         const time = Date.now();
         const player = store.getPlayer(uuid);
@@ -41,6 +41,6 @@ const playerService = new PlayerServiceServer({
         return playersProcessor;
     }
 
-})
+}
 
 export default playerService;

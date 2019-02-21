@@ -7,12 +7,14 @@ import RSocketWebSocketServer from 'rsocket-websocket-server'
 import { RequestHandlingRSocket } from 'rsocket-rpc-core'
 import { Server } from 'http';
 
+import { GameServiceServer, ExtrasServiceServer, ScoreServiceServer, PlayerServiceServer } from '@shared/service_rsocket_pb';
 import { MapServiceClient } from '@shared/service_rsocket_pb'
+import { Location } from '@shared/location_pb';
 import { Tile } from '@shared/tile_pb'
 import { Size } from '@shared/size_pb'
 import { Map } from '@shared/map_pb'
 import { Point } from '@shared/point_pb';
-import { Player } from '@shared/player_pb';
+import { Player, Nickname } from '@shared/player_pb';
 import Maze from './maze';
 import { extrasService, gameService, playerService } from './lib/services/';
 import { playersProcessor } from './lib/processors';
@@ -24,6 +26,7 @@ console.log("test");
 
 let maze = new Maze();
 maze.generate();
+store.setPlayers({});
 store.setMaze(maze);
 const map = new Map();
 
@@ -62,11 +65,11 @@ const rSocketServer = new RSocketServer({
         
         new MapServiceClient(socket).setup(map);
         const handler = new RequestHandlingRSocket();
-        handler.addService('org.coinen.pacman.GameService', gameService);
+        handler.addService('org.coinen.pacman.GameService', new GameServiceServer({ start: (nickname: Nickname) => gameService.start(nickname, uuid) }));
 
-        handler.addService('org.coinen.pacman.PlayerService', playerService);
+        handler.addService('org.coinen.pacman.PlayerService', new PlayerServiceServer({ locate: (location: Location) => playerService.locate(location, uuid), players: () => playerService.players() }));
 
-        handler.addService('org.coinen.pacman.ExtrasService', extrasService);
+        handler.addService('org.coinen.pacman.ExtrasService', new ExtrasServiceServer(extrasService));
 
         return handler;
     },

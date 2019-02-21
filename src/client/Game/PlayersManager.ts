@@ -43,12 +43,12 @@ export default class PlayersManager implements SceneSupport {
                 {}
             )
 
-        this.scene.scene.launch('Compass', {
-            state: this.state,
-            config: this.config,
-            playerService: this.playerService,
-            locationGameService: new MyLocationGameService(this.locationProcessor)
-        });
+        // this.scene.scene.launch('Compass', {
+        //     state: this.state,
+        //     config: this.config,
+        //     playerService: this.playerService,
+        //     locationGameService: new MyLocationGameService(this.locationProcessor)
+        // });
     }
 
     doOnDirection(direction: Direction): void {

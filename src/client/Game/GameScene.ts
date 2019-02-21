@@ -25,11 +25,7 @@ export default class GameScene extends Phaser.Scene {
         this.overlay = $("#phaser-overlay");
     }
 
-    get actor(): Phaser.Physics.Arcade.Sprite {
-        return
-    }
-
-    create(config: { maze: any; extras: number[]; quadrantMode: any; sizeData: any; player: Player.AsObject; players: Player.AsObject[]; playerService: PlayerService; extrasService: ExtrasService; }) {
+    init(config: { maze: any; extras: number[]; quadrantMode: any; sizeData: any; player: Player.AsObject; players: Player.AsObject[]; playerService: PlayerService; extrasService: ExtrasService; }) {
         this.config = {
             zoom: config.sizeData.zoom,
             size: 100,
@@ -45,6 +41,14 @@ export default class GameScene extends Phaser.Scene {
             powerState: 0
         }
 
+        this.managers = [
+            new MapManager(this, this.state, this.config),
+            new PlayersManager(this, this.state, this.config, config.playerService, new KeysService(this)),
+            new ExtrasManager(this, this.state, this.config, config.extras, config.extrasService),
+        ]
+    }
+
+    create(config: { maze: any; extras: number[]; quadrantMode: any; sizeData: any; player: Player.AsObject; players: Player.AsObject[]; playerService: PlayerService; extrasService: ExtrasService; }) {
         var self = this;
 
         setTimeout(function () {
@@ -61,9 +65,6 @@ export default class GameScene extends Phaser.Scene {
                 }, 10000);
             }
         }, 3000);
-
-
-
 
         this.anims.create({
             key: 'eat',
@@ -183,11 +184,6 @@ export default class GameScene extends Phaser.Scene {
         // this.time = Date.now();
 
         this.scaleChildren(this.config.scale);
-        this.managers = [
-            new PlayersManager(this, this.state, this.config, config.playerService, new KeysService(this)),
-            new MapManager(this, this.state, this.config),
-            new ExtrasManager(this, this.state, this.config, config.extras, config.extrasService),
-        ]
     }
 
     scaleChildren(scale: any) {

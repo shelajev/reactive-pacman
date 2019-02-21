@@ -2,7 +2,6 @@ const { DirectProcessor } = require('reactor-core-js/flux');
 
 import { Single } from 'rsocket-flowable';
 
-import { GameServiceServer } from '@shared/service_rsocket_pb';
 import { Nickname } from '@shared/player_pb';
 import { Config } from '@shared/config_pb';
 import { Player } from '@shared/player_pb';
@@ -13,7 +12,7 @@ import store from '../../store';
 import { playersProcessor } from '../processors';
 import findBestStartingPosition from '../bestPositionFinder';
 
-const gameService = new GameServiceServer({
+const gameService = {
     start(nickname: Nickname, uuid: string) {
         if (nickname.getValue().length <= 13 && !store.getPlayer(uuid)) {
             let name = nickname.getValue().replace(/[^a-zA-Z0-9. ]/g, '');
@@ -56,6 +55,6 @@ const gameService = new GameServiceServer({
 
         return Single.error(new Error("wrong name"));
     }
-});
+};
 
 export default gameService;

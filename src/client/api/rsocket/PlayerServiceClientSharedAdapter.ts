@@ -18,7 +18,13 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
     locate(locationStream: Flux<Location.AsObject>): Single<void> {
         return new Single(subject => {
-            let disposable: Disposable = locationStream
+            let disposable: Disposable = {
+                dispose: () => {}
+            };
+            
+            subject.onSubscribe(() => disposable.dispose());
+
+            disposable = locationStream
                 .map(location => {
                     const locationProto = new Location();
                     const positionProto = new Point();
@@ -36,8 +42,6 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
                     (e: Error) => subject.onError(e),
                     () => subject.onComplete()
                 )
-
-            subject.onSubscribe(() => disposable.dispose);
         })
     }
 

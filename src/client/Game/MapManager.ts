@@ -230,9 +230,11 @@ export default class MapManager implements SceneSupport {
                 });
 
                 count++;
+                console.log(count);
             }
         }
 
+        console.log("test");
         // var canvasTexture = this.game.textures.createCanvas('map', this.ceilPow2(data.width * this.size), this.ceilPow2(data.height * this.size));
         // var context = canvasTexture.context;
         // var texture = this.game.textures.get('tiles');
