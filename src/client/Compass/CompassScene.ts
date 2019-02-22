@@ -49,7 +49,7 @@ export default class CompassScene extends Scene {
             this.compassNeedle.setRotation(Date.now() % 360);
         }
         else {
-            this.compassNeedle.setRotation(rotation + Math.PI / 2);
+            this.compassNeedle.setRotation(rotation + Math.PI / 2 + Math.PI);
         }
 
         // this.scaleChildren(this.sizeData.scale);
