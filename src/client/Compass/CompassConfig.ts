@@ -1,6 +1,9 @@
-import * as Game from "../Game";
-import Service from "./CompassService";
+import { GameConfig, GameState, MyLocationGameService } from "../Game";
+import PlayerService from "../api/PlayerService";
 
-export default interface CompassConfig extends Game.Config {
-    readonly service: Service;
+export default interface CompassConfig {
+    readonly config: GameConfig;
+    readonly state: GameState;
+    readonly playerService: PlayerService;
+    readonly locationService: MyLocationGameService;
 }

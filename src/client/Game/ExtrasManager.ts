@@ -23,7 +23,7 @@ export default class ExtrasManager implements SceneSupport {
             .consume(e => this.doOnExtra(e));
     }
 
-    currentTimeout: number;
+    currentTimeout: Timeout;
 
     doOnExtra(extra: Extra.AsObject) {
         this.retainExtra(extra.last);

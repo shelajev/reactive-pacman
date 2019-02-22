@@ -11,12 +11,12 @@ export default class CompassScene extends Scene {
         super('Compass');
     }
 
-    create(config : CompassConfig) {
-        this.service = config.service;
-        this.compass = this.add.image(60, 60, 'compass').setScale(0.6 * config.scale);
-        this.compassNeedle = this.add.image(60, 60, 'compass-needle').setScale(0.6 * config.scale);
+    create(config: CompassConfig) {
+        this.compass = this.add.image(60, 60, 'compass').setScale(0.6 * config.config.scale);
+        this.compassNeedle = this.add.image(60, 60, 'compass-needle').setScale(0.6 * config.config.scale);
+        this.service = new CompassService(config.playerService, config.locationService, config.state);
 
-        this.scaleChildren(config.scale);
+        // this.scaleChildren(config.scale);
     }
 
     destroy() {

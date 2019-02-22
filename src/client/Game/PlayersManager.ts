@@ -45,14 +45,14 @@ export default class PlayersManager implements SceneSupport {
             );
 
         this.scene.cameras.main.startFollow(this.player);
-        // if (this.state.player.type === Player.Type.GHOST) {
-        //     this.scene.scene.launch('Compass', {
-        //         state: this.state,
-        //         config: this.config,
-        //         playerService: this.playerService,
-        //         locationGameService: new MyLocationGameService(this.locationProcessor)
-        //     });
-        // }
+        if (this.state.player.type === Player.Type.GHOST) {
+            this.scene.scene.launch('Compass', {
+                state: this.state,
+                config: this.config,
+                playerService: this.playerService,
+                locationService: new MyLocationGameService(this.locationProcessor)
+            });
+        }
     }
 
     nextDirection: Direction;

@@ -1,5 +1,5 @@
 import PlayerService from "../api/PlayerService";
-import { MyLocationGameService } from "../Game";
+import {GameState, MyLocationGameService} from "../Game";
 import { Player } from "@shared/player_pb";
 import { Disposable } from "reactor-core-js";
 import { Location } from "@shared/location_pb";
@@ -18,17 +18,18 @@ export default class CompassService implements Disposable {
     constructor(
         private playerService: PlayerService,
         private gameService: MyLocationGameService,
-        myLocation: Location.AsObject,
-        players: Player.AsObject[],
+        private state: GameState
     ) {
         this.playerServiceDisposable = playerService.players()
             .consume(player => this.doOnPlayerLocation(player));
         this.localGameServiceDisposable = gameService.playerLocation()
-            .consume();
-        this.playersLocation = players.filter(p => p.type === Player.Type.PACMAN)
-            .reduce<{ [name: string]: Location.AsObject }>((pv, cv) => (pv[cv.uuid] = cv.location) && pv, {})
+            .consume(location => this.doOnMyLocation(location));
+        this.playersLocation = Object.keys(this.state.players)
+            .map(uuid => this.state.players[uuid])
+            .filter(p => p.type === Player.Type.PACMAN)
+            .reduce<{ [name: string]: Location.AsObject }>((pv, cv) => (pv[cv.uuid] = cv.location) && pv, {});
 
-        this.doOnMyLocation(myLocation)
+        this.doOnMyLocation(state.player.location)
     }
 
     get rotation(): number {
@@ -46,7 +47,7 @@ export default class CompassService implements Disposable {
             const closestDistance = this.distanceTo(this.myLocation.position, this.playersLocation[this.closestPlayerUuid].position);
             
             if (closestDistance > playerDistance)  {
-                this.closestPlayerUuid = player.uuid
+                this.closestPlayerUuid = player.uuid;
                 this.rotationToClosest = this.rotationTo(this.myLocation.position, this.playersLocation[this.closestPlayerUuid].position);
             }
 
