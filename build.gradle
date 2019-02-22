@@ -1,0 +1,78 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.3.RELEASE'
+	id 'java'
+	id 'idea'
+	id 'com.google.protobuf' version '0.8.7'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'org.coinen.reactive.pacman'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+	jcenter()
+	mavenCentral()
+	maven { url 'https://jitpack.io' }
+	maven { url 'https://repo.spring.io/snapshot' }
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+dependencies {
+	implementation 'org.roaringbitmap:RoaringBitmap:[0.6,)'
+	implementation 'org.jctools:jctools-core:2.1.1'
+	implementation 'io.rsocket.rpc:rsocket-rpc-core:0.2.13'
+	implementation 'com.google.protobuf:protobuf-java:3.6.1'
+	implementation 'com.github.CollaborationInEncapsulation.spring-boot-rsocket:spring-boot-starter-rsocket:0.0.1.RELEASE'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	protobuf 'io.rsocket.rpc:rsocket-rpc-protobuf-idl:0.2.13'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+}
+
+sourceSets {
+	main {
+		proto { srcDir 'src/main/proto' }
+	}
+
+	test {
+		proto { srcDir 'src/test/proto' }
+	}
+}
+
+protobuf {
+	generatedFilesBaseDir = "${projectDir}/src/generated"
+
+	protoc {
+		artifact = 'com.google.protobuf:protoc:3.6.1'
+	}
+	plugins {
+		rsocketRpc {
+			artifact = "io.rsocket.rpc:rsocket-rpc-protobuf:0.2.13"
+		}
+	}
+	generateProtoTasks {
+		ofSourceSet('main')*.plugins {
+			rsocketRpc {}
+		}
+	}
+}
+
+idea {
+	module {
+		sourceDirs += file("src/main/proto")
+		sourceDirs += file("src/generated/main/java")
+		sourceDirs += file("src/generated/main/rsocketRpc")
+
+		generatedSourceDirs += file('src/generated/main/java')
+		generatedSourceDirs += file('src/generated/main/rsocketRpc')
+	}
+}
+
+clean {
+	delete 'src/generated/main'
+}
