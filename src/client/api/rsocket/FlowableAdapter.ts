@@ -12,7 +12,7 @@ export default class FlowableAdapter<T> implements Publisher<T> {
         this.source.subscribe({
             onSubscribe: (subscription: Subscription) => {
                 s.onSubscribe({
-                    request: (n) => subscription.request(n > 9007199254740991 ? 9007199254740991 : n),
+                    request: (n) => subscription.request(n > Number.MAX_SAFE_INTEGER ? Number.MAX_SAFE_INTEGER : n),
                     cancel: () => subscription.cancel()
                 })
             },

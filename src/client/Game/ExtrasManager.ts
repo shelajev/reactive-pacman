@@ -6,7 +6,7 @@ import * as FastBitSet from 'fastbitset';
 import SceneSupport from "../Commons/SceneSupport";
 
 export default class ExtrasManager implements SceneSupport {
-    extra: FastBitSet;
+    extra: Set<number>;
     extraSprites: Map<number, Phaser.Physics.Arcade.Sprite>;
 
     constructor(
@@ -16,7 +16,7 @@ export default class ExtrasManager implements SceneSupport {
         extras: Array<number>,
         extraService: ExtrasService,
     ) {
-        this.extra = new FastBitSet([])
+        this.extra = new Set();
         this.extraSprites = new Map();
         extras.forEach(extra => this.insertExtra(extra))
         extraService.extras()
@@ -30,11 +30,10 @@ export default class ExtrasManager implements SceneSupport {
 
     retainExtra(position: number) {
         if (this.extra.has(position)) {
-            this.extra.remove(position);
+            this.extra.delete(position);
 
             const normalizedPosition = Math.abs(position);
 
-            console.log("Retained: " + normalizedPosition);
             this.extraSprites.get(normalizedPosition).destroy();
             this.extraSprites.delete(normalizedPosition);
         }

@@ -77,9 +77,11 @@ export default class PlayersManager implements SceneSupport {
         const { uuid, state } = playerUpdate;
 
         if (state === Player.State.CONNECTED) {
-            this.players[uuid] = createSprite(playerUpdate, this.scene, this.config, this.state);
+            if (uuid !== this.state.player.uuid) {
+                this.players[uuid] = createSprite(playerUpdate, this.scene, this.config, this.state);
+            }
         } else if (state === Player.State.ACTIVE) {
-            if (uuid != this.state.player.uuid) {
+            if (uuid === this.state.player.uuid) {
                 this.state.player = playerUpdate;
             } else {
                 const sprite: Phaser.Physics.Arcade.Sprite = this.players[uuid];
@@ -95,7 +97,9 @@ export default class PlayersManager implements SceneSupport {
             delete this.state.players[uuid];
         }
     }
-    lastTime: number
+
+    lastX: number;
+    lastY: number;
     update(time: number, deltaTime: number): void {
         Object.keys(this.players).forEach((uuid) => {
             this.scene.children.bringToTop(this.players[uuid]);
@@ -170,14 +174,14 @@ export default class PlayersManager implements SceneSupport {
 
 
 
-        // const currentX = position.x;
-        // const currentY = position.y;
+        const currentX = position.x;
+        const currentY = position.y;
 
 
-        // if (this.lastX != currentX || this.lastY != currentY) {
-
-
-        this.locationProcessor.onNext(player.location);
-        // }
+        if (this.lastX != currentX || this.lastY != currentY) {
+            this.lastX = currentX;
+            this.lastY = currentY;
+            this.locationProcessor.onNext(player.location);
+        }
     }
 }
