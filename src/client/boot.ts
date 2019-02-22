@@ -12,6 +12,7 @@ import { CompassScene } from './Compass';
 import * as $ from 'jquery';
 import PlayerServiceClientSharedAdapter from './api/rsocket/PlayerServiceClientSharedAdapter';
 import GameServiceClientAdapter from './api/rsocket/GameServiceClientAdapter';
+import ExtrasServiceClientAdapter from './api/rsocket/ExtrasServiceClientAdapter';
 
 export class Boot extends Scene {
 
@@ -51,8 +52,8 @@ export class Boot extends Scene {
             responder: new MapServiceServer({
                 setup: (map: Map) => {
                     console.log(map.toObject());
-
-                    this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new PlayerServiceClientSharedAdapter(rSocket), extrasService: new GameServiceClientAdapter(rSocket), gameService: new GameServiceClientAdapter(rSocket) });
+                    
+                    this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new PlayerServiceClientSharedAdapter(rSocket), extrasService: new ExtrasServiceClientAdapter(rSocket), gameService: new GameServiceClientAdapter(rSocket) });
                 }
             })
         });

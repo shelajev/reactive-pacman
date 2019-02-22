@@ -8,6 +8,7 @@ import { PlayerServiceClient } from "@shared/service_rsocket_pb";
 import { Point } from "@shared/point_pb";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { Disposable } from "reactor-core-js";
+import FlowableAdapter from "./FlowableAdapter";
 
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
     private service: any;
@@ -36,7 +37,7 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
                     return locationProto;
                 })
-                .compose(flux => this.service.locate(flux))
+                .compose(flux => FlowableAdapter.wrap(this.service.locate(flux)))
                 .consume(
                     () => {},
                     (e: Error) => subject.onError(e),
@@ -46,7 +47,7 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
     }
 
     players(): Flux<Player.AsObject> {
-        return Flux.from<Player>(this.service.players(new Empty()))
+        return Flux.from<Player>(FlowableAdapter.wrap(this.service.players(new Empty())))
             .map(player => player.toObject())
     }
 }

@@ -19,6 +19,7 @@ import Maze from './maze';
 import { extrasService, gameService, playerService } from './lib/services/';
 import { playersProcessor } from './lib/processors';
 import store from './store';
+import { Flowable } from 'rsocket-flowable';
 
 const app = express();
 
@@ -32,12 +33,12 @@ const map = new Map();
 
 const players: { [e: string]: Player } = {};
 let sockets: any = {};
-store.getMaze().tiles.forEach((t:any) => {
+store.getMaze().tiles.forEach((t: any) => {
     const tile = new Tile();
     const point = new Point();
     point.setX(t.x);
     point.setY(t.y);
-    t.walls.forEach((w:any) => tile.addWalls(w));
+    t.walls.forEach((w: any) => tile.addWalls(w));
     tile.setPoint(point);
     map.addTiles(tile);
 });
@@ -53,21 +54,21 @@ const rSocketServer = new RSocketServer({
         const uuid = uuidv1();
 
         socket.connectionStatus()
-              .subscribe(cs => {
-                  if (cs.kind == "CLOSED" || cs.kind == "ERROR") {
-                      const player = players[uuid];
-                      delete players[uuid];
+            .subscribe(cs => {
+                if (cs.kind == "CLOSED" || cs.kind == "ERROR") {
+                    const player = players[uuid];
+                    delete players[uuid];
 
-                      player.setState(Player.State.DISCONNECTED);
-                      playersProcessor.onNext(player);
-                  } 
-              })
-        
+                    player.setState(Player.State.DISCONNECTED);
+                    playersProcessor.onNext(player);
+                }
+            })
+
         new MapServiceClient(socket).setup(map);
         const handler = new RequestHandlingRSocket();
         handler.addService('org.coinen.pacman.GameService', new GameServiceServer({ start: (nickname: Nickname) => gameService.start(nickname, uuid) }));
 
-        handler.addService('org.coinen.pacman.PlayerService', new PlayerServiceServer({ locate: (location: Location) => playerService.locate(location, uuid), players: () => playerService.players() }));
+        handler.addService('org.coinen.pacman.PlayerService', new PlayerServiceServer({ locate: (locationStream: Flowable<Location>) => playerService.locate(locationStream, uuid), players: () => playerService.players() }));
 
         handler.addService('org.coinen.pacman.ExtrasService', new ExtrasServiceServer(extrasService));
 
@@ -76,7 +77,7 @@ const rSocketServer = new RSocketServer({
     transport: new RSocketWebSocketServer(
         {
             server: server,
-        }, 
+        },
         BufferEncoders
     ),
 });
@@ -111,7 +112,7 @@ if (process.env.Heroku) {
 
 console.log(app);
 
-function collides(player1:any, player2:any) {
+function collides(player1: any, player2: any) {
     let maxDist = 30;
     if (Math.abs(player1.x - player2.x) <= maxDist && Math.abs(player1.y - player2.y) <= maxDist) {
         return true;

@@ -10,6 +10,7 @@ import PlayersManager from './PlayersManager';
 import MapManager from './MapManager';
 import ExtrasManager from './ExtrasManager';
 import { KeysService } from '../Commons/DirectionService';
+import Maze from 'src/server/maze';
 
 export default class GameScene extends Phaser.Scene {
     overlay: JQuery<HTMLElement>;
@@ -25,12 +26,20 @@ export default class GameScene extends Phaser.Scene {
         this.overlay = $("#phaser-overlay");
     }
 
-    init(config: { maze: any; extras: number[]; quadrantMode: any; sizeData: any; player: Player.AsObject; players: Player.AsObject[]; playerService: PlayerService; extrasService: ExtrasService; }) {
+    create(config: { maze: any; extras: number[]; quadrantMode: any; sizeData: any; player: Player.AsObject; players: Player.AsObject[]; playerService: PlayerService; extrasService: ExtrasService; }) {
+        const self = this;
+
         this.config = {
             zoom: config.sizeData.zoom,
             size: 100,
-            width: config.sizeData.width,
-            height: config.sizeData.height,
+            map: {
+                width: config.maze.size.width,
+                height: config.maze.size.height
+            },
+            screen: {
+                width: config.sizeData.width,
+                height: config.sizeData.height,
+            },
             scale: config.sizeData.scale
         }
 
@@ -40,16 +49,6 @@ export default class GameScene extends Phaser.Scene {
             players: config.players.reduce<{ [key: string]: Player.AsObject }>((players, player) => (players[player.uuid] = player) && players, {}),
             powerState: 0
         }
-
-        this.managers = [
-            new MapManager(this, this.state, this.config),
-            new PlayersManager(this, this.state, this.config, config.playerService, new KeysService(this)),
-            new ExtrasManager(this, this.state, this.config, config.extras, config.extrasService),
-        ]
-    }
-
-    create(config: { maze: any; extras: number[]; quadrantMode: any; sizeData: any; player: Player.AsObject; players: Player.AsObject[]; playerService: PlayerService; extrasService: ExtrasService; }) {
-        var self = this;
 
         setTimeout(function () {
             if (config.player.type == Player.Type.PACMAN) {
@@ -107,7 +106,7 @@ export default class GameScene extends Phaser.Scene {
             repeat: 0
         })
 
-        this.cameras.main.setSize(this.config.width * this.config.zoom, this.config.height * this.config.zoom);
+        this.cameras.main.setSize(this.config.screen.width * this.config.zoom, this.config.screen.height * this.config.zoom);
         //this.cameras.main.setBackgroundColor("#ff0000");
 
         // this.socket.on('user connected', this.addPlayer.bind(this));
@@ -127,7 +126,7 @@ export default class GameScene extends Phaser.Scene {
 
         //     var key = user.uuid;
         //     self.players[key].sprite.setRotation(self.players[key].rotation);
-        //     self.players[key].sprite.setFlipX(self.players[key].flipX);
+        //     self.players[key].sprite.setFlipX`(self.players[key].flipX);
         //     //self.players[key].sprite.x = self.players[key].x;
         //     //self.players[key].sprite.y = self.players[key].y;
 
@@ -183,7 +182,13 @@ export default class GameScene extends Phaser.Scene {
 
         // this.time = Date.now();
 
-        this.scaleChildren(this.config.scale);
+
+        this.managers = [
+            new MapManager(this, this.state, this.config),
+            new PlayersManager(this, this.state, this.config, config.playerService, new KeysService(this)),
+            new ExtrasManager(this, this.state, this.config, config.extras, config.extrasService),
+        ]
+        // this.scaleChildren(this.config.scale);
     }
 
     scaleChildren(scale: any) {
@@ -194,12 +199,12 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
-    update() {
-        this.scaleChildren(1 / this.config.scale);
+    update(time: number, deltaTime: number) {
+        // this.scaleChildren(1 / this.config.scale);
 
-        this.managers.forEach(manager => manager.update());
+        this.managers.forEach(manager => manager.update(time, deltaTime));
 
-        this.scaleChildren(this.config.scale);
+        // this.scaleChildren(this.config.scale);
     }
 
     // getPlayerText(user: any) {

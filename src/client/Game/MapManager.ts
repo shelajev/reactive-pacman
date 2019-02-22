@@ -19,9 +19,9 @@ export default class MapManager implements SceneSupport {
 
     update(): void {
         let { player: { location: { position: { x, y } } } } = this.state;
-        const { width, height, size, scale } = this.config;
-        x = x * size;
-        y = y * size;
+        const { screen: { width, height }, size, scale } = this.config;
+        // x = x / size;
+        // y = y / size;
 
         var canvasWidth = this.canvassize * size;
         for (var i = 0; i < this.canvases.length; i++) {
@@ -31,7 +31,7 @@ export default class MapManager implements SceneSupport {
             if (Math.abs(x - centerX) <= width / 2 / scale + 50 + canvasWidth / 2 && Math.abs(y - centerY) <= height / 2 / scale + 50 + canvasWidth / 2) {
                 if (!c.image) {
                     c.image = this.scene.add.image(c.x, c.y, c.name).setOrigin(0).setScale(scale);
-                    //console.log(c.image);
+                    
                     this.scene.children.sendToBack(c.image);
                 }
             }
@@ -92,22 +92,8 @@ export default class MapManager implements SceneSupport {
 
         var tiles = this.state.tiles;
         const size = this.config.size;
-        const wid = this.config.width;
-        const hei = this.config.width;
-
-        // if (this.tileDataMatches(oldData, data) && this.canvases.length > 0) {
-        // for (var i = 0 ; i < this.canvases.length ; i++) {
-        //     var c = this.canvases[i];
-        //     this.game.add.image(c.x, c.y, c.name).setOrigin(0);
-        // }
-        //this.game.add.image(-this.size / 2, -this.size / 2, 'map').setOrigin(0);
-        // return;
-        // }
-        // else if (this.canvases.length > 0) {
-        //     for (var i = 0 ; i < this.canvases.length ; i++) {
-        //         this.game.textures.remove(this.canvases[i].name);
-        //     }
-        // }
+        const wid = this.config.map.width;
+        const hei = this.config.map.height;
 
         this.canvases = [];
 
@@ -209,9 +195,6 @@ export default class MapManager implements SceneSupport {
                             context.drawImage(texture.getSourceImage() as HTMLCanvasElement, canvasData.x, canvasData.y,
                                 canvasData.width, canvasData.height, -size / 2, -size / 2, size, size);
                             context.restore();
-
-                            //sheet.setFrame(frame);
-                            //sheet.setRotation(Phaser.Math.DegToRad(rotation));
                         }
                     }
                 }
@@ -220,7 +203,6 @@ export default class MapManager implements SceneSupport {
 
                 var posX = -size / 2 + x * size;
                 var posY = -size / 2 + y * size;
-                //this.game.add.image(posX, posY, canvasName).setOrigin(0);
 
                 this.canvases.push({
                     x: posX,
@@ -230,105 +212,8 @@ export default class MapManager implements SceneSupport {
                 });
 
                 count++;
-                console.log(count);
             }
         }
-
-        console.log("test");
-        // var canvasTexture = this.game.textures.createCanvas('map', this.ceilPow2(data.width * this.size), this.ceilPow2(data.height * this.size));
-        // var context = canvasTexture.context;
-        // var texture = this.game.textures.get('tiles');
-
-        // for (var i = 0 ; i < data.width ; i++) {
-        //     for (var j = 0 ; j < data.height ; j++) {
-        //         var walls;
-        //         for (var t = 0 ; t < tiles.length ; t++) {
-        //             if (tiles[t].x == i && tiles[t].y == j) {
-        //                 walls = tiles[t].walls;
-        //                 break;
-        //             }
-        //         }
-
-        //         var frame = -1;
-        //         var rotation = 0;
-
-        //         var wallCount = 0;
-        //         for (var w = 0 ; w < walls.length ; w++) {
-        //             if (walls[w]) {
-        //                 wallCount++;
-        //             }
-        //         }
-
-        //         if (wallCount == 0) {
-        //             frame = 6;
-        //         }
-        //         else if (wallCount == 4) {
-        //             frame = 9;
-        //         }
-        //         else if (wallCount == 3) {
-        //             frame = 4;
-        //             for (var w = 0 ; w < walls.length ; w++) {
-        //                 var wall = walls[w];
-        //                 if (!wall) {
-        //                     rotation = 180 - 90 * w;
-        //                 }
-        //             }
-        //         }
-        //         else if (wallCount == 2) {
-        //             if (walls[0] == walls[2]) {
-        //                 frame = 13;
-        //                 if (walls[0]) {
-        //                     rotation = 90;
-        //                 }
-        //             }
-        //             else {
-        //                 frame = 8;
-        //                 for (var w = 0 ; w < walls.length ; w++) {
-        //                     var wall1 = walls[w];
-        //                     var wall2;
-        //                     if (w == walls.length - 1) {
-        //                         wall2 = walls[0];
-        //                     }
-        //                     else {
-        //                         wall2 = walls[w+1]
-        //                     }
-
-        //                     if (wall1 == wall2 && wall1) {
-        //                         rotation = -90 * w;
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //         else if (wallCount == 1) {
-        //             frame = 12;
-        //             for (var w = 0 ; w < walls.length ; w++) {
-        //                 var wall = walls[w];
-        //                 if (wall) {
-        //                     rotation = 90 - (w * 90);
-        //                     break;
-        //                 }
-        //             }
-        //         }
-
-        //         if (frame != -1) {
-        //             context.save();
-        //             context.translate(i * this.size + this.size / 2, j * this.size + this.size / 2);
-        //             context.rotate(Phaser.Math.DegToRad(rotation));
-
-        //             var canvasData = texture.frames[frame].canvasData;
-        //             context.drawImage(texture.getSourceImage(), canvasData.sx, canvasData.sy,
-        //                 canvasData.sWidth, canvasData.sHeight, -this.size / 2, -this.size / 2, this.size, this.size);
-        //             //var sheet = this.game.physics.add.sprite(i * this.size, j * this.size, 'tiles').setScale(0.5);
-        //             context.restore();
-        //             //sheet.setFrame(frame);
-        //             //sheet.setRotation(Phaser.Math.DegToRad(rotation));
-        //         }
-        //     }
-        // }
-
-        // canvasTexture.refresh();
-        // this.game.add.image(-this.size / 2, -this.size / 2, 'map').setOrigin(0);
-
     }
 
     public getTile(x: any, y: any) {

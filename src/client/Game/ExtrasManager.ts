@@ -1,6 +1,6 @@
 import GameState from "./GameState";
 import GameConfig from "./GameConfig";
-import ExtraService from "../api/ExtrasService";
+import ExtrasService from "../api/ExtrasService";
 import { Extra } from "@shared/extra_pb";
 import * as FastBitSet from 'fastbitset';
 import SceneSupport from "../Commons/SceneSupport";
@@ -14,8 +14,10 @@ export default class ExtrasManager implements SceneSupport {
         private state: GameState,
         private config: GameConfig,
         extras: Array<number>,
-        extraService: ExtraService,
+        extraService: ExtrasService,
     ) {
+        this.extra = new FastBitSet([])
+        this.extraSprites = new Map();
         extras.forEach(extra => this.insertExtra(extra))
         extraService.extras()
             .consume(e => this.doOnExtra(e));
@@ -32,6 +34,7 @@ export default class ExtrasManager implements SceneSupport {
 
             const normalizedPosition = Math.abs(position);
 
+            console.log("Retained: " + normalizedPosition);
             this.extraSprites.get(normalizedPosition).destroy();
             this.extraSprites.delete(normalizedPosition);
         }
@@ -39,7 +42,7 @@ export default class ExtrasManager implements SceneSupport {
 
     insertExtra(position: number) {
         const normalizedPosition = Math.abs(position);
-        const { width, height, size, scale } = this.config;
+        const { map: { width, height }, size, scale } = this.config;
         const i = normalizedPosition % width;
         const j = Math.floor(normalizedPosition / width);
         const sprite = this.scene.physics.add

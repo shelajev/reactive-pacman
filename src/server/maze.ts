@@ -385,8 +385,8 @@ export default class Maze {
     }
 
     collideFood(x: number, y: number) {
-        let i = x;
-        let j = y;
+        let i = Math.round(x / this.tileSize);
+        let j = Math.round(y / this.tileSize);
 
         const flattenPosition = i + j * this.width;
 

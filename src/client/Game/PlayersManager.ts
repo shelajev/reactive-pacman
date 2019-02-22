@@ -43,6 +43,7 @@ export default class PlayersManager implements SceneSupport {
                 {}
             )
 
+        this.scene.cameras.main.startFollow(this.player);
         // this.scene.scene.launch('Compass', {
         //     state: this.state,
         //     config: this.config,
@@ -51,20 +52,24 @@ export default class PlayersManager implements SceneSupport {
         // });
     }
 
+    nextDirection: Direction;
+
     doOnDirection(direction: Direction): void {
-        const { scale } = this.config;
-        const playerSprite = this.player;
-        const { player, powerState } = this.state;
+        this.nextDirection = direction;
+        // const { scale } = this.config;
+        // const playerSprite = this.player;
+        // const { player, powerState } = this.state;
 
-        updateSprite(player, scale, playerSprite);
+        // player.location.direction = direction;
+        // updateSprite(player, scale, playerSprite);
 
-        if (player.type == Player.Type.GHOST) {
-            const animationName = ghostAnimation(direction, powerState);
+        // if (player.type == Player.Type.GHOST) {
+        //     const animationName = ghostAnimation(direction, powerState);
 
-            if (animationName != playerSprite.anims.getCurrentKey()) {
-                playerSprite.anims.play(animationName);
-            }
-        }
+        //     if (animationName != playerSprite.anims.getCurrentKey()) {
+        //         playerSprite.anims.play(animationName);
+        //     }
+        // }
     }
 
     doOnPlayer(playerUpdate: Player.AsObject): void {
@@ -90,23 +95,24 @@ export default class PlayersManager implements SceneSupport {
             delete this.state.players[uuid];
         }
     }
-
-    update(): void {
+    lastTime: number
+    update(time: number, deltaTime: number): void {
         Object.keys(this.players).forEach((uuid) => {
             this.scene.children.bringToTop(this.players[uuid]);
         });
 
         const { size } = this.config;
-        const { player } = this.state;
-        const { type, location: { direction, position } } = player;
+        const { player, powerState } = this.state;
+        const { type, location: { position } } = player;
         const sprite = this.player;
-        const now = Date.now();
-        const deltaTime = now - this.scene.time.now;
+
+        const prevDirec = player.location.direction;
+        const direction = this.nextDirection;
 
         this.scene.children.bringToTop(this.player);
 
         //player.setVelocity(0);
-        const speed = playerSpeed(type, deltaTime);
+        const speed = playerSpeed(type, deltaTime, powerState);
 
         for (var i = 0; i < this.direcLog.length; i++) {
             this.direcLog[i].time += deltaTime;
@@ -119,7 +125,6 @@ export default class PlayersManager implements SceneSupport {
             this.direcLog.pop();
         }
         var success = false;
-        var prevDirec = this.direcLog.length > 1 ? this.direcLog[1].direc : direction;
         for (var i = 0; i < this.direcLog.length; i++) {
             if (this.direcLog[i].direc != prevDirec) {
                 var regVec = motionVector(prevDirec, speed);
@@ -170,11 +175,9 @@ export default class PlayersManager implements SceneSupport {
 
 
         // if (this.lastX != currentX || this.lastY != currentY) {
-        // console.log("Current player position: {X: %s, Y: %s}", this.playerSprite.x / 100, this.playerSprite.y / 100);
 
 
         this.locationProcessor.onNext(player.location);
         // }
     }
-
 }
