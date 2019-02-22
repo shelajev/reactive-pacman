@@ -1,14 +1,15 @@
-import GameScene from "./GameScene";
-import { Player } from "@shared/player_pb";
-import { DirectionService } from "../Commons/DirectionService";
+import {Player} from "@shared/player_pb";
+import {DirectionService} from "../Commons/DirectionService";
 import GameState from "./GameState";
 import GameConfig from "./GameConfig";
 import PlayerService from "../api/PlayerService";
-import { motionVector, playerSpeed, checkCollision, updateSprite, createSprite, ghostAnimation } from "./PlayerUtils";
-import { Direction, Location } from "@shared/location_pb";
-import { DirectProcessor } from "reactor-core-js/flux";
+import {
+    checkCollision, createSprite, motionVector, playerSpeed, updateSprite
+} from "./PlayerUtils";
+import {Direction, Location} from "@shared/location_pb";
+import {DirectProcessor} from "reactor-core-js/flux";
 import SceneSupport from "../Commons/SceneSupport";
-import { MyLocationGameService } from ".";
+import MyLocationGameService from "./MyLocationGameService";
 
 export default class PlayersManager implements SceneSupport {
 
@@ -41,15 +42,17 @@ export default class PlayersManager implements SceneSupport {
             .reduce<{ [key: string]: Phaser.Physics.Arcade.Sprite }>(
                 (players, uuid) => (players[uuid] = createSprite(this.state.players[uuid], this.scene, this.config, this.state)) && players,
                 {}
-            )
+            );
 
         this.scene.cameras.main.startFollow(this.player);
-        // this.scene.scene.launch('Compass', {
-        //     state: this.state,
-        //     config: this.config,
-        //     playerService: this.playerService,
-        //     locationGameService: new MyLocationGameService(this.locationProcessor)
-        // });
+        // if (this.state.player.type === Player.Type.GHOST) {
+        //     this.scene.scene.launch('Compass', {
+        //         state: this.state,
+        //         config: this.config,
+        //         playerService: this.playerService,
+        //         locationGameService: new MyLocationGameService(this.locationProcessor)
+        //     });
+        // }
     }
 
     nextDirection: Direction;
@@ -73,7 +76,6 @@ export default class PlayersManager implements SceneSupport {
     }
 
     doOnPlayer(playerUpdate: Player.AsObject): void {
-        const { size } = this.config;
         const { uuid, state } = playerUpdate;
 
         if (state === Player.State.CONNECTED) {
@@ -86,7 +88,7 @@ export default class PlayersManager implements SceneSupport {
             } else {
                 const sprite: Phaser.Physics.Arcade.Sprite = this.players[uuid];
 
-                updateSprite(playerUpdate, size, sprite);
+                updateSprite(playerUpdate, this.state, this.config, sprite);
 
                 this.state.players[uuid] = playerUpdate;
             }
@@ -145,7 +147,7 @@ export default class PlayersManager implements SceneSupport {
                     position.x = res.x;
                     position.y = res.y;
 
-                    updateSprite(player, size, sprite);
+                    updateSprite(player, this.state, this.config, sprite);
 
                     this.direcLog = [];
                     success = true;
@@ -166,13 +168,11 @@ export default class PlayersManager implements SceneSupport {
             position.x = res.x;
             position.y = res.y;
 
-            updateSprite(player, size, sprite);
+            updateSprite(player, this.state, this.config, sprite);
         }
 
         // this.text.x = this.playerSprite.x;
         // this.text.y = this.playerSprite.y + this.textOffset;
-
-
 
         const currentX = position.x;
         const currentY = position.y;

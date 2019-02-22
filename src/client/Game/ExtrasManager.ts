@@ -2,8 +2,8 @@ import GameState from "./GameState";
 import GameConfig from "./GameConfig";
 import ExtrasService from "../api/ExtrasService";
 import { Extra } from "@shared/extra_pb";
-import * as FastBitSet from 'fastbitset';
 import SceneSupport from "../Commons/SceneSupport";
+import Timeout = NodeJS.Timeout;
 
 export default class ExtrasManager implements SceneSupport {
     extra: Set<number>;
@@ -18,14 +18,30 @@ export default class ExtrasManager implements SceneSupport {
     ) {
         this.extra = new Set();
         this.extraSprites = new Map();
-        extras.forEach(extra => this.insertExtra(extra))
+        extras.forEach(extra => this.insertExtra(extra));
         extraService.extras()
             .consume(e => this.doOnExtra(e));
     }
 
+    currentTimeout: number;
+
     doOnExtra(extra: Extra.AsObject) {
         this.retainExtra(extra.last);
         this.insertExtra(extra.current);
+
+        if (Math.sign(extra.last) === -1) {
+            if (this.state.powerState > 0) {
+                clearTimeout(this.currentTimeout);
+            }
+
+            this.state.powerState = 1;
+            this.currentTimeout = setTimeout(() => {
+                this.state.powerState = 2;
+                this.currentTimeout = setTimeout(() => {
+                    this.state.powerState = 0;
+                }, 3000);
+            }, 7000);
+        }
     }
 
     retainExtra(position: number) {
@@ -38,6 +54,8 @@ export default class ExtrasManager implements SceneSupport {
             this.extraSprites.delete(normalizedPosition);
         }
     }
+
+    // extra < 0 == powerUp
 
     insertExtra(position: number) {
         const normalizedPosition = Math.abs(position);

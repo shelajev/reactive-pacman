@@ -25,6 +25,7 @@ export class KeysService implements DirectionService {
                 case "ArrowDown":
                     this.keysProcessor.onNext(Direction.DOWN);
                     return;
+
                 case "ArrowRight":
                     this.keysProcessor.onNext(Direction.RIGHT);
                     return;

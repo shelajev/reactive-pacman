@@ -1,13 +1,14 @@
 import GameConfig from "./GameConfig";
-import { Player } from "@shared/player_pb";
-import { Location, Direction } from "@shared/location_pb";
-import { Tile } from "@shared/tile_pb";
-import { Point } from "@shared/point_pb";
+import {Player} from "@shared/player_pb";
+import {Direction, Location} from "@shared/location_pb";
+import {Tile} from "@shared/tile_pb";
+import {Point} from "@shared/point_pb";
 import GameState from "./GameState";
 
 export const updateSprite = (
-    {location: { direction, position: {x, y} }, type }: Player.AsObject,
-    tileSize: number, 
+    { location: { direction, position: {x, y} }, type }: Player.AsObject,
+    { powerState }: GameState,
+    { size }: GameConfig,
     playerSprite: Phaser.Physics.Arcade.Sprite
 ) => {
 
@@ -32,7 +33,15 @@ export const updateSprite = (
         if (type == Player.Type.PACMAN)
             playerSprite.setRotation(Phaser.Math.DegToRad(90));
     }
-}
+
+    if (type === Player.Type.GHOST) {
+        const animationName = ghostAnimation(direction, powerState);
+
+        if (animationName !== playerSprite.anims.getCurrentKey()) {
+            playerSprite.anims.play(animationName);
+        }
+    }
+};
 
 export const createSprite = (user: Player.AsObject, scene: Phaser.Scene, config: GameConfig, state: GameState): Phaser.Physics.Arcade.Sprite => {
     const { scale, size } = config;
@@ -53,7 +62,7 @@ export const createSprite = (user: Player.AsObject, scene: Phaser.Scene, config:
     }
 
     return sprite
-}
+};
 
 export const ghostAnimation = (direction: Direction, powerState: number) => {
     let animationName = powerState == 0 ? "default" : powerState == 1 ? "powerup" : "powerup-wearoff";
@@ -66,7 +75,7 @@ export const ghostAnimation = (direction: Direction, powerState: number) => {
     }
 
     return animationName;
-}
+};
 
 export const playerSpeed = (playerType: Player.Type, dt: number, powerState: number) => {
     const maxSpeed = 5;
@@ -87,7 +96,7 @@ export const playerSpeed = (playerType: Player.Type, dt: number, powerState: num
     speed = Math.min(speed, maxSpeed);
 
     return speed;
-}
+};
 
 export const motionVector = (direction: number, speed: number) => {
     const obj = {
@@ -121,8 +130,8 @@ export const checkCollision = (
     forceTurn?: any
 ) => {
         const direction = initialLocation.direction;
-        const initialX = initialLocation.position.x
-        const initialY = initialLocation.position.y
+        const initialX = initialLocation.position.x;
+        const initialY = initialLocation.position.y;
         const finalX = nextPosition.x;
         const finalY = nextPosition.y;
         const size = 100;

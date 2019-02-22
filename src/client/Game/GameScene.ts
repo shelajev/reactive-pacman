@@ -104,83 +104,9 @@ export default class GameScene extends Phaser.Scene {
             delay: 3000,
             ease: 'Power1',
             repeat: 0
-        })
+        });
 
         this.cameras.main.setSize(this.config.screen.width * this.config.zoom, this.config.screen.height * this.config.zoom);
-        //this.cameras.main.setBackgroundColor("#ff0000");
-
-        // this.socket.on('user connected', this.addPlayer.bind(this));
-
-        // this.socket.on('user position', function(user) {
-        //     self.players[user.uuid].motionPath.push({
-        //         x: user.x,
-        //         y: user.y,
-        //         direc: user.direc
-        //     });
-        //     self.players[user.uuid].x = user.x;
-        //     self.players[user.uuid].y = user.y;
-        //     self.players[user.uuid].rotation = user.rotation;
-        //     self.players[user.uuid].flipX = user.flipX;
-        //     self.players[user.uuid].prevDirec = self.players[user.uuid].direc;
-        //     self.players[user.uuid].direc = user.direc;
-
-        //     var key = user.uuid;
-        //     self.players[key].sprite.setRotation(self.players[key].rotation);
-        //     self.players[key].sprite.setFlipX`(self.players[key].flipX);
-        //     //self.players[key].sprite.x = self.players[key].x;
-        //     //self.players[key].sprite.y = self.players[key].y;
-
-        //     //self.players[key].text.x = self.players[key].x;
-        //     //self.players[key].text.y = self.players[key].y + self.textOffset;
-
-        //     var p = self.players[key];
-        //     var now = Date.now();
-        //     var dt = now - p.time;
-        //     p.time = now;
-        // });
-
-        // this.socket.on('user disconnected', function(uuid) {
-        //     self.players[uuid].sprite.destroy();
-        //     self.players[uuid].text.destroy();
-        //     delete self.players[uuid];
-        // });
-
-        // this.socket.on('score', function(score) {
-        //     self.setScore(score);
-        // });
-
-        // this.socket.on('leaderboard', function(leaderboard) {
-        //     self.setLeaderboard(leaderboard);
-        // });
-
-        // this.socket.on('powerup', function(time) {
-        //     var anim = "";
-        //     if (time > 0) {
-        //         var wearoffSec = 3;
-        //         if (time > wearoffSec * 1000) {
-        //             anim = "powerup";
-        //         }
-        //         else {
-        //             anim = "powerup-wearoff";
-        //         }
-        //     }
-        //     else {
-        //         anim = "default";
-        //     }
-
-        //     if (self.powerupState != anim && self.powerupState == "default" && (anim == "powerup" || anim == "powerup-wearoff")) {
-        //         if (config.playerType == "man") {
-        //             self.notification("Powerup activated! You can kill ghosts.");
-        //         }
-        //         else if (config.playerType == "ghost") {
-        //             self.notification("Dino Powerup activated! Dinos can now kill you.");
-        //         }
-        //     }
-
-        //     self.powerupState = anim;
-        // });
-
-        // this.time = Date.now();
 
 
         this.managers = [
