@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 
 import org.coinen.pacman.Config;
 import org.coinen.pacman.Nickname;
+import org.coinen.pacman.Score;
 import org.coinen.reactive.pacman.repository.ExtrasRepository;
 import org.coinen.reactive.pacman.repository.PlayerRepository;
 import org.coinen.reactive.pacman.service.GameService;
@@ -50,6 +51,17 @@ public class DefaultGameService implements GameService {
                                                                        .equals(player.getUuid()))
                                                          .collect(Collectors.toList()))
                                      .addAllExtras(extrasRepository.finaAll())
+                                     .addAllScores(
+                                         playerRepository.findAll()
+                                                         .stream()
+                                                         .map(p -> Score.newBuilder()
+                                                                             .setUsername(p.getNickname())
+                                                                             .setScore(p.getScore())
+                                                                             .setUuid(p.getUuid())
+                                                                             .build())
+                                                         .collect(Collectors.toList())
+
+                                     )
                                      .build());
         }
 

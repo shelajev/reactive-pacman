@@ -1,6 +1,7 @@
 package org.coinen.reactive.pacman.service.support;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -53,12 +54,36 @@ public class DefaultPlayerService implements PlayerService {
 
                                Point position = location.getPosition();
 
-                               if (Math.signum(extrasService.check(position.getX(),
-                                   position.getY())) == -1.0f) {
+                               List<Player> collisions = playerRepository.findAll().stream()
+                                   .filter(p -> p.getState().equals(Player.State.ACTIVE))
+                                   .filter(p -> !p.getType().equals(player.getType()))
+                                   .filter(p -> distance(p.getLocation().getPosition(), player.getLocation().getPosition()) < 100)
+                                   .collect(Collectors.toList());
+                               if (collisions.size() > 0) {
+                                   if (extrasService.isPowerupActive() && player.getType().equals(Player.Type.GHOST) ||
+                                       !extrasService.isPowerupActive() && player.getType().equals(Player.Type.PACMAN)) {
+                                       builder.setState(Player.State.DISCONNECTED);
+                                       collisions.forEach(collision -> {
+                                           Player collidedWith = playerRepository.update(UUID.fromString(collision.getUuid()), p -> p.toBuilder()
+                                               .setScore(p.getScore() + 100)
+                                               .build());
+                                           playersProcessor.onNext(collidedWith);
+                                       });
+                                   } else if (extrasService.isPowerupActive() && player.getType().equals(Player.Type.PACMAN) ||
+                                              !extrasService.isPowerupActive() && player.getType().equals(Player.Type.GHOST)) {
+                                       collisions.forEach(collision -> {
+                                           Player collidedWith = playerRepository.update(UUID.fromString(collision.getUuid()), p -> p.toBuilder()
+                                                .setState(Player.State.DISCONNECTED)
+                                                .build());
+                                           playersProcessor.onNext(collidedWith);
+                                       });
+                                       builder.setScore(player.getScore() + 100 * collisions.size());
+                                   }
+                               } else if (Math.signum(extrasService.check(position.getX(),
+                                   position.getY())) != 1.0f) {
                                    builder.setScore(player.getScore() + 1);
                                    // scoreProcessor.onNext({player, score: player.getScore() + 1});
                                }
-
                                return builder.build();
                            }));
                        })

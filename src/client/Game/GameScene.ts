@@ -11,6 +11,7 @@ import MapManager from './MapManager';
 import ExtrasManager from './ExtrasManager';
 import { KeysService } from '../Commons/DirectionService';
 import Maze from 'src/server/maze';
+import LeaderboardManager from './LeaderboardManager';
 
 export default class GameScene extends Phaser.Scene {
     overlay: JQuery<HTMLElement>;
@@ -113,6 +114,7 @@ export default class GameScene extends Phaser.Scene {
             new MapManager(this, this.state, this.config),
             new PlayersManager(this, this.state, this.config, config.playerService, new KeysService(this)),
             new ExtrasManager(this, this.state, this.config, config.extras, config.extrasService),
+            new LeaderboardManager(this, this.state, this.config, config.playerService)
         ]
         // this.scaleChildren(this.config.scale);
     }
@@ -150,7 +152,7 @@ export default class GameScene extends Phaser.Scene {
         var overlay = this.overlay;
         overlay.find('.notification-tray').empty();
         this.setScore(config.score);
-        // this.setLeaderboard([]);
+        this.setLeaderboard();
     }
 
     hideOverlay() {
@@ -167,19 +169,11 @@ export default class GameScene extends Phaser.Scene {
         overlay.find(".score").find("p").text("Score: " + score);
     }
 
-    // setLeaderboard(data: any) {
-    //     var overlay = this.overlay;
-    //     var leaderboard = overlay.find(".leaderboard").find('ol');
-    //     leaderboard.empty();
-    //     for (var i = 0; i < data.length; i++) {
-    //         var elem = $("<li></li>");
-    //         elem.text(data[i].name + " - " + data[i].score);
-    //         if (data[i].uuid == this.player.uuid) {
-    //             elem.addClass('me');
-    //         }
-    //         elem.appendTo(leaderboard);
-    //     }
-    // }
+    setLeaderboard() {
+        var overlay = this.overlay;
+        var leaderboard = overlay.find(".leaderboard").find('ol');
+        leaderboard.empty();
+    }
 
     notification(text: string) {
         var overlay = this.overlay;

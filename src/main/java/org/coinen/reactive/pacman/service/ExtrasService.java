@@ -8,4 +8,6 @@ public interface ExtrasService {
     Flux<Extra> extras();
 
     int check(float x, float y);
+
+    boolean isPowerupActive();
 }

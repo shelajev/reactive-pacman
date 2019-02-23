@@ -5,6 +5,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es5",
+    "downlevelIteration": true,
     "allowJs": true,
     "typeRoots": [
       "node_modules/@types",

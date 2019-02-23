@@ -77,7 +77,6 @@ export default class PlayersManager implements SceneSupport {
 
     doOnPlayer(playerUpdate: Player.AsObject): void {
         const { uuid, state } = playerUpdate;
-
         if (state === Player.State.CONNECTED) {
             if (uuid !== this.state.player.uuid) {
                 this.players[uuid] = createSprite(playerUpdate, this.scene, this.config, this.state);
@@ -93,10 +92,14 @@ export default class PlayersManager implements SceneSupport {
                 this.state.players[uuid] = playerUpdate;
             }
         } else {
-            this.players[uuid].destroy();
-
-            delete this.players[uuid];
-            delete this.state.players[uuid];
+            if (this.state.player.uuid === uuid) {
+                location.reload(true);
+            } 
+            else {
+                this.players[uuid].destroy();
+                delete this.players[uuid];
+                delete this.state.players[uuid];
+            }
         }
     }
 

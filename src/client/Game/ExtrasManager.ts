@@ -27,7 +27,7 @@ export default class ExtrasManager implements SceneSupport {
     doOnExtra(extra: Extra.AsObject) {
         this.retainExtra(extra.last);
         this.insertExtra(extra.current);
-
+        
         if (Math.sign(extra.last) === -1) {
             if (this.state.powerState > 0) {
                 clearTimeout(this.currentTimeout);

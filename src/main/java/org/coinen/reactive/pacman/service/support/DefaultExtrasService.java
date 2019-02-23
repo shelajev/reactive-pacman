@@ -4,14 +4,19 @@ import org.coinen.pacman.Extra;
 import org.coinen.reactive.pacman.repository.ExtrasRepository;
 import org.coinen.reactive.pacman.repository.PlayerRepository;
 import org.coinen.reactive.pacman.service.ExtrasService;
+import reactor.core.Disposable;
 import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 public class DefaultExtrasService implements ExtrasService {
     final ExtrasRepository extrasRepository;
     final PlayerRepository playerRepository;
-
+    boolean powerUpActive;
+    Disposable powerUpTimer;
     final DirectProcessor<Extra> extrasProcessor = DirectProcessor.create();
     final FluxSink<Extra> extrasFluxSink = extrasProcessor.serialize().sink();
 
@@ -34,6 +39,12 @@ public class DefaultExtrasService implements ExtrasService {
 
         if (retainedExtra != 0) {
             if (Math.signum(retainedExtra) == -1.0f) {
+                if (this.powerUpActive)
+                    this.powerUpTimer.dispose();
+                this.powerUpTimer = Mono.delay(Duration.ofMillis(10000))
+                    .doOnNext(e -> setPowerup(false))
+                    .subscribe();
+                this.powerUpActive = true;
                 // scoreProcessor.onNext({player, score: player.getScore() + 1});
             }
             else {
@@ -54,6 +65,15 @@ public class DefaultExtrasService implements ExtrasService {
         }
 
         return 0;
+    }
+
+    @Override
+    public boolean isPowerupActive() {
+        return this.powerUpActive;
+    }
+
+    private void setPowerup(boolean value) {
+        this.powerUpActive = value;
     }
 
     static int[] generate(int width, int height, int offset) {
