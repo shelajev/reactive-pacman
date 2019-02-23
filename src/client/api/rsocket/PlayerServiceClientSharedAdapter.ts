@@ -8,7 +8,7 @@ import { PlayerServiceClient } from "@shared/service_rsocket_pb";
 import { Point } from "@shared/point_pb";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { Disposable } from "reactor-core-js";
-import FlowableAdapter from "./FlowableAdapter";
+import FlowableAdapter from "../FlowableAdapter";
 
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
     private service: any;

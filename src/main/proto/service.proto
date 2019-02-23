@@ -22,6 +22,11 @@ service MapService {
     }
 }
 
+service SetupService {
+
+    rpc get(google.protobuf.Empty) returns (Map) {}
+}
+
 service GameService {
     rpc start (Nickname) returns (Config) {}
 }

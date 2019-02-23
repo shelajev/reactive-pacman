@@ -3,7 +3,6 @@ import GameConfig from "./GameConfig";
 import ExtrasService from "../api/ExtrasService";
 import { Extra } from "@shared/extra_pb";
 import SceneSupport from "../Commons/SceneSupport";
-import Timeout = NodeJS.Timeout;
 
 export default class ExtrasManager implements SceneSupport {
     extra: Set<number>;
@@ -23,7 +22,7 @@ export default class ExtrasManager implements SceneSupport {
             .consume(e => this.doOnExtra(e));
     }
 
-    currentTimeout: Timeout;
+    currentTimeout: any;
 
     doOnExtra(extra: Extra.AsObject) {
         this.retainExtra(extra.last);

@@ -10,9 +10,8 @@ import Menu from './menu';
 import { CompassScene } from './Compass';
 
 import * as $ from 'jquery';
-import PlayerServiceClientSharedAdapter from './api/rsocket/PlayerServiceClientSharedAdapter';
-import GameServiceClientAdapter from './api/rsocket/GameServiceClientAdapter';
-import ExtrasServiceClientAdapter from './api/rsocket/ExtrasServiceClientAdapter';
+import * as RSocketApi from './api/rsocket';
+import * as HttpApi from './api/http';
 
 export class Boot extends Scene {
 
@@ -37,37 +36,42 @@ export class Boot extends Scene {
     }
 
     create(config : any) {
-        let rSocket: ReactiveSocket<any, any>;
-        const client = new RpcClient({
-            transport: new RSocketWebSocketClient(
-                {
-                    url: 'ws://localhost:3000',
-                },
-                BufferEncoders
-            ), 
-            setup: {
-                keepAlive: 60000,
-                lifetime: 360000,
-            },
-            responder: new MapServiceServer({
-                setup: (map: Map) => {
-                    console.log(map.toObject());
-                    
-                    this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new PlayerServiceClientSharedAdapter(rSocket), extrasService: new ExtrasServiceClientAdapter(rSocket), gameService: new GameServiceClientAdapter(rSocket) });
-                }
-            })
-        });
+        // let rSocket: ReactiveSocket<any, any>;
+        // const client = new RpcClient({
+        //     transport: new RSocketWebSocketClient(
+        //         {
+        //             url: 'ws://localhost:3000',
+        //         },
+        //         BufferEncoders
+        //     ),
+        //     setup: {
+        //         keepAlive: 60000,
+        //         lifetime: 360000,
+        //     },
+        //     responder: new MapServiceServer({
+        //         setup: (map: Map) => {
+        //             console.log(map.toObject());
+        //
+        //             this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(rSocket), extrasService: new RSocketApi.ExtrasServiceClientAdapter(rSocket), gameService: new RSocketApi.GameServiceClientAdapter(rSocket) });
+        //         }
+        //     })
+        // });
+        //
+        //
+        // this.showLoadingCircle(() =>
+        //     client
+        //         .connect()
+        //         .then(rsocket => {
+        //             console.log(rsocket);
+        //             rSocket = rsocket;
+        //         })
+        // )
 
-
-        this.showLoadingCircle(() => 
-            client
-                .connect()
-                .then(rsocket => {
-                    console.log(rsocket);
-                    rSocket = rsocket;
-                })
-        )
-
+        this.showLoadingCircle(() =>
+            new HttpApi.SetupServiceClientAdapter()
+                .map()
+                .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new HttpApi.PlayerServiceClientSharedAdapter(), extrasService: new HttpApi.ExtrasServiceClientAdapter(), gameService: new HttpApi.GameServiceClientAdapter() }))
+        );
     }
 
     showLoadingCircle(callback: () => void) {
@@ -86,6 +90,7 @@ export class Boot extends Scene {
     const normalHeight = 720;
     const scale: number = screen.height <= 720 ? 0.5 : 1
     const zoom = 1;
+
     const game = new Game({
         type: Phaser.AUTO,
         parent: 'canvas-container',

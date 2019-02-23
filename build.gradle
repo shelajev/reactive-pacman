@@ -17,13 +17,21 @@ repositories {
 	maven { url 'https://jitpack.io' }
 	maven { url 'https://repo.spring.io/snapshot' }
 	maven { url 'https://repo.spring.io/milestone' }
+	maven { url 'https://oss.jfrog.org/oss-snapshot-local' }
+	maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
 dependencies {
+
+	implementation "io.grpc:grpc-stub:1.18.0"
+	implementation "io.grpc:grpc-netty:1.18.0"
+	implementation "io.grpc:grpc-protobuf:1.18.0"
+	implementation "com.salesforce.servicelibs:reactor-grpc-stub:0.9.0"
 	implementation 'org.roaringbitmap:RoaringBitmap:[0.6,)'
 	implementation 'org.jctools:jctools-core:2.1.1'
 	implementation 'io.rsocket.rpc:rsocket-rpc-core:0.2.13'
 	implementation 'com.google.protobuf:protobuf-java:3.6.1'
+	implementation 'io.github.lognet:grpc-spring-boot-starter:3.1.0'
 	implementation 'com.github.CollaborationInEncapsulation.spring-boot-rsocket:spring-boot-starter-rsocket:0.0.1.RELEASE'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
@@ -51,13 +59,21 @@ protobuf {
 		artifact = 'com.google.protobuf:protoc:3.6.1'
 	}
 	plugins {
+		grpc {
+			artifact = "io.grpc:protoc-gen-grpc-java:1.18.0"
+		}
+		reactorGRpc {
+			artifact = "com.salesforce.servicelibs:reactor-grpc:0.9.0:jdk8@jar"
+		}
 		rsocketRpc {
 			artifact = "io.rsocket.rpc:rsocket-rpc-protobuf:0.2.13"
 		}
 	}
 	generateProtoTasks {
 		ofSourceSet('main')*.plugins {
-			rsocketRpc {}
+			grpc {}
+			rsocketRpc  {}
+			reactorGRpc {}
 		}
 	}
 }
@@ -66,10 +82,14 @@ idea {
 	module {
 		sourceDirs += file("src/main/proto")
 		sourceDirs += file("src/generated/main/java")
+		sourceDirs += file("src/generated/main/grpc")
+		sourceDirs += file("src/generated/main/reactorGRpc")
 		sourceDirs += file("src/generated/main/rsocketRpc")
 
 		generatedSourceDirs += file('src/generated/main/java')
-		generatedSourceDirs += file('src/generated/main/rsocketRpc')
+		generatedSourceDirs += file("src/generated/main/grpc")
+		generatedSourceDirs += file("src/generated/main/reactorGRpc")
+		generatedSourceDirs += file("src/generated/main/rsocketRpc")
 	}
 }
 

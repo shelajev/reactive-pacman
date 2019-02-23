@@ -4,7 +4,7 @@ import ExtrasService from "../ExtrasService";
 import { Extra } from "@shared/extra_pb";
 import { Flux } from "reactor-core-js/flux";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
-import FlowableAdapter from "./FlowableAdapter";
+import FlowableAdapter from "../FlowableAdapter";
 
 export default class ExtrasServiceClientAdapter implements ExtrasService {
 
