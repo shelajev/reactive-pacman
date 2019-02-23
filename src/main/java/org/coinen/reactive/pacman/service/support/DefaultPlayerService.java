@@ -46,7 +46,7 @@ public class DefaultPlayerService implements PlayerService {
                        .doOnNext(location -> {
                            var time = Instant.now();
                            playersProcessor.onNext(playerRepository.update(uuid, player -> {
-                               var builder = playerRepository.findOne(uuid)
+                               var playerBuilder = playerRepository.findOne(uuid)
                                                              .toBuilder()
                                                              .setTimestamp(time.toEpochMilli())
                                                              .setState(Player.State.ACTIVE)
@@ -62,7 +62,7 @@ public class DefaultPlayerService implements PlayerService {
                                if (collisions.size() > 0) {
                                    if (extrasService.isPowerupActive() && player.getType().equals(Player.Type.GHOST) ||
                                        !extrasService.isPowerupActive() && player.getType().equals(Player.Type.PACMAN)) {
-                                       builder.setState(Player.State.DISCONNECTED);
+                                       playerBuilder.setState(Player.State.DISCONNECTED);
                                        collisions.forEach(collision -> {
                                            Player collidedWith = playerRepository.update(UUID.fromString(collision.getUuid()), p -> p.toBuilder()
                                                .setScore(p.getScore() + 100)
@@ -77,14 +77,13 @@ public class DefaultPlayerService implements PlayerService {
                                                 .build());
                                            playersProcessor.onNext(collidedWith);
                                        });
-                                       builder.setScore(player.getScore() + 100 * collisions.size());
+                                       playerBuilder.setScore(player.getScore() + 100 * collisions.size());
                                    }
-                               } else if (Math.signum(extrasService.check(position.getX(),
-                                   position.getY())) != 1.0f) {
-                                   builder.setScore(player.getScore() + 1);
+                               } else if (player.getType() == Player.Type.PACMAN && Math.signum(extrasService.check(position.getX(), position.getY())) != 1.0f) {
+                                   playerBuilder.setScore(player.getScore() + 1);
                                    // scoreProcessor.onNext({player, score: player.getScore() + 1});
                                }
-                               return builder.build();
+                               return playerBuilder.build();
                            }));
                        })
                        .then()

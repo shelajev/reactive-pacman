@@ -27,6 +27,7 @@ public class HttpExtrasController {
     public Flux<String> extras(@CookieValue("uuid") String uuid) {
         return extrasService.extras()
                             .map(e -> Arrays.toString(e.toByteArray()))
+                            .onBackpressureDrop()
                             .subscriberContext(Context.of("uuid", uuid));
     }
 }

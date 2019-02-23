@@ -6,6 +6,7 @@ import org.coinen.pacman.ReactorGameServiceGrpc;
 import org.coinen.reactive.pacman.service.GameService;
 import org.lognet.springboot.grpc.GRpcService;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 @GRpcService
 public class GrpcGameController extends ReactorGameServiceGrpc.GameServiceImplBase {
@@ -18,6 +19,7 @@ public class GrpcGameController extends ReactorGameServiceGrpc.GameServiceImplBa
 
     @Override
     public Mono<Config> start(Mono<Nickname> message) {
-        return message.flatMap(gameService::start);
+        return message.flatMap(gameService::start)
+                      .subscriberContext(Context.of("uuid", UUIDHolder.get()));
     }
 }

@@ -15,10 +15,11 @@ import java.time.Duration;
 public class DefaultExtrasService implements ExtrasService {
     final ExtrasRepository extrasRepository;
     final PlayerRepository playerRepository;
-    boolean powerUpActive;
-    Disposable powerUpTimer;
     final DirectProcessor<Extra> extrasProcessor = DirectProcessor.create();
     final FluxSink<Extra> extrasFluxSink = extrasProcessor.serialize().sink();
+
+    volatile Disposable powerUpTimer;
+    volatile boolean powerUpActive;
 
     public DefaultExtrasService(ExtrasRepository extrasRepository,
         PlayerRepository playerRepository) {

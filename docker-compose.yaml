@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  envoy:
+    image: "envoyproxy/envoy:latest"
+    hostname: "envoy"
+    ports:
+      - 8000:8080
+    volumes:
+      - "./envoy.yaml:/etc/envoy/envoy.yaml"
+    entrypoint: "/usr/local/bin/envoy -c /etc/envoy/envoy.yaml"

@@ -32,13 +32,13 @@ service GameService {
 }
 
 service PlayerService {
-    rpc locate(stream Location) returns (google.protobuf.Empty) {
-        option (io.rsocket.rpc.options) = {
-            fire_and_forget: true
-        };
-    }
+    rpc locate(stream Location) returns (google.protobuf.Empty) {}
 
     rpc players(google.protobuf.Empty) returns (stream Player) {}
+}
+
+service LocationService {
+    rpc locate(Location) returns (google.protobuf.Empty) {}
 }
 
 service ExtrasService {

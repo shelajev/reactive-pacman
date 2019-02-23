@@ -12,6 +12,7 @@ import { CompassScene } from './Compass';
 import * as $ from 'jquery';
 import * as RSocketApi from './api/rsocket';
 import * as HttpApi from './api/http';
+import * as GrpcApi from './api/grpc';
 
 export class Boot extends Scene {
 
@@ -68,9 +69,10 @@ export class Boot extends Scene {
         // )
 
         this.showLoadingCircle(() =>
-            new HttpApi.SetupServiceClientAdapter()
+            // new HttpApi.SetupServiceClientAdapter()
+            new GrpcApi.SetupServiceClientAdapter()
                 .map()
-                .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new HttpApi.PlayerServiceClientSharedAdapter(), extrasService: new HttpApi.ExtrasServiceClientAdapter(), gameService: new HttpApi.GameServiceClientAdapter() }))
+                .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new GrpcApi.PlayerServiceClientSharedAdapter(), extrasService: new GrpcApi.ExtrasServiceClientAdapter(), gameService: new GrpcApi.GameServiceClientAdapter() }))
         );
     }
 

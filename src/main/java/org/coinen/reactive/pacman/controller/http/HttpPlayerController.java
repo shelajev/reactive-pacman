@@ -60,6 +60,7 @@ public class HttpPlayerController {
     public Flux<String> players(@CookieValue("uuid") String uuid) {
         return playerService.players()
                             .map(e -> Arrays.toString(e.toByteArray()))
+                            .onBackpressureDrop()
                             .subscriberContext(Context.of("uuid", UUID.fromString(uuid)));
     }
 }

@@ -7,6 +7,7 @@ import org.coinen.reactive.pacman.service.ExtrasService;
 import org.lognet.springboot.grpc.GRpcService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 @GRpcService
 public class GrpcExtrasController extends ReactorExtrasServiceGrpc.ExtrasServiceImplBase {
@@ -18,6 +19,8 @@ public class GrpcExtrasController extends ReactorExtrasServiceGrpc.ExtrasService
 
     @Override
     public Flux<Extra> extras(Mono<Empty> request) {
-        return extrasService.extras();
+        return extrasService.extras()
+                            .onBackpressureDrop()
+                            .subscriberContext(Context.of("uuid", UUIDHolder.get()));
     }
 }
