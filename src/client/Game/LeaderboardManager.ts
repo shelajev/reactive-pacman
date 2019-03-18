@@ -17,6 +17,20 @@ export default class LeaderboardManager implements SceneSupport {
         private playerService: PlayerService
     ) {
         this.leaderboard = new Map();
+        const players = Object.keys(state.players);
+        players.forEach(uuid => {
+            const player = state.players[uuid];
+            this.leaderboard.set(player.uuid, {
+                score: player.score,
+                uuid: player.uuid,
+                username: player.nickname
+            });
+        });
+        this.leaderboard.set(state.player.uuid, {
+            score: state.player.score,
+            uuid: state.player.uuid,
+            username: state.player.nickname
+        });
         this.overlay = $("#phaser-overlay");
         this.playerServiceDisposable = playerService.players()
             .consume(player => this.doOnPlayerScore(player));
