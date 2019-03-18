@@ -42,14 +42,14 @@ export default class GameScene extends Phaser.Scene {
                 height: config.sizeData.height,
             },
             scale: config.sizeData.scale
-        }
+        };
 
         this.state = {
             tiles: config.maze.tilesList,
             player: config.player,
             players: config.players.reduce<{ [key: string]: Player.AsObject }>((players, player) => (players[player.uuid] = player) && players, {}),
             powerState: 0
-        }
+        };
 
         setTimeout(function () {
             if (config.player.type == Player.Type.PACMAN) {
@@ -68,14 +68,14 @@ export default class GameScene extends Phaser.Scene {
 
         this.anims.create({
             key: 'eat',
-            frames: this.anims.generateFrameNumbers('man', { start: 0, end: 1 }),
-            frameRate: 5,
+            frames: this.anims.generateFrameNumbers('man', { start: 0, end: 3 }),
+            frameRate: 10,
             repeat: -1
         });
 
-        var directionStates = ["", "-up", "-down"];
+        const directionStates = ["", "-up", "-down"];
 
-        for (var i = 0; i < directionStates.length; i++) {
+        for (let i = 0; i < directionStates.length; i++) {
             this.anims.create({
                 key: ("default" + directionStates[i]) + "",
                 frames: this.anims.generateFrameNumbers('ghost', { frames: [0 + i] }),
@@ -98,7 +98,7 @@ export default class GameScene extends Phaser.Scene {
             });
         }
 
-        var fadeTween = this.tweens.add({
+        const fadeTween = this.tweens.add({
             targets: this.text,
             alpha: 0,
             duration: 500,

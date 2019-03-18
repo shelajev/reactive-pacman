@@ -1,7 +1,6 @@
 import GameService from "../GameService";
 import { Nickname } from "@shared/player_pb";
 import { Config } from "@shared/config_pb";
-import { ReactiveSocket } from "rsocket-types";
 import { Single } from "rsocket-flowable";
 import { GameServiceClient } from "@shared/service_grpc_web_pb";
 import { ClientReadableStream } from "grpc-web";

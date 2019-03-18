@@ -9,6 +9,8 @@ public interface PlayerService {
 
     Mono<Player> createPlayer(String nickname);
 
+    Mono<Void> disconnectPlayer();
+
     Mono<Void> locate(Flux<Location> locationStream);
 
     Flux<Player> players();

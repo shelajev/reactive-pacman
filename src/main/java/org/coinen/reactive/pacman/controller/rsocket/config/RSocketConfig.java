@@ -52,14 +52,19 @@ public class RSocketConfig {
     }
 
     @Bean
-    public SetupController setupController(RequestHandlingRSocket socket, MapService mapService) {
-        return new SetupController(socket, mapService);
+    public SetupController setupController(
+        RequestHandlingRSocket socket,
+        MapService mapService,
+        PlayerService playerService) {
+        return new SetupController(socket, mapService, playerService);
     }
 
     @Bean
     public RequestHandlingRSocket requestHandlingRSocket(
         RSocketRpcService[] rSocketRpcServices
     ) {
-        return new RequestHandlingRSocket(rSocketRpcServices);
+        RequestHandlingRSocket socket = new RequestHandlingRSocket(rSocketRpcServices);
+        socket.onClose().log().subscribe();
+        return socket;
     }
 }

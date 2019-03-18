@@ -31,49 +31,59 @@ export class Boot extends Scene {
         this.load.image('compass-needle', 'asset/compass-needle.png');
 
         this.load.spritesheet('ghost', 'asset/ghost2.png', {frameWidth: 60, frameHeight: 60});
-        this.load.spritesheet('man', 'asset/man2.png', {frameWidth: 60, frameHeight: 60});
+        this.load.spritesheet('man', 'asset/pacman-sprite.png', {frameWidth: 60, frameHeight: 60});
 
         this.load.spritesheet('tiles', 'asset/tile2.png', {frameWidth: 100, frameHeight: 100});
     }
 
     create(config : any) {
-        // let rSocket: ReactiveSocket<any, any>;
-        // const client = new RpcClient({
-        //     transport: new RSocketWebSocketClient(
-        //         {
-        //             url: 'ws://localhost:3000',
-        //         },
-        //         BufferEncoders
-        //     ),
-        //     setup: {
-        //         keepAlive: 60000,
-        //         lifetime: 360000,
-        //     },
-        //     responder: new MapServiceServer({
-        //         setup: (map: Map) => {
-        //             console.log(map.toObject());
-        //
-        //             this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(rSocket), extrasService: new RSocketApi.ExtrasServiceClientAdapter(rSocket), gameService: new RSocketApi.GameServiceClientAdapter(rSocket) });
-        //         }
-        //     })
-        // });
-        //
-        //
-        // this.showLoadingCircle(() =>
-        //     client
-        //         .connect()
-        //         .then(rsocket => {
-        //             console.log(rsocket);
-        //             rSocket = rsocket;
-        //         })
-        // )
+        const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');
+            if(type === "rsocket") {
+            let rSocket: ReactiveSocket<any, any>;
+            const client = new RpcClient({
+                transport: new RSocketWebSocketClient(
+                    {
+                        url: 'ws://localhost:3000',
+                    },
+                    BufferEncoders
+                ),
+                setup: {
+                    keepAlive: 60000,
+                    lifetime: 360000,
+                },
+                responder: new MapServiceServer({
+                    setup: (map: Map) => {
+                        console.log(map.toObject());
 
-        this.showLoadingCircle(() =>
-            // new HttpApi.SetupServiceClientAdapter()
-            new GrpcApi.SetupServiceClientAdapter()
-                .map()
-                .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new GrpcApi.PlayerServiceClientSharedAdapter(), extrasService: new GrpcApi.ExtrasServiceClientAdapter(), gameService: new GrpcApi.GameServiceClientAdapter() }))
-        );
+                        this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(rSocket), extrasService: new RSocketApi.ExtrasServiceClientAdapter(rSocket), gameService: new RSocketApi.GameServiceClientAdapter(rSocket) });
+                    }
+                })
+            });
+
+
+            this.showLoadingCircle(() =>
+                client
+                    .connect()
+                    .then(rsocket => {
+                        console.log(rsocket);
+                        rSocket = rsocket;
+                    })
+            );
+        } else if (type === "grpc") {
+
+            this.showLoadingCircle(() =>
+                new GrpcApi.SetupServiceClientAdapter()
+                    .map()
+                    .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new GrpcApi.PlayerServiceClientSharedAdapter(), extrasService: new GrpcApi.ExtrasServiceClientAdapter(), gameService: new GrpcApi.GameServiceClientAdapter() }))
+            );
+        } else {
+            this.showLoadingCircle(() =>
+                new HttpApi.SetupServiceClientAdapter()
+                    .map()
+                    .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new HttpApi.PlayerServiceClientSharedAdapter(), extrasService: new HttpApi.ExtrasServiceClientAdapter(), gameService: new HttpApi.GameServiceClientAdapter() }))
+            );
+        }
     }
 
     showLoadingCircle(callback: () => void) {

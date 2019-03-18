@@ -26,17 +26,18 @@ dependencies {
 	implementation "io.grpc:grpc-stub:1.18.0"
 	implementation "io.grpc:grpc-netty:1.18.0"
 	implementation "io.grpc:grpc-protobuf:1.18.0"
-	implementation "com.salesforce.servicelibs:reactor-grpc-stub:0.9.0"
+	implementation "com.salesforce.servicelibs:reactor-grpc-stub:0.10.0-RC1"
 	implementation 'org.roaringbitmap:RoaringBitmap:[0.6,)'
 	implementation 'org.jctools:jctools-core:2.1.1'
-	implementation 'io.rsocket.rpc:rsocket-rpc-core:0.2.13'
+	implementation 'io.rsocket:rsocket-core:0.12.1-RC3-SNAPSHOT'
+	implementation 'io.rsocket.rpc:rsocket-rpc-core:0.2.14'
 	implementation 'com.google.protobuf:protobuf-java:3.6.1'
 	implementation 'io.github.lognet:grpc-spring-boot-starter:3.1.0'
-	implementation 'com.github.CollaborationInEncapsulation.spring-boot-rsocket:spring-boot-starter-rsocket:0.0.1.RELEASE'
+	implementation 'com.github.collaborationinencapsulation.spring-boot-rsocket:spring-boot-starter-rsocket:c1bd9a7c10'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-	protobuf 'io.rsocket.rpc:rsocket-rpc-protobuf-idl:0.2.13'
+	protobuf 'io.rsocket.rpc:rsocket-rpc-protobuf-idl:0.2.14'
 	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
@@ -63,10 +64,10 @@ protobuf {
 			artifact = "io.grpc:protoc-gen-grpc-java:1.18.0"
 		}
 		reactorGRpc {
-			artifact = "com.salesforce.servicelibs:reactor-grpc:0.9.0:jdk8@jar"
+			artifact = "com.salesforce.servicelibs:reactor-grpc:0.10.0-RC1:jdk8@jar"
 		}
 		rsocketRpc {
-			artifact = "io.rsocket.rpc:rsocket-rpc-protobuf:0.2.13"
+			artifact = "io.rsocket.rpc:rsocket-rpc-protobuf:0.2.14"
 		}
 	}
 	generateProtoTasks {

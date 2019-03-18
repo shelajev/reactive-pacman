@@ -123,7 +123,7 @@ export default class PlayersManager implements SceneSupport {
         //player.setVelocity(0);
         const speed = playerSpeed(type, deltaTime, powerState);
 
-        for (var i = 0; i < this.direcLog.length; i++) {
+        for (let i = 0; i < this.direcLog.length; i++) {
             this.direcLog[i].time += deltaTime;
         }
         this.direcLog.unshift({
@@ -133,12 +133,12 @@ export default class PlayersManager implements SceneSupport {
         while (this.direcLog[this.direcLog.length - 1].time > 400) {
             this.direcLog.pop();
         }
-        var success = false;
-        for (var i = 0; i < this.direcLog.length; i++) {
+        let success = false;
+        for (let i = 0; i < this.direcLog.length; i++) {
             if (this.direcLog[i].direc != prevDirec) {
-                var regVec = motionVector(prevDirec, speed);
-                var motionVec = motionVector(this.direcLog[i].direc, speed);
-                var res = checkCollision(
+                const regVec = motionVector(prevDirec, speed);
+                const motionVec = motionVector(this.direcLog[i].direc, speed);
+                const res = checkCollision(
                     this.state.tiles,
                     { ...player.location, direction: this.direcLog[i].direc },
                     { x: position.x + motionVec.x, y: position.y + motionVec.y },
@@ -160,8 +160,8 @@ export default class PlayersManager implements SceneSupport {
         }
 
         if (!success) {
-            var motionVec = motionVector(prevDirec, speed);
-            var res = checkCollision(
+            const motionVec = motionVector(prevDirec, speed);
+            const res = checkCollision(
                 this.state.tiles,
                 { ...player.location, direction: prevDirec },
                 { x: position.x + motionVec.x, y: position.y + motionVec.y },

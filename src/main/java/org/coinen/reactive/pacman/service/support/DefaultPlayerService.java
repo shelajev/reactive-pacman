@@ -46,11 +46,17 @@ public class DefaultPlayerService implements PlayerService {
                        .doOnNext(location -> {
                            var time = Instant.now();
                            playersProcessor.onNext(playerRepository.update(uuid, player -> {
-                               var playerBuilder = playerRepository.findOne(uuid)
-                                                             .toBuilder()
-                                                             .setTimestamp(time.toEpochMilli())
-                                                             .setState(Player.State.ACTIVE)
-                                                             .setLocation(location);
+                               Player foundPlayer = playerRepository.findOne(uuid);
+
+                               if (foundPlayer == null) {
+                                   return null;
+                               }
+
+                               var playerBuilder = foundPlayer
+                                                                   .toBuilder()
+                                                                   .setTimestamp(time.toEpochMilli())
+                                                                   .setState(Player.State.ACTIVE)
+                                                                   .setLocation(location);
 
                                Point position = location.getPosition();
 
@@ -79,10 +85,15 @@ public class DefaultPlayerService implements PlayerService {
                                        });
                                        playerBuilder.setScore(player.getScore() + 100 * collisions.size());
                                    }
-                               } else if (player.getType() == Player.Type.PACMAN && Math.signum(extrasService.check(position.getX(), position.getY())) != 1.0f) {
+                               } else if (player.getType() == Player.Type.PACMAN && extrasService.check(position.getX(), position.getY()) > 0) {
                                    playerBuilder.setScore(player.getScore() + 1);
                                    // scoreProcessor.onNext({player, score: player.getScore() + 1});
                                }
+
+                               if (playerBuilder.getState() == Player.State.DISCONNECTED) {
+                                   playerRepository.delete(uuid);
+                               }
+
                                return playerBuilder.build();
                            }));
                        })
@@ -122,6 +133,19 @@ public class DefaultPlayerService implements PlayerService {
                     playersSink.next(player);
                 }
             });
+    }
+
+    @Override
+    public Mono<Void> disconnectPlayer() {
+        return Mono.subscriberContext()
+                   .map(c -> c.<UUID>get("uuid"))
+                   .doOnNext(uuid -> {
+                       Player player = playerRepository.delete(uuid);
+                        if (player != null) {
+                            playersSink.next(player.toBuilder().setState(Player.State.DISCONNECTED).build());
+                        }
+                   })
+                   .then();
     }
 
     private Player.Type generatePlayerType() {

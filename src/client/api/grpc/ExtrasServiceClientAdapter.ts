@@ -1,4 +1,3 @@
-import { ReactiveSocket } from "rsocket-types";
 import ExtrasService from "../ExtrasService";
 import { Extra } from "@shared/extra_pb";
 import { Flux } from "reactor-core-js/flux";

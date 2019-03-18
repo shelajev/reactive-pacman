@@ -1,14 +1,10 @@
 import PlayerService from "../api/PlayerService";
-import {GameState, MyLocationGameService} from ".";
+import { GameState } from ".";
 import { Player } from "@shared/player_pb";
 import { Score } from "@shared/score_pb";
 import { Disposable } from "reactor-core-js";
 import * as $ from 'jquery';
 import SceneSupport from "../Commons/SceneSupport";
-
-
-import { Location } from "@shared/location_pb";
-import { Point } from "@shared/point_pb";
 
 export default class LeaderboardManager implements SceneSupport {
 
@@ -23,6 +19,7 @@ export default class LeaderboardManager implements SceneSupport {
         this.overlay = $("#phaser-overlay");
         this.playerServiceDisposable = playerService.players()
             .consume(player => this.doOnPlayerScore(player));
+        this.overlay.find(".leaderboard").show();
     }
 
     doOnPlayerScore(player: Player.AsObject): void {

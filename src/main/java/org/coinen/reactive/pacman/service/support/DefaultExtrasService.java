@@ -62,7 +62,7 @@ public class DefaultExtrasService implements ExtrasService {
 
             extrasFluxSink.next(extra);
 
-            return addedExtra;
+            return retainedExtra;
         }
 
         return 0;
