@@ -172,40 +172,30 @@ public class DefaultPlayerService implements PlayerService {
     }
 
     private Point findBestStartingPosition(Player.Type playerType) {
-        Point bestStart = null;
-        var furthestDist = -1f;
-        var starts = mapService.getTilesPositions();
+
         var players = playerRepository.findAll()
-                                      .stream()
-                                      .filter(p -> p.getType() != playerType)
-                                      .collect(Collectors.toList());
-        for (var i = 0; i < starts.size(); i++) {
-            var start = starts.get(i);
-            var closestPlayerDist = -1f;
+            .stream()
+            .filter(p -> p.getType() != playerType)
+            .collect(Collectors.toList());
+
+        while(true) {
+            var point = mapService.getRandomPoint();
+            if (players.size() == 0) {
+                return point;
+            }
             for (Player player : players) {
                 if (playerType != player.getType()) {
                     var dist = distance(player.getLocation()
-                                              .getPosition(), start);
-                    if (closestPlayerDist == -1 || dist < closestPlayerDist) {
-                        closestPlayerDist = dist;
+                        .getPosition(), point);
+                    if (dist > 5) {
+                        return point;
                     }
                 }
             }
-
-            if (closestPlayerDist > furthestDist) {
-                furthestDist = closestPlayerDist;
-                bestStart = start;
-            }
         }
-
-        if (bestStart == null) {
-            bestStart = starts.get(getRandomIntInclusive(0, starts.size() - 1));
-        }
-
-        return bestStart;
     }
 
-    float distance(Point p1, Point p2) {
+    private float distance(Point p1, Point p2) {
         var d1 = p1.getX() - p2.getX();
         var d2 = p1.getY() - p2.getY();
         return d1 * d1 + d2 * d2;

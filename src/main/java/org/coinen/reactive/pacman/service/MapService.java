@@ -10,4 +10,6 @@ public interface MapService {
     Map getMap();
 
     List<Point> getTilesPositions();
+
+    Point getRandomPoint();
 }

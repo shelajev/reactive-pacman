@@ -3,6 +3,7 @@ package org.coinen.reactive.pacman.service.support;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.coinen.pacman.Map;
@@ -46,10 +47,15 @@ public class DefaultMapService implements MapService {
         return tilesPosition;
     }
 
+    @Override
+    public Point getRandomPoint() {
+        return tilesPosition.get(getRandomIntInclusive(0, tilesPosition.size() - 1));
+    }
+
     static List<Point> generateTileCoordinates(int width,
-        int height,
-        int offsetX,
-        int offsetY) {
+                                               int height,
+                                               int offsetX,
+                                               int offsetY) {
         var minX = offsetX;
         var maxX = width - offsetX - 1;
         var minY = offsetY;
