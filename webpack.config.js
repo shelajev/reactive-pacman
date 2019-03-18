@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: './src/client/boot.ts',
@@ -17,6 +18,9 @@ module.exports = {
             title: 'Hot Module Replacement',
             template: path.join(__dirname, 'src/public/index.html')
         }),
+        new CopyPlugin([
+            { from: 'src/public', to: './' },
+        ]),
         new webpack.HotModuleReplacementPlugin()
     ],
     module: {
@@ -26,11 +30,17 @@ module.exports = {
                 use: 'ts-loader',
                 exclude: /node_modules/
             },
+            {
+                test: /\.(png|svg|jpg|gif)$/,
+                use: [
+                    'file-loader'
+                ]
+            }
         ]
     },
     resolve: {
         alias: {
-            "@shared": "/Users/olehdokuka/Documents/Workspace/Java/dinoman-io/src/shared"
+            "@shared": "/Users/daniildrobot/Documents/Workspace/work/coinen/reactive-pacman/src/shared"
         },
         extensions: ['.tsx', '.ts', '.js']
     },

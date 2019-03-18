@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm run protocts ; npm run protocrpc ; npm run protocgrpc ; tsc ; webpack",
+    "build": "npm run protocts ; tsc ; webpack",
     "protocts": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/proto --js_out=import_style=commonjs,binary:src/shared --ts_out=service=false:src/shared --plugin=protoc-gen-ts=node_modules/.bin/protoc-gen-ts src/proto/*.proto node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto",
     "protocrpc": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/proto --js_out=import_style=commonjs,binary:src/shared --rsocket_rpc_out=src/shared --plugin=protoc-gen-rsocket_rpc=node_modules/.bin/rsocket_rpc_js_protoc_plugin src/proto/*.proto node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto",
     "protocgrpc": "protoc -I=src/proto service.proto --plugin=protoc-gen-grpc-web=node_modules/.bin/protoc-gen-grpc-web --grpc-web_out=import_style=commonjs+dts,mode=grpcwebtext:src/shared",
@@ -41,8 +41,9 @@
   },
   "devDependencies": {
     "@grpc/proto-loader": "^0.4.0",
-    "css-loader": "^2.1.0",
     "async": "^2.6.2",
+    "copy-webpack-plugin": "^5.0.1",
+    "css-loader": "^2.1.0",
     "html-webpack-plugin": "^3.2.0",
     "livereload": "^0.7.0",
     "rsocket-rpc-protobuf": "^0.1.5",
