@@ -41,7 +41,7 @@ export default class Menu extends Scene {
             loginError.find("p").text(config.text);
         }
         else {
-            $("#phaser-container").css("background-color", "#2c9b7e");
+            $("#phaser-container").css("background-color", "#116");
             $('#phaser-overlay-container').show();
             $('#phaser-overlay-container').css("pointer-events", "auto");
             $('#phaser-overlay-container #phaser-overlay').children().hide();

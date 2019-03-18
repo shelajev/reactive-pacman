@@ -73,9 +73,9 @@ export class Boot extends Scene {
         } else if (type === "grpc") {
 
             this.showLoadingCircle(() =>
-                new GrpcApi.SetupServiceClientAdapter()
-                    .map()
-                    .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new GrpcApi.PlayerServiceClientSharedAdapter(), extrasService: new GrpcApi.ExtrasServiceClientAdapter(), gameService: new GrpcApi.GameServiceClientAdapter() }))
+            new GrpcApi.SetupServiceClientAdapter()
+            .map()
+                .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new GrpcApi.PlayerServiceClientSharedAdapter(), extrasService: new GrpcApi.ExtrasServiceClientAdapter(), gameService: new GrpcApi.GameServiceClientAdapter() }))
             );
         } else {
             this.showLoadingCircle(() =>
@@ -106,7 +106,7 @@ export class Boot extends Scene {
     const game = new Game({
         type: Phaser.AUTO,
         parent: 'canvas-container',
-        backgroundColor: '#2c9b7e',
+        backgroundColor: '#116',
         width: normalWidth * zoom * scale,
         height: normalHeight * zoom * scale,
         physics: {
