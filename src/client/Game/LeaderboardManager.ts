@@ -9,8 +9,9 @@ import SceneSupport from "../Commons/SceneSupport";
 export default class LeaderboardManager implements SceneSupport {
 
     private playerServiceDisposable: Disposable;
-    private leaderboard: Map<String, Score.AsObject>
-    private overlay: JQuery<HTMLElement>
+    private leaderboard: Map<String, Score.AsObject>;
+    private readonly overlay: JQuery<HTMLElement>;
+
     constructor(
         private scene: Phaser.Scene, private state: GameState, private config: GameConfig,
         private playerService: PlayerService
@@ -23,13 +24,15 @@ export default class LeaderboardManager implements SceneSupport {
     }
 
     doOnPlayerScore(player: Player.AsObject): void {
-        console.log('player score', player);
-        this.leaderboard.set(player.uuid, {
-            score: player.score,
-            username: player.nickname || 'Incognito',
-            uuid: player.uuid
-        });
+        const { uuid, state, score, nickname } = player;
 
+        if (state !== Player.State.DISCONNECTED) {
+            this.leaderboard.set(uuid, {
+                score: score, username: nickname || 'Incognito', uuid
+            });
+        } else {
+            this.leaderboard.delete(uuid);
+        }
     }
 
     update() {

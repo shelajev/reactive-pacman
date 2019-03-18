@@ -1,9 +1,9 @@
 import PlayerService from "../api/PlayerService";
 import {GameState, MyLocationGameService} from "../Game";
-import { Player } from "@shared/player_pb";
-import { Disposable } from "reactor-core-js";
-import { Location } from "@shared/location_pb";
-import { Point } from "@shared/point_pb";
+import {Player} from "@shared/player_pb";
+import {Disposable} from "reactor-core-js";
+import {Location} from "@shared/location_pb";
+import {Point} from "@shared/point_pb";
 
 export default class CompassService implements Disposable {
 
@@ -12,7 +12,7 @@ export default class CompassService implements Disposable {
     private localGameServiceDisposable: Disposable;
 
     private closestPlayerUuid: string;
-    private playersLocation: { [name: string]: Location.AsObject };
+    private readonly playersLocation: { [name: string]: Location.AsObject };
     private myLocation: Location.AsObject;
 
     constructor(
@@ -42,20 +42,22 @@ export default class CompassService implements Disposable {
     }
 
     private doOnPlayerLocation(player: Player.AsObject): void {
-        if (player.type === Player.Type.PACMAN && player.state !== Player.State.DISCONNECTED) {
-            const playerDistance = this.distanceTo(player.location.position, this.myLocation.position);
+        const { location, type, uuid, state } = player;
+
+        if (type === Player.Type.PACMAN && state !== Player.State.DISCONNECTED) {
+            const playerDistance = this.distanceTo(location.position, this.myLocation.position);
             const closestDistance = this.distanceTo(this.myLocation.position, this.playersLocation[this.closestPlayerUuid].position);
             
             if (closestDistance > playerDistance)  {
-                this.closestPlayerUuid = player.uuid;
+                this.closestPlayerUuid = uuid;
                 this.rotationToClosest = this.rotationTo(this.myLocation.position, this.playersLocation[this.closestPlayerUuid].position);
             }
 
-            this.playersLocation[player.uuid] = player.location;
-        } else if (player.state === Player.State.DISCONNECTED) {
-            delete this.playersLocation[player.uuid];
+            this.playersLocation[uuid] = location;
+        } else if (state === Player.State.DISCONNECTED) {
+            delete this.playersLocation[uuid];
 
-            if (player.uuid === this.closestPlayerUuid) {
+            if (uuid === this.closestPlayerUuid) {
                 delete this.closestPlayerUuid;
                 delete this.rotationToClosest;
 

@@ -40,7 +40,7 @@ module.exports = {
     },
     resolve: {
         alias: {
-            "@shared": "/Users/daniildrobot/Documents/Workspace/work/coinen/reactive-pacman/src/shared"
+            "@shared": __dirname + "/src/shared"
         },
         extensions: ['.tsx', '.ts', '.js']
     },

@@ -45,47 +45,72 @@ public class DefaultPlayerService implements PlayerService {
                    .flatMap(uuid -> locationStream
                        .doOnNext(location -> {
                            var time = Instant.now();
-                           playersProcessor.onNext(playerRepository.update(uuid, player -> {
+                           var updatedPlayer = playerRepository.update(uuid, player -> {
                                Player foundPlayer = playerRepository.findOne(uuid);
 
                                if (foundPlayer == null) {
                                    return null;
                                }
 
-                               var playerBuilder = foundPlayer
-                                                                   .toBuilder()
-                                                                   .setTimestamp(time.toEpochMilli())
-                                                                   .setState(Player.State.ACTIVE)
-                                                                   .setLocation(location);
+                               var playerBuilder = foundPlayer.toBuilder()
+                                                              .setTimestamp(time.toEpochMilli())
+                                                              .setState(Player.State.ACTIVE)
+                                                              .setLocation(location);
 
                                Point position = location.getPosition();
 
-                               List<Player> collisions = playerRepository.findAll().stream()
-                                   .filter(p -> p.getState().equals(Player.State.ACTIVE))
-                                   .filter(p -> !p.getType().equals(player.getType()))
-                                   .filter(p -> distance(p.getLocation().getPosition(), player.getLocation().getPosition()) < 100)
-                                   .collect(Collectors.toList());
+                               List<Player> collisions = playerRepository.findAll()
+                                                                         .stream()
+                                                                         .filter(p -> p.getState()
+                                                                                       .equals(
+                                                                                           Player.State.ACTIVE))
+                                                                         .filter(p -> !p.getType()
+                                                                                        .equals(
+                                                                                            player.getType()))
+                                                                         .filter(p -> distance(
+                                                                             p.getLocation()
+                                                                              .getPosition(),
+                                                                             player.getLocation()
+                                                                                   .getPosition()) < 100)
+                                                                         .collect(
+                                                                             Collectors.toList());
                                if (collisions.size() > 0) {
-                                   if (extrasService.isPowerupActive() && player.getType().equals(Player.Type.GHOST) ||
-                                       !extrasService.isPowerupActive() && player.getType().equals(Player.Type.PACMAN)) {
+                                   if (extrasService.isPowerupActive() && player.getType()
+                                                                                .equals(
+                                                                                    Player.Type.GHOST) || !extrasService.isPowerupActive() && player.getType()
+                                                                                                                                                    .equals(
+                                                                                                                                                        Player.Type.PACMAN)) {
                                        playerBuilder.setState(Player.State.DISCONNECTED);
                                        collisions.forEach(collision -> {
-                                           Player collidedWith = playerRepository.update(UUID.fromString(collision.getUuid()), p -> p.toBuilder()
-                                               .setScore(p.getScore() + 100)
-                                               .build());
+                                           Player collidedWith =
+                                               playerRepository.update(UUID.fromString(
+                                                   collision.getUuid()),
+                                                   p -> p.toBuilder()
+                                                         .setScore(p.getScore() + 100)
+                                                         .build());
                                            playersProcessor.onNext(collidedWith);
                                        });
-                                   } else if (extrasService.isPowerupActive() && player.getType().equals(Player.Type.PACMAN) ||
-                                              !extrasService.isPowerupActive() && player.getType().equals(Player.Type.GHOST)) {
+                                   }
+                                   else if (extrasService.isPowerupActive() && player.getType()
+                                                                                     .equals(
+                                                                                         Player.Type.PACMAN) || !extrasService.isPowerupActive() && player.getType()
+                                                                                                                                                          .equals(
+                                                                                                                                                              Player.Type.GHOST)) {
                                        collisions.forEach(collision -> {
-                                           Player collidedWith = playerRepository.update(UUID.fromString(collision.getUuid()), p -> p.toBuilder()
-                                                .setState(Player.State.DISCONNECTED)
-                                                .build());
+                                           Player collidedWith =
+                                               playerRepository.update(UUID.fromString(
+                                                   collision.getUuid()),
+                                                   p -> p.toBuilder()
+                                                         .setState(Player.State.DISCONNECTED)
+                                                         .build());
                                            playersProcessor.onNext(collidedWith);
                                        });
                                        playerBuilder.setScore(player.getScore() + 100 * collisions.size());
                                    }
-                               } else if (player.getType() == Player.Type.PACMAN && extrasService.check(position.getX(), position.getY()) > 0) {
+                               }
+                               else if (player.getType() == Player.Type.PACMAN && extrasService.check(
+                                   position.getX(),
+                                   position.getY()) > 0) {
                                    playerBuilder.setScore(player.getScore() + 1);
                                    // scoreProcessor.onNext({player, score: player.getScore() + 1});
                                }
@@ -95,7 +120,11 @@ public class DefaultPlayerService implements PlayerService {
                                }
 
                                return playerBuilder.build();
-                           }));
+                           });
+
+                           if (updatedPlayer != null) {
+                               playersProcessor.onNext(updatedPlayer);
+                           }
                        })
                        .then()
                    );

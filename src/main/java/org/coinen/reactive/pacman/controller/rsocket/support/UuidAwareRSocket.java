@@ -43,9 +43,4 @@ public class UuidAwareRSocket extends RSocketProxy {
     public Mono<Void> metadataPush(Payload payload) {
         return super.metadataPush(payload).subscriberContext(Context.of("uuid", uuid));
     }
-
-    @Override
-    public Mono<Void> onClose() {
-        return super.onClose().subscriberContext(Context.of("uuid", uuid));
-    }
 }

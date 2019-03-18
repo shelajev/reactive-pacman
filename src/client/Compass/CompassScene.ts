@@ -46,7 +46,7 @@ export default class CompassScene extends Scene {
         // });
 
         if (rotation == undefined) {
-            this.compassNeedle.setRotation(Date.now() % 360);
+            this.compassNeedle.setRotation((Date.now() / 500) % 360);
         }
         else {
             this.compassNeedle.setRotation(rotation + Math.PI / 2 + Math.PI);

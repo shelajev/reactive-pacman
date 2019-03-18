@@ -18,8 +18,10 @@ import org.coinen.reactive.pacman.service.GameService;
 import org.coinen.reactive.pacman.service.MapService;
 import org.coinen.reactive.pacman.service.PlayerService;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
 public class RSocketConfig {
@@ -53,18 +55,17 @@ public class RSocketConfig {
 
     @Bean
     public SetupController setupController(
-        RequestHandlingRSocket socket,
+        ObjectProvider<RequestHandlingRSocket> socket,
         MapService mapService,
         PlayerService playerService) {
-        return new SetupController(socket, mapService, playerService);
+        return new SetupController(socket::getIfAvailable, mapService, playerService);
     }
 
     @Bean
+    @Scope("prototype")
     public RequestHandlingRSocket requestHandlingRSocket(
         RSocketRpcService[] rSocketRpcServices
     ) {
-        RequestHandlingRSocket socket = new RequestHandlingRSocket(rSocketRpcServices);
-        socket.onClose().log().subscribe();
-        return socket;
+        return new RequestHandlingRSocket(rSocketRpcServices);
     }
 }
