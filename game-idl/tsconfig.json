@@ -16,15 +16,13 @@
       "scripthost",
       "dom"
     ],
-    "baseUrl": "./"
+    "baseUrl": "./",
+    "rootDir": "./"
   },
-  "include": [
-    "src/main/typescript/index.ts",
-    "src/generated/main/javascript/*"
+  "files": [
+    "src/main/typescript/index.ts"
   ],
-  "exclude": [
-    "./build",
-    "./src/@types/**/*",
-    "./node_modules/**/*"
+  "include": [
+    "src/**/*"
   ]
 }

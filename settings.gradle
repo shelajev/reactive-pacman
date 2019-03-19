@@ -16,5 +16,6 @@ rootProject.name = 'reactive-pacman'
 
 include 'game-idl'
 include 'game-server'
+include 'game-client'
 include 'metrics-idl'
 include 'metrics-server'

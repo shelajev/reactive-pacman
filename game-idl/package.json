@@ -4,7 +4,10 @@
   "description": "Pacman Game Protobuf Generated Files",
   "scripts": {
     "postinstall": "node ../scripts/grpc-web-plugin-loader.js ; npm run build",
-    "build": "node ../scripts/make-local-generated-dir.js ; npm run protocall ; tsc",
+    "build": "npm run create-gen-dir ; npm run protocall ; npm run copy-template ; tsc ; npm run copy-generated",
+    "create-gen-dir": "node ../scripts/make-local-generated-dir.js",
+    "copy-generated": "ncp ./src/generated ./build/src/generated",
+    "copy-template": "node ../scripts/copy-template.js ./src/main/resources/service_rsocket_pb.d.ts.template ./src/generated/main/javascript/service_rsocket_pb.d.ts",
     "protocall": "npm run protocrpc ; npm run protocgrpc ; npm run protocts ; node ../scripts/postprocess-generated-ts.js ./src/generated/main/javascript/service_pb.d.ts",
     "protocts": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/main/proto --js_out=import_style=commonjs,binary:src/generated/main/javascript --ts_out=service=false:src/generated/main/javascript --plugin=protoc-gen-ts=node_modules/.bin/protoc-gen-ts src/main/proto/*.proto node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto",
     "protocrpc": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/main/proto --js_out=import_style=commonjs,binary:src/generated/main/javascript --rsocket_rpc_out=src/generated/main/javascript --plugin=protoc-gen-rsocket_rpc=node_modules/.bin/rsocket_rpc_js_protoc_plugin src/main/proto/*.proto node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto",
@@ -12,8 +15,8 @@
   },
   "author": "Oleh Dokuka",
   "license": "ISC",
-  "main": "./src/main/typescript/index.ts",
-  "types": "./src/main/typescript/index.ts",
+  "main": "build/src/main/typescript/index.js",
+  "types": "build/src/main/typescript/index.d.ts",
   "dependencies": {
     "@types/google-protobuf": "^3.2.7",
     "google-protobuf": "^3.7.0",
@@ -26,6 +29,7 @@
     "module-alias": "^2.2.0"
   },
   "devDependencies": {
+    "ncp": "^2.0.0",
     "follow-redirects": "^1.7.0",
     "@grpc/proto-loader": "^0.4.0",
     "rsocket-rpc-protobuf": "^0.1.5",
