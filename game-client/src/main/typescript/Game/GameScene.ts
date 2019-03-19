@@ -9,7 +9,7 @@ import SceneSupport from '../Commons/SceneSupport';
 import PlayersManager from './PlayersManager';
 import MapManager from './MapManager';
 import ExtrasManager from './ExtrasManager';
-import { KeysService } from '../Commons/DirectionService';
+import { ControlsService } from '../Commons/DirectionService';
 import LeaderboardManager from './LeaderboardManager';
 
 export default class GameScene extends Phaser.Scene {
@@ -111,11 +111,11 @@ export default class GameScene extends Phaser.Scene {
 
         this.managers = [
             new MapManager(this, this.state, this.config),
-            new PlayersManager(this, this.state, this.config, config.playerService, new KeysService(this)),
+            new PlayersManager(this, this.state, this.config, config.playerService, new ControlsService(this)),
             new ExtrasManager(this, this.state, this.config, config.extras, config.extrasService),
             new LeaderboardManager(this, this.state, this.config, config.playerService)
         ]
-        // this.scaleChildren(this.config.scale);
+        this.scaleChildren(this.config.scale);
     }
 
     scaleChildren(scale: any) {
@@ -127,11 +127,11 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update(time: number, deltaTime: number) {
-        // this.scaleChildren(1 / this.config.scale);
+        this.scaleChildren(1 / this.config.scale);
 
         this.managers.forEach(manager => manager.update(time, deltaTime));
 
-        // this.scaleChildren(this.config.scale);
+        this.scaleChildren(this.config.scale);
     }
 
     // getPlayerText(user: any) {

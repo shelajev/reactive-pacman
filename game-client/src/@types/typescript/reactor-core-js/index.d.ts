@@ -16,7 +16,7 @@ declare module 'reactor-core-js/flux' {
 
 
         compose<V>(transformer: (flux: Flux<T>) => Publisher<V>): Flux<V> 
-
+        static mergeArray<T>(sources: Flux<T>[]): Flux<T>;
         consume(): Disposable;
         consume(onNextCallback: (t: T) => void): Disposable;
         consume(onNextCallback: (t: T) => void, onErrorCallback: (e: Error) => void): Disposable;

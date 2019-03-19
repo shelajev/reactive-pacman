@@ -37,8 +37,86 @@ export class KeysService implements DirectionService {
         return this.keysProcessor;
     }
 }
+export class SwipeService implements DirectionService {
+
+    private swipeProcessor: DirectProcessor<Direction>;
+    private initialX: number;
+    private initialY: number;
+
+    constructor(scene: Phaser.Scene) {
+        const canvas = window.document.querySelector('canvas');
+        this.swipeProcessor = new DirectProcessor<Direction>();
+        // window.document.addEventListener("touchstart", this.startTouch.bind(this), false);
+        // window.document.addEventListener("touchmove", this.moveTouch.bind(this), false);
+        window.document.ontouchstart = (e) => this.startTouch(e);
+        window.document.ontouchmove = (e) => this.moveTouch(e);
+    }
+
+    startTouch(e: TouchEvent) {
+        this.initialX = e.touches[0].clientX;
+        this.initialY = e.touches[0].clientY;
+    }
+
+    moveTouch(e: TouchEvent) {
+        if (this.initialX === null) {
+            return;
+        }
+        var currentX = e.touches[0].clientX;
+        var currentY = e.touches[0].clientY;
+        
+        var diffX = this.initialX - currentX;
+        var diffY = this.initialY - currentY;
+        
+        if (Math.abs(diffX) > Math.abs(diffY)) {
+            // sliding horizontally
+            if (diffX > 0) {
+            // swiped left
+                this.swipeProcessor.onNext(Direction.LEFT);
+                console.log('swiped');
+            } else {
+            // swiped right
+                this.swipeProcessor.onNext(Direction.RIGHT);
+                console.log('swiped');
+            }
+        } else {
+            // sliding vertically
+            if (diffY > 0) {
+            // swiped up
+                this.swipeProcessor.onNext(Direction.UP);
+                console.log('swiped');
+            } else {
+            // swiped down
+                this.swipeProcessor.onNext(Direction.DOWN);
+                console.log('swiped');
+            }
+        }
+
+        this.initialX = null;
+        this.initialY = null;
+
+        // e.preventDefault();
+    }
 
 
+    listen(): Flux<Direction> {
+        return this.swipeProcessor;
+    }
+}
+
+
+export class ControlsService implements DirectionService {
+    private swipeService: SwipeService;
+    private keysService: KeysService;
+
+    constructor(scene: Phaser.Scene) {
+        this.keysService = new KeysService(scene);
+        this.swipeService = new SwipeService(scene);
+    }
+
+    listen(): Flux<Direction> {
+        return Flux.mergeArray([this.swipeService.listen(), this.keysService.listen()]);
+    }
+}
 
 // this.swipeDirec = -1;
 
