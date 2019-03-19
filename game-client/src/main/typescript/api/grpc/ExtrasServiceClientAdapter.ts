@@ -11,7 +11,9 @@ export default class ExtrasServiceClientAdapter implements ExtrasService {
     private service: GRPCServices.ExtrasServiceClient;
 
     constructor() {
-        this.service = new GRPCServices.ExtrasServiceClient("http://localhost:8000", {}, {});
+        const urlParams = new URLSearchParams(window.location.search);
+        const endpoint = urlParams.get('endpoint');
+        this.service = new GRPCServices.ExtrasServiceClient(endpoint || "http://localhost:8000", {}, {});
     }
 
     extras(): Flux<Extra.AsObject> {

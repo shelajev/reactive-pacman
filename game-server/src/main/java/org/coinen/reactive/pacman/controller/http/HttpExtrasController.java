@@ -23,7 +23,7 @@ public class HttpExtrasController {
     }
 
     @GetMapping("/extras")
-    @CrossOrigin(origins = "http://localhost:9000", methods = RequestMethod.GET, allowedHeaders = "*", allowCredentials = "true")
+    @CrossOrigin(origins = "*", methods = RequestMethod.GET, allowedHeaders = "*", allowCredentials = "true")
     public Flux<String> extras(@CookieValue("uuid") String uuid) {
         return extrasService.extras()
                             .map(e -> Arrays.toString(e.toByteArray()))

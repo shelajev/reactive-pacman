@@ -10,7 +10,9 @@ export default class SetupServiceClientAdapter {
     private service: GRPCServices.SetupServiceClient;
 
     constructor() {
-        this.service = new GRPCServices.SetupServiceClient("http://localhost:8000", {}, {});
+        const urlParams = new URLSearchParams(window.location.search);
+        const endpoint = urlParams.get('endpoint');
+        this.service = new GRPCServices.SetupServiceClient(endpoint || "http://localhost:8000", {}, {});
     }
 
     map(): Single<Map.AsObject> {

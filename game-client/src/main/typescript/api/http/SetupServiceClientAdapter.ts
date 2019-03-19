@@ -4,9 +4,11 @@ import { Map } from "game-idl";
 export default class SetupServiceClientAdapter {
 
     map(): Single<Map.AsObject> {
+        const urlParams = new URLSearchParams(window.location.search);
+        const endpoint = urlParams.get('endpoint');
         return new Single(subject => {
             subject.onSubscribe();
-            fetch("http://localhost:3000/http/setup", {
+            fetch(`${endpoint || "http://localhost:3000"}/http/setup`, {
                 credentials: "include"
             })
             .then(response => response.arrayBuffer())

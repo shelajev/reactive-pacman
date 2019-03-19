@@ -27,7 +27,8 @@ public class HttpGameController {
     }
 
     @PostMapping("/start")
-    @CrossOrigin(origins = "http://localhost:9000", methods = RequestMethod.POST, allowedHeaders = "*", allowCredentials = "true")
+    @CrossOrigin(origins = "*", methods = RequestMethod.POST, allowedHeaders = "*",
+        allowCredentials = "true")
     public Mono<Config> start(@RequestBody Nickname nickname, @CookieValue("uuid") String uuid) {
         return gameService.start(nickname).subscriberContext(Context.of("uuid", UUID.fromString(uuid)));
     }

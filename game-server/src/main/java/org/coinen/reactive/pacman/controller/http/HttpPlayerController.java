@@ -34,7 +34,7 @@ public class HttpPlayerController {
     }
 
     @PostMapping("/locate")
-    @CrossOrigin(origins = "http://localhost:9000", methods = RequestMethod.POST, allowedHeaders = "*", allowCredentials = "true")
+    @CrossOrigin(origins = "*", methods = RequestMethod.POST, allowedHeaders = "*", allowCredentials = "true")
     public void locate(@RequestBody Location location, @CookieValue("uuid") String uuidString) {
         UUID uuid = UUID.fromString(uuidString);
 
@@ -56,7 +56,7 @@ public class HttpPlayerController {
     }
 
     @GetMapping("/players")
-    @CrossOrigin(origins = "http://localhost:9000", methods = RequestMethod.GET, allowedHeaders = "*", allowCredentials = "true")
+    @CrossOrigin(origins = "*", methods = RequestMethod.GET, allowedHeaders = "*", allowCredentials = "true")
     public Flux<String> players(@CookieValue("uuid") String uuid) {
         return playerService.players()
                             .map(e -> Arrays.toString(e.toByteArray()))

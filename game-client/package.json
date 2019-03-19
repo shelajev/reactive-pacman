@@ -6,7 +6,6 @@
   "scripts": {
     "postinstall": "npm run build",
     "build": "webpack",
-    "start": "node dist/server/index.js",
     "start:dev": "webpack-dev-server"
   },
   "author": "",

@@ -10,6 +10,8 @@ import { Disposable } from "reactor-core-js";
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
     locate(locationStream: Flux<Location.AsObject>): Single<void> {
+        const urlParams = new URLSearchParams(window.location.search);
+        const endpoint = urlParams.get('endpoint');
         return new Single(subject => {
             let disposable: Disposable = {
                 dispose: () => {}
@@ -33,7 +35,7 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
                     (location) => {
                         if(!isFetching) {
                             isFetching = true;
-                            fetch("http://localhost:3000/http/locate", {
+                            fetch(`${endpoint || "http://localhost:3000"}/http/locate`, {
                                 method: "POST",
                                 body: location.serializeBinary(),
                                 credentials: "include"
@@ -50,8 +52,10 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
     }
 
     players(): Flux<Player.AsObject> {
+        const urlParams = new URLSearchParams(window.location.search);
+        const endpoint = urlParams.get('endpoint');
         return Flux.from<Player>(FlowableAdapter.wrap(new Flowable(subscriber => {
-            const eventSource = new EventSource("http://localhost:3000/http/players", { withCredentials : true });
+            const eventSource = new EventSource(`${endpoint || "http://localhost:3000"}/http/players`, { withCredentials : true });
 
             subscriber.onSubscribe({
                 request: (): void => {},

@@ -29,7 +29,7 @@ public class HttpSetupController {
     }
 
     @GetMapping("/setup")
-    @CrossOrigin(origins = "http://localhost:9000", methods = RequestMethod.GET, allowedHeaders = "*", allowCredentials = "true")
+    @CrossOrigin(origins = "*", methods = RequestMethod.GET, allowedHeaders = "*", allowCredentials = "true")
     public Map setup(ServerWebExchange webExchange) {
         UUID uuid = new UUID(Clock.systemUTC().millis(), ThreadLocalRandom.current().nextLong());
 

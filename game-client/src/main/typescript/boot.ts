@@ -38,13 +38,13 @@ export class Boot extends Scene {
 
     create(config : any) {
         const urlParams = new URLSearchParams(window.location.search);
-            const type = urlParams.get('type');
-            if(type === "rsocket") {
+        const type = urlParams.get('type');
+        if(type === "rsocket") {
             let rSocket: ReactiveSocket<any, any>;
             const client = new RpcClient({
                 transport: new RSocketWebSocketClient(
                     {
-                        url: 'ws://localhost:3000',
+                        url: urlParams.get('endpoint') || 'ws://localhost:3000',
                     },
                     BufferEncoders
                 ),

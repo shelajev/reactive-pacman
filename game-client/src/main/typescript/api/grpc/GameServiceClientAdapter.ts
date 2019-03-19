@@ -10,7 +10,9 @@ export default class GameServiceClientAdapter implements GameService {
     private service: GRPCServices.GameServiceClient;
 
     constructor() {
-        this.service = new GRPCServices.GameServiceClient("http://localhost:8000", {}, {});
+        const urlParams = new URLSearchParams(window.location.search);
+        const endpoint = urlParams.get('endpoint');
+        this.service = new GRPCServices.GameServiceClient(endpoint || "http://localhost:8000", {}, {});
     }
 
     start({ value }: Nickname.AsObject): Single<Config.AsObject> {

@@ -7,8 +7,10 @@ import {Flowable} from "rsocket-flowable";
 export default class ExtrasServiceClientAdapter implements ExtrasService {
 
     extras(): Flux<Extra.AsObject> {
+        const urlParams = new URLSearchParams(window.location.search);
+        const endpoint = urlParams.get('endpoint');
         return Flux.from<Extra>(FlowableAdapter.wrap(new Flowable(subscriber => {
-                const eventSource = new EventSource("http://localhost:3000/http/extras", { withCredentials : true });
+                const eventSource = new EventSource(`${endpoint || "http://localhost:3000"}/http/extras`, { withCredentials : true });
 
                 subscriber.onSubscribe({
                     request: (): void => {},
