@@ -1,99 +1,65 @@
 plugins {
-	id 'org.springframework.boot' version '2.1.3.RELEASE'
+	id 'org.springframework.boot' version '2.1.3.RELEASE' apply false
+	id 'com.google.protobuf' version '0.8.8' apply false
 	id 'java'
 	id 'idea'
-	id 'com.google.protobuf' version '0.8.7'
 }
 
-apply plugin: 'io.spring.dependency-management'
+allprojects {
 
-group = 'org.coinen.reactive.pacman'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+	group = 'org.coinen.reactive.pacman'
+	version = '0.0.1'
+	sourceCompatibility = '11'
 
-repositories {
-	jcenter()
-	mavenCentral()
-	maven { url 'https://jitpack.io' }
-	maven { url 'https://repo.spring.io/snapshot' }
-	maven { url 'https://repo.spring.io/milestone' }
-	maven { url 'https://oss.jfrog.org/oss-snapshot-local' }
-	maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
+	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'java'
+	apply plugin: 'idea'
 
-dependencies {
-
-	implementation "io.grpc:grpc-stub:1.18.0"
-	implementation "io.grpc:grpc-netty:1.18.0"
-	implementation "io.grpc:grpc-protobuf:1.18.0"
-	implementation "com.salesforce.servicelibs:reactor-grpc-stub:0.10.0-RC1"
-	implementation 'org.roaringbitmap:RoaringBitmap:[0.6,)'
-	implementation 'org.jctools:jctools-core:2.1.1'
-	implementation 'io.rsocket:rsocket-core:0.12.1-RC3-SNAPSHOT'
-	implementation 'io.rsocket.rpc:rsocket-rpc-core:0.2.14'
-	implementation 'com.google.protobuf:protobuf-java:3.6.1'
-	implementation 'io.github.lognet:grpc-spring-boot-starter:3.1.0'
-	implementation 'com.github.collaborationinencapsulation.spring-boot-rsocket:spring-boot-starter-rsocket:c1bd9a7c10'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
-	protobuf 'io.rsocket.rpc:rsocket-rpc-protobuf-idl:0.2.14'
-	
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
-}
-
-sourceSets {
-	main {
-		proto { srcDir 'src/main/proto' }
+	repositories {
+		jcenter()
+		mavenCentral()
+		maven { url 'https://jitpack.io' }
+		maven { url 'https://repo.spring.io/snapshot' }
+		maven { url 'https://repo.spring.io/milestone' }
+		maven { url 'https://oss.jfrog.org/oss-snapshot-local' }
+		maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 	}
 
-	test {
-		proto { srcDir 'src/test/proto' }
-	}
-}
-
-protobuf {
-	generatedFilesBaseDir = "${projectDir}/src/generated"
-
-	protoc {
-		artifact = 'com.google.protobuf:protoc:3.6.1'
-	}
-	plugins {
-		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.18.0"
+	dependencyManagement {
+		imports {
+			mavenBom 'org.springframework.boot:spring-boot-dependencies:2.1.3.RELEASE'
+			mavenBom 'org.roaringbitmap:RoaringBitmapParent:0.7.42'
+			mavenBom 'org.roaringbitmap:RoaringBitmapParent:0.7.42'
+			mavenBom 'com.google.protobuf:protobuf-bom:3.7.0'
 		}
-		reactorGRpc {
-			artifact = "com.salesforce.servicelibs:reactor-grpc:0.10.0-RC1:jdk8@jar"
-		}
-		rsocketRpc {
-			artifact = "io.rsocket.rpc:rsocket-rpc-protobuf:0.2.14"
+
+		dependencies {
+
+			dependencySet (group: 'io.grpc', version: '1.19.0') {
+				entry 'grpc-stub'
+				entry 'grpc-netty'
+				entry 'grpc-protobuf'
+				entry 'protoc-gen-grpc-java'
+			}
+
+			dependencySet (group: 'io.rsocket', version: '0.12.1-RC3-SNAPSHOT') {
+				entry 'rsocket-core'
+				entry 'rsocket-transport-netty'
+			}
+
+			dependencySet (group: 'io.rsocket.rpc', version: '0.2.14') {
+				entry 'rsocket-rpc-core'
+				entry 'rsocket-rpc-protobuf'
+				entry 'rsocket-rpc-protobuf-idl'
+			}
+
+			dependency group: 'com.google.protobuf', name: 'protoc', version: '3.7.0'
+
+			dependency group: 'org.jctools', name: 'jctools-core', version: '2.1.1'
+			dependency group: 'com.salesforce.servicelibs', name: 'reactor-grpc-stub', version: '0.10.0-RC1'
+
+			dependency group:'io.github.lognet', name: 'grpc-spring-boot-starter', version: '3.1.0'
+			dependency group: 'com.github.collaborationinencapsulation.spring-boot-rsocket', name: 'spring-boot-starter-rsocket', version: 'c1bd9a7c10'
 		}
 	}
-	generateProtoTasks {
-		ofSourceSet('main')*.plugins {
-			grpc {}
-			rsocketRpc  {}
-			reactorGRpc {}
-		}
-	}
-}
-
-idea {
-	module {
-		sourceDirs += file("src/main/proto")
-		sourceDirs += file("src/generated/main/java")
-		sourceDirs += file("src/generated/main/grpc")
-		sourceDirs += file("src/generated/main/reactorGRpc")
-		sourceDirs += file("src/generated/main/rsocketRpc")
-
-		generatedSourceDirs += file('src/generated/main/java')
-		generatedSourceDirs += file("src/generated/main/grpc")
-		generatedSourceDirs += file("src/generated/main/reactorGRpc")
-		generatedSourceDirs += file("src/generated/main/rsocketRpc")
-	}
-}
-
-clean {
-	delete 'src/generated/main'
 }

@@ -10,12 +10,12 @@ src/shared/*
 
 HELP.md
 .gradle
-/build/
+build
 !gradle/wrapper/gradle-wrapper.jar
 
 ### Project ###
 
-src/generated/
+**/generated/
 
 ### STS ###
 .apt_generated
