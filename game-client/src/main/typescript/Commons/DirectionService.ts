@@ -45,16 +45,18 @@ export class SwipeService implements DirectionService {
 
     constructor(scene: Phaser.Scene) {
         const canvas = window.document.querySelector('canvas');
-        this.swipeProcessor = new DirectProcessor<Direction>();
-        // window.document.addEventListener("touchstart", this.startTouch.bind(this), false);
-        // window.document.addEventListener("touchmove", this.moveTouch.bind(this), false);
-        window.document.ontouchstart = (e) => this.startTouch(e);
-        window.document.ontouchmove = (e) => this.moveTouch(e);
+        this.swipeProcessor = new DirectProcessor<Direction>()
+        window.document.querySelector('#phaser-overlay').addEventListener("touchstart", this.startTouch.bind(this), false);
+        window.document.querySelector('#phaser-overlay').addEventListener("touchmove", this.moveTouch.bind(this), false);
+        // window.document.querySelector('#phaser-overlay').ontouchstart = (e) => this.startTouch(e);
+        // window.document.querySelector('#phaser-overlay').ontouchmove = (e) => this.moveTouch(e);
     }
 
     startTouch(e: TouchEvent) {
         this.initialX = e.touches[0].clientX;
         this.initialY = e.touches[0].clientY;
+        e.preventDefault();
+
     }
 
     moveTouch(e: TouchEvent) {
@@ -72,29 +74,25 @@ export class SwipeService implements DirectionService {
             if (diffX > 0) {
             // swiped left
                 this.swipeProcessor.onNext(Direction.LEFT);
-                console.log('swiped');
             } else {
             // swiped right
                 this.swipeProcessor.onNext(Direction.RIGHT);
-                console.log('swiped');
             }
         } else {
             // sliding vertically
             if (diffY > 0) {
             // swiped up
                 this.swipeProcessor.onNext(Direction.UP);
-                console.log('swiped');
             } else {
             // swiped down
                 this.swipeProcessor.onNext(Direction.DOWN);
-                console.log('swiped');
             }
         }
 
         this.initialX = null;
         this.initialY = null;
 
-        // e.preventDefault();
+        e.preventDefault();
     }
 
 

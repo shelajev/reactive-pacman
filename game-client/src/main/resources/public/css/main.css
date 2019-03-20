@@ -9,6 +9,7 @@ html {
     background-attachment: fixed;
     background-position: center 99.5%;
     background-size: auto 3%;
+    overflow: hidden!important;
 }
 
 body {
@@ -17,6 +18,7 @@ body {
     background-color: #116;
     color: #333;
     font: caption;
+    overflow: hidden!important;
 }
 
 @font-face {
