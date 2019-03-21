@@ -1,5 +1,6 @@
 package org.coinen.reactive.pacman.service.support;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 public class DefaultPlayerService implements PlayerService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPlayerService.class);
@@ -37,6 +39,20 @@ public class DefaultPlayerService implements PlayerService {
         playerRepository = repository;
         this.extrasService = extrasService;
         mapService = service;
+        Flux.interval(Duration.ofSeconds(5))
+            .doOnNext(this::checkPlayers)
+            .subscribe();
+    }
+
+    private void checkPlayers(long el) {
+        playerRepository.findAll()
+            .forEach(p -> {
+                if (System.currentTimeMillis() - p.getTimestamp() > 60000) {
+                    this.disconnectPlayer()
+                        .subscriberContext(Context.of("uuid", p.getUuid()))
+                        .subscribe();
+                }
+            });
     }
 
     @Override
