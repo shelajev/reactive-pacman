@@ -1,5 +1,4 @@
-
-import { Player } from 'game-idl';
+import {Player} from 'game-idl';
 import * as $ from 'jquery';
 import GameConfig from './GameConfig';
 import PlayerService from "../api/PlayerService";
@@ -9,8 +8,9 @@ import SceneSupport from '../Commons/SceneSupport';
 import PlayersManager from './PlayersManager';
 import MapManager from './MapManager';
 import ExtrasManager from './ExtrasManager';
-import { ControlsService } from '../Commons/DirectionService';
+import {ControlsService} from '../Commons/DirectionService';
 import LeaderboardManager from './LeaderboardManager';
+import {DirectProcessor} from 'reactor-core-js/flux';
 
 export default class GameScene extends Phaser.Scene {
     overlay: JQuery<HTMLElement>;
@@ -108,6 +108,20 @@ export default class GameScene extends Phaser.Scene {
 
         this.cameras.main.setSize(this.config.screen.width * this.config.zoom, this.config.screen.height * this.config.zoom);
 
+
+        setInterval(() => {
+            const { players } = this.state;
+
+            Object.keys(players).forEach(uuid => {
+                const player = players[uuid];
+
+                if (Date.now() - player.timestamp > 10000) {
+                    player.state = Player.State.DISCONNECTED;
+                    delete players[uuid];
+                    (config.playerService.players() as DirectProcessor<Player.AsObject>).onNext(player);
+                }
+            });
+        }, 5000);
 
         this.managers = [
             new MapManager(this, this.state, this.config),

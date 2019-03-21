@@ -114,7 +114,6 @@ export default class PlayersManager implements SceneSupport {
             this.scene.children.bringToTop(this.players[uuid]);
         });
 
-        const { size } = this.config;
         const { player, powerState } = this.state;
         const { type, location: { position } } = player;
         const sprite = this.player;
@@ -185,7 +184,8 @@ export default class PlayersManager implements SceneSupport {
         const currentY = position.y;
 
 
-        if (this.lastX != currentX || this.lastY != currentY) {
+        if (this.lastX != currentX || this.lastY != currentY || (Date.now() - player.timestamp) > 5000) {
+            player.timestamp = Date.now();
             this.lastX = currentX;
             this.lastY = currentY;
             this.locationProcessor.onNext(player.location);

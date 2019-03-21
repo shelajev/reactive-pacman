@@ -118,7 +118,7 @@ public class DefaultPlayerService implements PlayerService {
                                    // scoreProcessor.onNext({player, score: player.getScore() + 1});
                                }
 
-                               return playerBuilder.build();
+                               return playerBuilder.setTimestamp(Instant.now().toEpochMilli()).build();
                            });
 
 
@@ -157,6 +157,7 @@ public class DefaultPlayerService implements PlayerService {
                              .setScore(score)
                              .setType(playerType)
                              .setUuid(uuid.toString())
+                             .setTimestamp(Instant.now().toEpochMilli())
                              .build();
             }))
             .doAfterSuccessOrError((player, t) -> {
