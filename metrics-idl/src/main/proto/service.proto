@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package org.coinen.pacman.metrics;
+
+import "metrics.proto";
+
+option java_package = "org.coinen.pacman.metrics";
+option java_multiple_files = false;
+
+
+service MetricsSnapshotHandler {
+    rpc StreamMetrics (stream MetricsSnapshot) returns (stream Skew) {}
+    rpc SendMetrics (MetricsSnapshot) returns (Skew) {}
+}

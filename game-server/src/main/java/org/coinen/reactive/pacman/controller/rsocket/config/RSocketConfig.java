@@ -1,6 +1,7 @@
 package org.coinen.reactive.pacman.controller.rsocket.config;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.opentracing.Tracer;
@@ -27,30 +28,36 @@ import org.springframework.context.annotation.Scope;
 public class RSocketConfig {
 
     @Bean
+    public MeterRegistry rSocketMeterRegistry() {
+        return new RSocketMeterRegistrySupplier().get();
+    }
+
+    @Bean
     public ExtrasServiceServer extrasServiceServer(
         ExtrasService extrasService,
-        Optional<MeterRegistry> meterRegistry,
+        MeterRegistry rSocketMeterRegistry,
         Optional<Tracer> tracer
     ) {
-        return new ExtrasServiceServer(new ExtrasController(extrasService), meterRegistry, tracer);
+        return new ExtrasServiceServer(new ExtrasController(extrasService),
+            Optional.of(rSocketMeterRegistry), tracer);
     }
 
     @Bean
     public GameServiceServer gameServiceServer(
         GameService gameService,
-        Optional<MeterRegistry> meterRegistry,
+        MeterRegistry rSocketMeterRegistry,
         Optional<Tracer> tracer
     ) {
-        return new GameServiceServer(new GameController(gameService), meterRegistry, tracer);
+        return new GameServiceServer(new GameController(gameService), Optional.of(rSocketMeterRegistry), tracer);
     }
 
     @Bean
     public PlayerServiceServer playerServiceServer(
         PlayerService playerService,
-        Optional<MeterRegistry> meterRegistry,
+        MeterRegistry rSocketMeterRegistry,
         Optional<Tracer> tracer
     ) {
-        return new PlayerServiceServer(new PlayerController(playerService), meterRegistry, tracer);
+        return new PlayerServiceServer(new PlayerController(playerService), Optional.of(rSocketMeterRegistry), tracer);
     }
 
     @Bean

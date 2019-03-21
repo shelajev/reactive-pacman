@@ -1,11 +1,8 @@
 package org.coinen.reactive.pacman.controller.grpc;
 
-import java.time.Clock;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 import com.google.protobuf.Empty;
-import io.grpc.Context;
 import io.grpc.Metadata;
 import io.grpc.ServerCall;
 import io.grpc.ServerCallHandler;

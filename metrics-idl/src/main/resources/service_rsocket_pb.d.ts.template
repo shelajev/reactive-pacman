@@ -1,0 +1,37 @@
+import * as rsocket_flowable from 'rsocket-flowable';
+import * as metrics_pb from './metrics_pb';
+import { ReactiveSocket, Responder, Payload } from 'rsocket-types';
+
+
+export interface MetricsSnapshotHandler {
+  streamMetrics(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>): rsocket_flowable.Flowable<metrics_pb.Skew>;
+  streamMetrics(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>, metadata: Buffer): rsocket_flowable.Flowable<metrics_pb.Skew>;
+
+  sendMetrics(message: metrics_pb.MetricsSnapshot): rsocket_flowable.Single<metrics_pb.Skew>;
+  sendMetrics(message: metrics_pb.MetricsSnapshot, metadata: Buffer): rsocket_flowable.Single<metrics_pb.Skew>;
+}
+
+export class MetricsSnapshotHandlerClient implements MetricsSnapshotHandler {
+  constructor(rs: ReactiveSocket<any, any>);
+  constructor(rs: ReactiveSocket<any, any>, tracer: any);
+  constructor(rs: ReactiveSocket<any, any>, tracer: any, meterRegistry: any);
+
+
+  streamMetrics(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>): rsocket_flowable.Flowable<metrics_pb.Skew>;
+  streamMetrics(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>, metadata: Buffer): rsocket_flowable.Flowable<metrics_pb.Skew>;
+
+  sendMetrics(message: metrics_pb.MetricsSnapshot): rsocket_flowable.Single<metrics_pb.Skew>;
+  sendMetrics(message: metrics_pb.MetricsSnapshot, metadata: Buffer): rsocket_flowable.Single<metrics_pb.Skew>;
+}
+
+export class MetricsSnapshotHandlerServer implements Responder<any, any> {
+  constructor(service: MetricsSnapshotHandler);
+  constructor(service: MetricsSnapshotHandler, tracer: any);
+  constructor(service: MetricsSnapshotHandler, tracer: any, meterRegistry: any);
+
+  fireAndForget(payload: Payload<any, any>): void;
+  requestResponse(payload: Payload<any, any>): rsocket_flowable.Single<Payload<any, any>>;
+  requestStream(payload: Payload<any, any>): rsocket_flowable.Flowable<Payload<any, any>>;
+  requestChannel(payloads: rsocket_flowable.Flowable<Payload<any, any>>): rsocket_flowable.Flowable<Payload<any, any>>;
+  metadataPush(payload: Payload<any, any>): rsocket_flowable.Single<void>;
+}

@@ -5,13 +5,10 @@ import java.util.concurrent.ConcurrentMap;
 
 import com.google.protobuf.Empty;
 import org.coinen.pacman.Location;
-import org.coinen.pacman.Player;
 import org.coinen.pacman.ReactorLocationServiceGrpc;
-import org.coinen.pacman.ReactorPlayerServiceGrpc;
 import org.coinen.reactive.pacman.service.PlayerService;
 import org.jctools.maps.NonBlockingHashMap;
 import org.lognet.springboot.grpc.GRpcService;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.UnicastProcessor;
 import reactor.util.concurrent.Queues;
