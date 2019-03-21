@@ -35,6 +35,7 @@ public class SetupController implements SocketAcceptor {
         final UUID uuid = new UUID(Clock.systemUTC().millis(), ThreadLocalRandom.current().nextLong());
 
         sendingSocket.onClose()
+                     .onErrorResume(e -> Mono.empty())
                      .then(playerService.disconnectPlayer())
                      .subscriberContext(Context.of("uuid", uuid))
                      .subscribe();

@@ -172,11 +172,13 @@ public class DefaultPlayerService implements PlayerService {
         return Mono.subscriberContext()
                    .map(c -> c.<UUID>get("uuid"))
                    .doOnNext(uuid -> {
-
+                       LOGGER.info("Disconnecting Player: {}", uuid);
                        Player player = playerRepository.delete(uuid);
-                        if (player != null) {
-                            playersSink.next(player.toBuilder().setState(Player.State.DISCONNECTED).build());
-                        }
+                       if (player != null) {
+                           playersSink.next(player.toBuilder()
+                                                  .setState(Player.State.DISCONNECTED)
+                                                  .build());
+                       }
                    })
                    .then();
     }
