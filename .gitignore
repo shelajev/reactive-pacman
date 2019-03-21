@@ -11,6 +11,7 @@ src/shared/*
 HELP.md
 .gradle
 build
+out
 !gradle/wrapper/gradle-wrapper.jar
 
 ### Project ###
