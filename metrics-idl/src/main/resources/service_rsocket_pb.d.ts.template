@@ -1,14 +1,15 @@
 import * as rsocket_flowable from 'rsocket-flowable';
 import * as metrics_pb from './metrics_pb';
 import { ReactiveSocket, Responder, Payload } from 'rsocket-types';
+import {Empty} from "google-protobuf/google/protobuf/empty_pb";
 
 
 export interface MetricsSnapshotHandler {
-  streamMetrics(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>): rsocket_flowable.Flowable<metrics_pb.Skew>;
-  streamMetrics(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>, metadata: Buffer): rsocket_flowable.Flowable<metrics_pb.Skew>;
+  streamMetricsSnapshots(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>): rsocket_flowable.Single<Empty>;
+  streamMetricsSnapshots(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>, metadata: Buffer): rsocket_flowable.Single<Empty>;
 
-  sendMetrics(message: metrics_pb.MetricsSnapshot): rsocket_flowable.Single<metrics_pb.Skew>;
-  sendMetrics(message: metrics_pb.MetricsSnapshot, metadata: Buffer): rsocket_flowable.Single<metrics_pb.Skew>;
+  sendMetricsSnapshot(message: metrics_pb.MetricsSnapshot): rsocket_flowable.Single<Empty>;
+  sendMetricsSnapshot(message: metrics_pb.MetricsSnapshot, metadata: Buffer): rsocket_flowable.Single<Empty>;
 }
 
 export class MetricsSnapshotHandlerClient implements MetricsSnapshotHandler {
@@ -17,11 +18,11 @@ export class MetricsSnapshotHandlerClient implements MetricsSnapshotHandler {
   constructor(rs: ReactiveSocket<any, any>, tracer: any, meterRegistry: any);
 
 
-  streamMetrics(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>): rsocket_flowable.Flowable<metrics_pb.Skew>;
-  streamMetrics(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>, metadata: Buffer): rsocket_flowable.Flowable<metrics_pb.Skew>;
+  streamMetricsSnapshots(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>): rsocket_flowable.Single<Empty>;
+  streamMetricsSnapshots(message: rsocket_flowable.Flowable<metrics_pb.MetricsSnapshot>, metadata: Buffer): rsocket_flowable.Single<Empty>;
 
-  sendMetrics(message: metrics_pb.MetricsSnapshot): rsocket_flowable.Single<metrics_pb.Skew>;
-  sendMetrics(message: metrics_pb.MetricsSnapshot, metadata: Buffer): rsocket_flowable.Single<metrics_pb.Skew>;
+  sendMetricsSnapshot(message: metrics_pb.MetricsSnapshot): rsocket_flowable.Single<Empty>;
+  sendMetricsSnapshot(message: metrics_pb.MetricsSnapshot, metadata: Buffer): rsocket_flowable.Single<Empty>;
 }
 
 export class MetricsSnapshotHandlerServer implements Responder<any, any> {

@@ -1,4 +1,5 @@
 import PlayerService from "../api/PlayerService";
+import GameConfig from "./GameConfig";
 import { GameState } from ".";
 import { Player } from "game-idl";
 import { Score } from "game-idl";

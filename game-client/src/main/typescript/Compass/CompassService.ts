@@ -42,65 +42,87 @@ export default class CompassService implements Disposable {
     }
 
     private doOnPlayerLocation(player: Player.AsObject): void {
-        const { location, type, uuid, state } = player;
+        try {
+            const {location, type, uuid, state} = player;
 
-        if (type === Player.Type.PACMAN && state !== Player.State.DISCONNECTED) {
-            const playerDistance = this.distanceTo(location.position, this.myLocation.position);
-            const closestDistance = this.distanceTo(this.myLocation.position, this.playersLocation[this.closestPlayerUuid].position);
-            
-            if (closestDistance > playerDistance)  {
-                this.closestPlayerUuid = uuid;
-                this.rotationToClosest = this.rotationTo(this.myLocation.position, this.playersLocation[this.closestPlayerUuid].position);
-            }
+            if (type === Player.Type.PACMAN && state !== Player.State.DISCONNECTED) {
+                this.playersLocation[uuid] = location;
 
-            this.playersLocation[uuid] = location;
-        } else if (state === Player.State.DISCONNECTED) {
-            delete this.playersLocation[uuid];
+                if (this.closestPlayerUuid) {
+                    const playerDistance = this.distanceTo(location.position,
+                        this.myLocation.position);
+                    const closestDistance = this.distanceTo(this.myLocation.position,
+                        this.playersLocation[this.closestPlayerUuid].position);
 
-            if (uuid === this.closestPlayerUuid) {
-                delete this.closestPlayerUuid;
-                delete this.rotationToClosest;
+                    if (closestDistance > playerDistance) {
+                        this.closestPlayerUuid = uuid;
+                        this.rotationToClosest = this.rotationTo(this.myLocation.position, location.position);
+
+                        return;
+                    }
+                }
 
                 this.doOnMyLocation(this.myLocation);
             }
+            else if (state === Player.State.DISCONNECTED) {
+                delete this.playersLocation[uuid];
+
+                if (uuid === this.closestPlayerUuid) {
+                    delete this.closestPlayerUuid;
+                    delete this.rotationToClosest;
+
+                    this.doOnMyLocation(this.myLocation);
+                }
+            }
+        } catch(e) {
+            // delete this.closestPlayerUuid;
+            console.error(e);
         }
     }
 
     private doOnMyLocation(location: Location.AsObject) {
-        let closestLocation;
-        let closestPlayerUuid;
-        let closestDistance = Number.MAX_SAFE_INTEGER;
+        try {
+            let closestLocation;
+            let closestPlayerUuid;
+            let closestDistance = Number.MAX_SAFE_INTEGER;
 
-        if (this.closestPlayerUuid) {
-            closestLocation = this.playersLocation[this.closestPlayerUuid];
-            closestDistance = this.distanceTo(this.myLocation.position, closestLocation.position);
-
-            /**
-             * This check whether closestLocation became even more closer. 
-             * In case it becomes closer, than we don't have to recalculate all distance
-             * and assume that current closest player is the closest one still
-             */
-            if (closestDistance > this.distanceTo(location.position, closestLocation.position)) {
-                this.myLocation = location;
-                this.rotationToClosest = this.rotationTo(location.position, closestLocation.position);
+            if (!Object.keys(this.playersLocation).length) {
                 return;
             }
-        }
 
-        for (const uuid in this.playersLocation) {
-            const playerLocation = this.playersLocation[uuid];
-            const playerDistance = this.distanceTo(location.position, playerLocation.position);
-            
-            if (closestDistance >= playerDistance) {
-                closestLocation = playerLocation;
-                closestDistance = playerDistance;
-                closestPlayerUuid = uuid;
+            if (this.closestPlayerUuid) {
+                closestLocation = this.playersLocation[this.closestPlayerUuid];
+                closestDistance = this.distanceTo(this.myLocation.position, closestLocation.position);
+
+                /**
+                 * This check whether closestLocation became even more closer.
+                 * In case it becomes closer, than we don't have to recalculate all distance
+                 * and assume that current closest player is the closest one still
+                 */
+                if (closestDistance > this.distanceTo(location.position, closestLocation.position)) {
+                    this.myLocation = location;
+                    this.rotationToClosest = this.rotationTo(location.position, closestLocation.position);
+                    return;
+                }
             }
-        }
 
-        this.rotationToClosest = this.rotationTo(location.position, closestLocation.position);
-        this.closestPlayerUuid = closestPlayerUuid;
-        this.myLocation = location;
+            for (const uuid in this.playersLocation) {
+                const playerLocation = this.playersLocation[uuid];
+                const playerDistance = this.distanceTo(location.position, playerLocation.position);
+
+                if (closestDistance >= playerDistance) {
+                    closestLocation = playerLocation;
+                    closestDistance = playerDistance;
+                    closestPlayerUuid = uuid;
+                }
+            }
+
+            this.rotationToClosest = this.rotationTo(location.position, closestLocation.position);
+            this.closestPlayerUuid = closestPlayerUuid;
+            this.myLocation = location;
+        } catch(e) {
+            console.error(e);
+        }
     }
 
     private distanceTo(p1: Point.AsObject, p2: Point.AsObject): number {

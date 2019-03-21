@@ -1,6 +1,6 @@
 import PlayerService from "../PlayerService";
 import FlowableAdapter from "../FlowableAdapter";
-import { Flux } from "reactor-core-js/flux";
+import { Flux, DirectProcessor } from "reactor-core-js/flux";
 import { Single, Flowable } from "rsocket-flowable";
 import { Player } from "game-idl";
 import { Location } from "game-idl";
@@ -8,7 +8,9 @@ import { Point } from "game-idl";
 import { Disposable } from "reactor-core-js";
 
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
-
+    
+    private sharedPlayersStream: DirectProcessor<Player.AsObject>;
+    
     locate(locationStream: Flux<Location.AsObject>): Single<void> {
         const urlParams = new URLSearchParams(window.location.search);
         const endpoint = urlParams.get('endpoint');
@@ -52,24 +54,31 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
     }
 
     players(): Flux<Player.AsObject> {
-        const urlParams = new URLSearchParams(window.location.search);
-        const endpoint = urlParams.get('endpoint');
-        return Flux.from<Player>(FlowableAdapter.wrap(new Flowable(subscriber => {
-            const eventSource = new EventSource(`${endpoint || "http://localhost:3000"}/http/players`, { withCredentials : true });
+        if (!this.sharedPlayersStream) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const endpoint = urlParams.get('endpoint');
+            this.sharedPlayersStream = new DirectProcessor();
+            
+            Flux.from<Player>(FlowableAdapter.wrap(new Flowable(subscriber => {
+                const eventSource = new EventSource(`${endpoint || "http://localhost:3000"}/http/players`, { withCredentials : true });
 
-            subscriber.onSubscribe({
-                request: (): void => {},
-                cancel: (): void => eventSource.close()
-            });
+                subscriber.onSubscribe({
+                    request: (): void => {},
+                    cancel: (): void => eventSource.close()
+                });
 
-            eventSource.onmessage = e => {
-                subscriber.onNext(Player.deserializeBinary(new Uint8Array(eval(e.data))));
-            };
+                eventSource.onmessage = e => {
+                    subscriber.onNext(Player.deserializeBinary(new Uint8Array(eval(e.data))));
+                };
 
-            eventSource.onerror = e => {
-                subscriber.onError(e.data);
-            }
-        })))
-        .map(player => player.toObject());
+                eventSource.onerror = e => {
+                    subscriber.onError(e.data);
+                }
+            })))
+            .map(player => player.toObject())
+            .subscribe(this.sharedPlayersStream);
+        }
+
+        return this.sharedPlayersStream
     }
 }

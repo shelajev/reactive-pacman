@@ -1,0 +1,24 @@
+dependencies {
+
+  implementation project(':metrics-idl')
+  implementation "io.grpc:grpc-stub"
+  implementation "io.grpc:grpc-netty"
+  implementation "io.grpc:grpc-protobuf"
+  implementation "com.salesforce.servicelibs:reactor-grpc-stub"
+  implementation 'org.roaringbitmap:RoaringBitmap'
+  implementation 'org.jctools:jctools-core'
+  implementation 'io.rsocket:rsocket-core'
+  implementation 'io.rsocket.rpc:rsocket-rpc-core'
+  implementation 'com.google.protobuf:protobuf-java'
+  implementation 'io.github.lognet:grpc-spring-boot-starter'
+  implementation 'com.github.collaborationinencapsulation.spring-boot-rsocket:spring-boot-starter-rsocket'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-webflux'
+  implementation "io.micrometer:micrometer-registry-influx"
+
+
+  
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'io.projectreactor:reactor-test'
+}

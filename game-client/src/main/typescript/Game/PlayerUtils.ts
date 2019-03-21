@@ -51,8 +51,8 @@ export const createSprite = (user: Player.AsObject, scene: Phaser.Scene, config:
             user.location.position.x, 
             user.location.position.y,
             user.type == Player.Type.GHOST ? "ghost" : "man"
-        )
-        .setScale(scale);
+        );
+        // .setScale(scale, scale);
 
     if (user.type == Player.Type.PACMAN) {
         sprite.anims.play("eat");

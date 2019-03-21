@@ -45,11 +45,13 @@ allprojects {
 				entry 'rsocket-transport-netty'
 			}
 
-			dependencySet (group: 'io.rsocket.rpc', version: '0.2.14') {
+			dependencySet (group: 'io.rsocket.rpc', version: '0.2.15') {
 				entry 'rsocket-rpc-core'
 				entry 'rsocket-rpc-protobuf'
 				entry 'rsocket-rpc-protobuf-idl'
 			}
+
+			dependency group: 'io.projectreactor.netty', name: 'reactor-netty', version: '0.9.0.BUILD-SNAPSHOT'
 
 			dependency group: 'org.roaringbitmap', name: 'RoaringBitmap', version: '0.7.42'
 

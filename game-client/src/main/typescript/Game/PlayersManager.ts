@@ -82,9 +82,11 @@ export default class PlayersManager implements SceneSupport {
                 this.players[uuid] = createSprite(playerUpdate, this.scene, this.config, this.state);
             }
         } else if (state === Player.State.ACTIVE) {
-            if (uuid === this.state.player.uuid) {
-                this.state.player = playerUpdate;
-            } else {
+            if (uuid !== this.state.player.uuid) {
+                if (!this.players[uuid]) {
+                    this.players[uuid] = createSprite(playerUpdate, this.scene, this.config, this.state);
+                }
+                
                 const sprite: Phaser.Physics.Arcade.Sprite = this.players[uuid];
 
                 updateSprite(playerUpdate, this.state, this.config, sprite);
@@ -96,7 +98,9 @@ export default class PlayersManager implements SceneSupport {
                 location.reload(true);
             } 
             else {
-                this.players[uuid].destroy();
+                if (this.players[uuid]) {
+                    this.players[uuid].destroy();
+                }
                 delete this.players[uuid];
                 delete this.state.players[uuid];
             }

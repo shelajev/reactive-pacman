@@ -1,4 +1,4 @@
-import { Flux } from "reactor-core-js/flux";
+import { Flux, DirectProcessor } from "reactor-core-js/flux";
 import {Flowable, Single} from "rsocket-flowable";
 import { Player } from "game-idl";
 import { Location } from "game-idl";
@@ -12,6 +12,7 @@ import FlowableAdapter from "../FlowableAdapter";
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
     private service: GRPCServices.PlayerServiceClient;
     private locationServiceFallback: GRPCServices.LocationServiceClient;
+    private sharedPlayersStream: DirectProcessor<Player.AsObject>;
 
     constructor() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -56,18 +57,24 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
     }
 
     players(): Flux<Player.AsObject> {
-        return Flux.from<Player>(FlowableAdapter.wrap(new Flowable(subscriber => {
-                const clientReadableStream = this.service.players(new Empty(), {"uuid": localStorage.getItem("uuid")});
+        if (!this.sharedPlayersStream) {
+            this.sharedPlayersStream = new DirectProcessor()
+            Flux.from<Player>(FlowableAdapter.wrap(new Flowable(subscriber => {
+                    const clientReadableStream = this.service.players(new Empty(), {"uuid": localStorage.getItem("uuid")});
 
-                subscriber.onSubscribe({
-                    request: (): void => {},
-                    cancel: (): void => clientReadableStream.cancel()
-                });
+                    subscriber.onSubscribe({
+                        request: (): void => {},
+                        cancel: (): void => clientReadableStream.cancel()
+                    });
 
-                clientReadableStream.on("data", response => subscriber.onNext(response));
-                clientReadableStream.on("end", () => subscriber.onComplete());
-                clientReadableStream.on("error", (err) => subscriber.onError(new Error(`An Grpc Error was thrown. Code: [${err.code}]. Message: ${err.message}`)));
-            })))
-            .map(player => player.toObject())
+                    clientReadableStream.on("data", response => subscriber.onNext(response));
+                    clientReadableStream.on("end", () => subscriber.onComplete());
+                    clientReadableStream.on("error", (err) => subscriber.onError(new Error(`An Grpc Error was thrown. Code: [${err.code}]. Message: ${err.message}`)));
+                })))
+                .map(player => player.toObject())
+                .subscribe(this.sharedPlayersStream);
+        }
+
+        return this.sharedPlayersStream;
     }
 }

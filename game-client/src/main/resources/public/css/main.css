@@ -1,6 +1,7 @@
-html, body {
+html {
     background-color: #116;
     height: 100%;
+    overflow: scroll;
 }
 
 html { 
@@ -9,7 +10,7 @@ html {
     background-attachment: fixed;
     background-position: center 99.5%;
     background-size: auto 3%;
-    overflow: hidden!important;
+    /*overflow: hidden!important;*/
 }
 
 body {
@@ -18,7 +19,8 @@ body {
     background-color: #116;
     color: #333;
     font: caption;
-    overflow: hidden!important;
+    display: block;
+    /*overflow: hidden!important;*/
 }
 
 @font-face {
@@ -27,7 +29,16 @@ body {
     src: url('../fonts/nexa.ttf') format('truetype');
 }
     
-    
+#to-scroll {
+    display: none;
+    width: 100%;
+    height: 100px;
+    bottom: 50px;
+    position: absolute;
+    color: white;
+    text-align: center;
+    line-height: 100px;
+}
 
 #phaser-container {
     z-index: 999;
@@ -39,12 +50,12 @@ body {
 }
 
 #canvas-container {
+    display: none;
     position: absolute;
     width: 100%;
     height: 100%;
     top: 0;
     left: 0;
-
 }
 
 canvas {

@@ -49,13 +49,11 @@ export class Boot extends Scene {
                     BufferEncoders
                 ),
                 setup: {
-                    keepAlive: 60000,
-                    lifetime: 360000,
+                    keepAlive: 5000,
+                    lifetime: 60000,
                 },
                 responder: new RSocketRPCServices.MapServiceServer({
                     setup: (map: Map) => {
-                        console.log(map.toObject());
-
                         this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(rSocket), extrasService: new RSocketApi.ExtrasServiceClientAdapter(rSocket), gameService: new RSocketApi.GameServiceClientAdapter(rSocket) });
                     }
                 })
@@ -93,16 +91,14 @@ export class Boot extends Scene {
         $(".main").hide();
         $("#phaser-container").css("background-color", "white");
         $('#phaser-overlay-container #phaser-overlay').find('.loader').fadeIn(200, callback);
-
     }
 }
 
 (() => {
     const normalWidth = 1280;
     const normalHeight = 720;
-    const scale: number = screen.height <= 720 ? 0.5 : 1
+    const scale: number = 1;
     const zoom = 1;
-
     const game = new Game({
         type: Phaser.AUTO,
         parent: 'canvas-container',
@@ -114,6 +110,10 @@ export class Boot extends Scene {
             arcade: {
                 debug: false
             }
+        },
+        scale: {
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH
         },
         scene: [Boot, Menu, GameScene, CompassScene],
         // scene: [Boot, Menu, GameLoader, Game, Compass]

@@ -114,33 +114,12 @@ export default class GameScene extends Phaser.Scene {
             new PlayersManager(this, this.state, this.config, config.playerService, new ControlsService(this)),
             new ExtrasManager(this, this.state, this.config, config.extras, config.extrasService),
             new LeaderboardManager(this, this.state, this.config, config.playerService)
-        ]
-        this.scaleChildren(this.config.scale);
-    }
-
-    scaleChildren(scale: any) {
-        var children = this.children.list;
-        for (var i = 0; i < children.length; i++) {
-            children[i].x *= scale;
-            children[i].y *= scale;
-        }
+        ];
     }
 
     update(time: number, deltaTime: number) {
-        this.scaleChildren(1 / this.config.scale);
-
         this.managers.forEach(manager => manager.update(time, deltaTime));
-
-        this.scaleChildren(this.config.scale);
     }
-
-    // getPlayerText(user: any) {
-    //     var text = this.add.text(user.x, user.y + this.textOffset, user.nickname, { fontFamily: 'Arial', fontSize: '18px', fill: 'rgba(255,255,255,0.8)' });
-    //     text.setScale(this.sizeData.scale);
-    //     text.setOrigin(0.5);
-    //     return text;
-    // }
-
 
     initOverlay(config: any) {
         $('#phaser-overlay-container').show();
@@ -193,27 +172,4 @@ export default class GameScene extends Phaser.Scene {
             }, readTime);
         });
     }
-
-    // endSwipe(e: any) {
-    //     this.swipeData.startPosition = null;
-
-    //     // var swipeTime = e.upTime - e.downTime;
-    //     // var swipe = new Phaser.Geom.Point(e.upX - e.downX, e.upY - e.downY);
-    //     // var swipeMagnitude = Phaser.Geom.Point.GetMagnitude(swipe);
-    //     // var swipeNormal = new Phaser.Geom.Point(swipe.x / swipeMagnitude, swipe.y / swipeMagnitude);
-    //     // if(swipeMagnitude > 20 && swipeTime < 1000 && (Math.abs(swipeNormal.y) > 0.6 || Math.abs(swipeNormal.x) > 0.6)) {
-    //     //     if(swipeNormal.x > 0.6) {
-    //     //         this.swipeDirec = 3
-    //     //     }
-    //     //     if(swipeNormal.x < -0.6) {
-    //     //         this.swipeDirec = 1;
-    //     //     }
-    //     //     if(swipeNormal.y > 0.6) {
-    //     //         this.swipeDirec = 2;
-    //     //     }
-    //     //     if(swipeNormal.y < -0.6) {
-    //     //         this.swipeDirec = 0;
-    //     //     }
-    //     // }
-    // }
 }

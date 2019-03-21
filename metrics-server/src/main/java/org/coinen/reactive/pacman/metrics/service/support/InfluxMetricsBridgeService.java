@@ -1,8 +1,14 @@
 package org.coinen.reactive.pacman.metrics.service.support;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executors;
 import java.util.function.DoubleConsumer;
 
@@ -15,25 +21,29 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.influx.InfluxMeterRegistry;
 import org.coinen.reactive.pacman.metrics.service.MetricsService;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.DirectProcessor;
+import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.MonoProcessor;
+import reactor.core.publisher.SignalType;
 import reactor.core.publisher.TopicProcessor;
 import reactor.util.concurrent.WaitStrategy;
 
-public class InfluxMetricsBridgeService implements MetricsService {
+public class InfluxMetricsBridgeService implements MetricsService, Subscription {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InfluxMetricsBridgeService.class);
 
-    private final long                          metricsSkewInterval;
-    private final InfluxMeterRegistry           registry;
+    private final InfluxMeterRegistry registry;
 
-    private final Map<Meter.Id, DoubleConsumer> consumers = new HashMap<>();
+    private final ConcurrentHashMap<Subscription, Class<?>> subscriptions = new ConcurrentHashMap<>();
+    private final Map<Meter.Id, DoubleConsumer>       consumers     = new HashMap<>();
 
-    private final DirectProcessor<Long> timestampProcessor = DirectProcessor.create();
-    private final TopicProcessor<Meter> metersProcessor    =
+    private final MonoProcessor<Void> terminateProcessor = MonoProcessor.create();
+    private final TopicProcessor<Meter> metersProcessor  =
         TopicProcessor.<Meter>builder().autoCancel(false)
                                        .bufferSize(8192)
                                        .requestTaskExecutor(Executors.newWorkStealingPool())
@@ -42,33 +52,65 @@ public class InfluxMetricsBridgeService implements MetricsService {
                                        .share(true)
                                        .build();
 
-    public InfluxMetricsBridgeService(long interval, InfluxMeterRegistry registry) {
-        this.metricsSkewInterval = interval;
+    public InfluxMetricsBridgeService(InfluxMeterRegistry registry) {
         this.registry = registry;
 
         initMetersProcessing();
     }
 
     @Override
-    public Flux<Long> metrics(Flux<Meter> metersFlux) {
-        metersFlux
-            .retryBackoff(10, Duration.ofSeconds(1))
-            .onErrorResume(e -> Mono.empty())
-            .subscribeWith(metersProcessor);
+    public Mono<Void> metrics(Publisher<Meter> metersFlux) {
+        Flux.from(metersFlux)
+            .subscribe(new BaseSubscriber<>() {
+                @Override
+                protected void hookOnSubscribe(Subscription subscription) {
+                    int size = subscriptions.size() + 1;
+                    int requestPerSubscription = (int) Math.ceil(8192 / size);
 
-        return timestampProcessor;
+                    subscription.request(requestPerSubscription);
+                    subscriptions.put(subscription, InfluxMetricsBridgeService.class);
+                }
+
+                @Override
+                protected void hookOnNext(Meter value) {
+                    metersProcessor.onNext(value);
+                }
+
+                @Override
+                protected void hookFinally(SignalType type) {
+                    subscriptions.remove(upstream());
+                }
+            });
+
+        return terminateProcessor;
     }
 
+    @Override
+    public void request(long n) {
+        final List<Subscription> subscriptions = new ArrayList<>(this.subscriptions.keySet());
+
+        int size = subscriptions.size();
+
+        if (size == 0) {
+            return;
+        }
+
+        int requestPerSubscription = (int) Math.ceil(n / size);
+
+        for (Subscription s: subscriptions) {
+            s.request(requestPerSubscription);
+        }
+    }
+
+    @Override
+    public void cancel() { }
+
     private void initMetersProcessing() {
+        metersProcessor.onSubscribe(this);
         metersProcessor
             .subscribe(
-                this::record
+                this::record, terminateProcessor::onError, terminateProcessor::onComplete
             );
-
-        Flux.interval(Duration.ofSeconds(metricsSkewInterval))
-            .map(l -> System.currentTimeMillis())
-            .takeUntilOther(metersProcessor)
-            .subscribeWith(timestampProcessor);
     }
 
     private void record(Meter meter) {

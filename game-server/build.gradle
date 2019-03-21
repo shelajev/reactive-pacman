@@ -1,6 +1,8 @@
 dependencies {
 
   implementation project(':game-idl')
+  implementation project(':metrics-idl')
+  implementation project(':metrics-client')
 
   implementation "io.grpc:grpc-stub"
   implementation "io.grpc:grpc-netty"
@@ -8,6 +10,7 @@ dependencies {
   implementation "com.salesforce.servicelibs:reactor-grpc-stub"
   implementation 'org.roaringbitmap:RoaringBitmap'
   implementation 'org.jctools:jctools-core'
+  implementation 'io.projectreactor.addons:reactor-extra'
   implementation 'io.rsocket:rsocket-core'
   implementation 'io.rsocket:rsocket-transport-netty'
   implementation "io.micrometer:micrometer-core"

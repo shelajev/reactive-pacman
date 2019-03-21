@@ -13,6 +13,6 @@ public class DefaultApplicationConfig {
     public InfluxMetricsBridgeService influxMetricsBridgeService(
         InfluxMeterRegistry meterRegistry
     ) {
-        return new InfluxMetricsBridgeService(1, meterRegistry);
+        return new InfluxMetricsBridgeService(meterRegistry);
     }
 }

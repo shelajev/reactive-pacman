@@ -13,12 +13,15 @@ import org.coinen.reactive.pacman.repository.PlayerRepository;
 import org.coinen.reactive.pacman.service.ExtrasService;
 import org.coinen.reactive.pacman.service.MapService;
 import org.coinen.reactive.pacman.service.PlayerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 public class DefaultPlayerService implements PlayerService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPlayerService.class);
 
     final DirectProcessor<Player> playersProcessor = DirectProcessor.create();
     final FluxSink<Player>        playersSink      = playersProcessor.serialize()
@@ -57,27 +60,28 @@ public class DefaultPlayerService implements PlayerService {
 
                                Point position = location.getPosition();
 
-                               List<Player> collisions = playerRepository.findAll()
-                                                                         .stream()
-                                                                         .filter(p -> p.getState()
-                                                                                       .equals(
-                                                                                           Player.State.ACTIVE))
-                                                                         .filter(p -> !p.getType()
-                                                                                        .equals(
-                                                                                            player.getType()))
-                                                                         .filter(p -> distance(
-                                                                             p.getLocation()
-                                                                              .getPosition(),
-                                                                             player.getLocation()
-                                                                                   .getPosition()) < 100)
-                                                                         .collect(
-                                                                             Collectors.toList());
+                               List<Player> collisions = playerRepository
+                                   .findAll()
+                                   .stream()
+                                   .filter(p -> p.getState()
+                                                 .equals(Player.State.ACTIVE))
+                                   .filter(p -> !p.getType()
+                                                  .equals(player.getType()))
+                                   .filter(p ->
+                                       distance(
+                                           p.getLocation().getPosition(),
+                                           player.getLocation().getPosition()
+                                       ) < 100
+                                   )
+                                   .collect(Collectors.toList());
                                if (collisions.size() > 0) {
-                                   if (extrasService.isPowerupActive() && player.getType()
-                                                                                .equals(
-                                                                                    Player.Type.GHOST) || !extrasService.isPowerupActive() && player.getType()
-                                                                                                                                                    .equals(
-                                                                                                                                                        Player.Type.PACMAN)) {
+                                   if (extrasService.isPowerupActive()
+                                       && player.getType()
+                                                .equals(Player.Type.GHOST)
+                                       || !extrasService.isPowerupActive()
+                                       && player.getType()
+                                                .equals(Player.Type.PACMAN)) {
+
                                        playerBuilder.setState(Player.State.DISCONNECTED);
                                        collisions.forEach(collision -> {
                                            Player collidedWith =
@@ -89,11 +93,12 @@ public class DefaultPlayerService implements PlayerService {
                                            playersProcessor.onNext(collidedWith);
                                        });
                                    }
-                                   else if (extrasService.isPowerupActive() && player.getType()
-                                                                                     .equals(
-                                                                                         Player.Type.PACMAN) || !extrasService.isPowerupActive() && player.getType()
-                                                                                                                                                          .equals(
-                                                                                                                                                              Player.Type.GHOST)) {
+                                   else if (extrasService.isPowerupActive()
+                                       && player.getType()
+                                                .equals(Player.Type.PACMAN)
+                                       || !extrasService.isPowerupActive()
+                                       && player.getType()
+                                                .equals(Player.Type.GHOST)) {
                                        collisions.forEach(collision -> {
                                            Player collidedWith =
                                                playerRepository.update(UUID.fromString(
@@ -113,16 +118,15 @@ public class DefaultPlayerService implements PlayerService {
                                    // scoreProcessor.onNext({player, score: player.getScore() + 1});
                                }
 
-                               if (playerBuilder.getState() == Player.State.DISCONNECTED) {
-                                   playerRepository.delete(uuid);
-                               }
-
                                return playerBuilder.build();
                            });
 
-                           if (updatedPlayer != null) {
-                               playersProcessor.onNext(updatedPlayer);
+
+                           if (updatedPlayer.getState() == Player.State.DISCONNECTED) {
+                               playerRepository.delete(uuid);
                            }
+
+                           playersProcessor.onNext(updatedPlayer);
                        })
                        .then()
                    );
@@ -167,6 +171,7 @@ public class DefaultPlayerService implements PlayerService {
         return Mono.subscriberContext()
                    .map(c -> c.<UUID>get("uuid"))
                    .doOnNext(uuid -> {
+
                        Player player = playerRepository.delete(uuid);
                         if (player != null) {
                             playersSink.next(player.toBuilder().setState(Player.State.DISCONNECTED).build());

@@ -1,6 +1,7 @@
 dependencies {
 
   implementation project(':metrics-idl')
+  implementation project(':metrics-client')
   implementation "io.grpc:grpc-stub"
   implementation "io.grpc:grpc-netty"
   implementation "io.grpc:grpc-protobuf"

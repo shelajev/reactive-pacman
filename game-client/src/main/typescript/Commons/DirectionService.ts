@@ -8,7 +8,7 @@ export interface DirectionService {
 
 export class KeysService implements DirectionService {
 
-    private keysProcessor: DirectProcessor<Direction>;
+    private readonly keysProcessor: DirectProcessor<Direction>;
 
     constructor(scene: Phaser.Scene) {
         this.keysProcessor = new DirectProcessor<Direction>();
@@ -39,61 +39,111 @@ export class KeysService implements DirectionService {
 }
 export class SwipeService implements DirectionService {
 
-    private swipeProcessor: DirectProcessor<Direction>;
+
+    private readonly minX = 30;  //min x swipe for horizontal swipe
+    private readonly maxX = 30;  //max x difference for vertical swipe
+    private readonly minY = 50;  //min y swipe for vertical swipe
+    private readonly maxY = 60;  //max y difference for horizontal swipe
+
+    private readonly swipeProcessor: DirectProcessor<Direction>;
+
     private initialX: number;
     private initialY: number;
+    private observedX: number;
+    private observedY: number;
 
     constructor(scene: Phaser.Scene) {
-        const canvas = window.document.querySelector('canvas');
         this.swipeProcessor = new DirectProcessor<Direction>()
-        window.document.querySelector('#phaser-overlay').addEventListener("touchstart", this.startTouch.bind(this), false);
-        window.document.querySelector('#phaser-overlay').addEventListener("touchmove", this.moveTouch.bind(this), false);
-        // window.document.querySelector('#phaser-overlay').ontouchstart = (e) => this.startTouch(e);
-        // window.document.querySelector('#phaser-overlay').ontouchmove = (e) => this.moveTouch(e);
+        window.document.querySelector('#phaser-overlay').addEventListener("touchstart", this.doOnStartTouch.bind(this), false);
+        window.document.querySelector('#phaser-overlay').addEventListener("touchmove", this.doOnMoveTouch.bind(this), false);
+        window.document.querySelector('#phaser-overlay').addEventListener("touchend", this.doOnEndTouch.bind(this), false);
     }
 
-    startTouch(e: TouchEvent) {
-        this.initialX = e.touches[0].clientX;
-        this.initialY = e.touches[0].clientY;
+    doOnStartTouch(e: TouchEvent) {
+        const touch = e.touches[0];
+
+        this.initialX = touch.screenX;
+        this.initialY = touch.screenY;
+
         e.preventDefault();
-
     }
 
-    moveTouch(e: TouchEvent) {
-        if (this.initialX === null) {
-            return;
-        }
-        var currentX = e.touches[0].clientX;
-        var currentY = e.touches[0].clientY;
-        
-        var diffX = this.initialX - currentX;
-        var diffY = this.initialY - currentY;
-        
-        if (Math.abs(diffX) > Math.abs(diffY)) {
-            // sliding horizontally
-            if (diffX > 0) {
-            // swiped left
-                this.swipeProcessor.onNext(Direction.LEFT);
-            } else {
-            // swiped right
+    doOnMoveTouch(e: TouchEvent) {
+        const touch = e.touches[0];
+
+        this.observedX = touch.screenX;
+        this.observedY = touch.screenY;
+
+        e.preventDefault();
+    }
+
+    doOnEndTouch(e: TouchEvent) {
+        const {
+            initialX, initialY,
+            observedX, observedY,
+            maxX, minX, maxY, minY
+        } = this;
+
+        if ((((observedX - minX > initialX) || (observedX + minX < initialX)) && ((observedY < initialY + maxY) && (initialY > observedY - maxY) && (observedX > 0)))) {
+            if (observedX > initialX) {
                 this.swipeProcessor.onNext(Direction.RIGHT);
-            }
-        } else {
-            // sliding vertically
-            if (diffY > 0) {
-            // swiped up
-                this.swipeProcessor.onNext(Direction.UP);
             } else {
-            // swiped down
+                this.swipeProcessor.onNext(Direction.LEFT);
+            }
+        }
+        //vertical detection
+        else if ((((observedY - minY > initialY) || (observedY + minY < initialY)) && ((observedX < initialX + maxX) && (initialX > observedX - maxX) && (observedY > 0)))) {
+            if (observedY > initialY) {
                 this.swipeProcessor.onNext(Direction.DOWN);
+            } else {
+                this.swipeProcessor.onNext(Direction.UP);
             }
         }
 
-        this.initialX = null;
-        this.initialY = null;
+        this.initialX = 0;
+        this.initialY = 0;
+        this.observedX = 0;
+        this.observedY = 0;
 
         e.preventDefault();
     }
+
+    //
+    // moveTouch(e: TouchEvent) {
+    //     if (this.initialX === null) {
+    //         return;
+    //     }
+    //     var currentX = e.touches[0].clientX;
+    //     var currentY = e.touches[0].clientY;
+    //
+    //     var diffX = this.initialX - currentX;
+    //     var diffY = this.initialY - currentY;
+    //
+    //     if (Math.abs(diffX) > Math.abs(diffY)) {
+    //         // sliding horizontally
+    //         if (diffX > 0) {
+    //         // swiped left
+    //             this.swipeProcessor.onNext(Direction.LEFT);
+    //         } else {
+    //         // swiped right
+    //             this.swipeProcessor.onNext(Direction.RIGHT);
+    //         }
+    //     } else {
+    //         // sliding vertically
+    //         if (diffY > 0) {
+    //         // swiped up
+    //             this.swipeProcessor.onNext(Direction.UP);
+    //         } else {
+    //         // swiped down
+    //             this.swipeProcessor.onNext(Direction.DOWN);
+    //         }
+    //     }
+    //
+    //     this.initialX = null;
+    //     this.initialY = null;
+    //
+    //     e.preventDefault();
+    // }
 
 
     listen(): Flux<Direction> {
@@ -115,52 +165,3 @@ export class ControlsService implements DirectionService {
         return Flux.mergeArray([this.swipeService.listen(), this.keysService.listen()]);
     }
 }
-
-// this.swipeDirec = -1;
-
-// this.swipeData = {
-//     startPosition: null,
-//     timestamp: null
-// };
-// if (!this.quadrantMode) {
-//     this.input.on("pointerup", this.endSwipe, this);
-//     this.input.addMoveCallback((e: any) => {
-//         if (self.scene.isActive("Game")) {
-//             var x = e.touches[0].clientX;
-//             var y = e.touches[0].clientY;
-//             if (!self.swipeData.startPosition) {
-//                 self.swipeData.startPosition = {
-//                     x: x,
-//                     y: y
-//                 };
-//                 self.swipeData.timestamp = Date.now();
-//             }
-//             else if (self.swipeData.timestamp + 500 > Date.now()) {
-
-//                 var dx = x - self.swipeData.startPosition.x;
-//                 var dy = y - self.swipeData.startPosition.y;
-//                 var swipe = new Phaser.Geom.Point(dx, dy);
-//                 var swipeMagnitude = Phaser.Geom.Point.GetMagnitude(swipe);
-//                 var swipeNormal = new Phaser.Geom.Point(swipe.x / swipeMagnitude, swipe.y / swipeMagnitude);
-//                 if(swipeMagnitude > 15 && (Math.abs(swipeNormal.y) > 0.6 || Math.abs(swipeNormal.x) > 0.6)) {
-//                     if(swipeNormal.x > 0.6) {
-//                         self.swipeDirec = 3
-//                     }
-//                     if(swipeNormal.x < -0.6) {
-//                         self.swipeDirec = 1;
-//                     }
-//                     if(swipeNormal.y > 0.6) {
-//                         self.swipeDirec = 2;
-//                     }
-//                     if(swipeNormal.y < -0.6) {
-//                         self.swipeDirec = 0;
-//                     }
-//                     self.swipeData.startPosition = null;
-//                 }
-//             }
-//             else {
-//                 self.swipeData.startPosition = null;
-//             }
-//         }
-//     });
-// }

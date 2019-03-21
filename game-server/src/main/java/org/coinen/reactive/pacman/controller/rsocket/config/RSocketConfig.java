@@ -1,23 +1,28 @@
 package org.coinen.reactive.pacman.controller.rsocket.config;
 
+import java.time.Duration;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.opentracing.Tracer;
+import io.rsocket.RSocketFactory;
 import io.rsocket.rpc.RSocketRpcService;
 import io.rsocket.rpc.rsocket.RequestHandlingRSocket;
+import io.rsocket.transport.netty.client.WebsocketClientTransport;
 import org.coinen.pacman.ExtrasServiceServer;
 import org.coinen.pacman.GameServiceServer;
 import org.coinen.pacman.PlayerServiceServer;
+import org.coinen.pacman.metrics.MetricsSnapshotHandlerClient;
 import org.coinen.reactive.pacman.controller.rsocket.ExtrasController;
 import org.coinen.reactive.pacman.controller.rsocket.GameController;
 import org.coinen.reactive.pacman.controller.rsocket.PlayerController;
 import org.coinen.reactive.pacman.controller.rsocket.SetupController;
+import org.coinen.reactive.pacman.metrics.ReactiveMetricsRegistry;
 import org.coinen.reactive.pacman.service.ExtrasService;
 import org.coinen.reactive.pacman.service.GameService;
 import org.coinen.reactive.pacman.service.MapService;
 import org.coinen.reactive.pacman.service.PlayerService;
+import reactor.retry.Retry;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
@@ -28,8 +33,26 @@ import org.springframework.context.annotation.Scope;
 public class RSocketConfig {
 
     @Bean
-    public MeterRegistry rSocketMeterRegistry() {
-        return new RSocketMeterRegistrySupplier().get();
+    public MeterRegistry reactiveRSocketMeterRegistry() {
+        ReactiveMetricsRegistry registry = new ReactiveMetricsRegistry("game.server");
+        RSocketFactory.connect()
+                      .transport(WebsocketClientTransport.create(4000))
+                      .start()
+                      .retryBackoff(Integer.MAX_VALUE, Duration.ofSeconds(2))
+                      .subscribe(rSocket -> {
+                          MetricsSnapshotHandlerClient client =
+                              new MetricsSnapshotHandlerClient(rSocket);
+
+                          client.streamMetricsSnapshots(registry.asFlux())
+                                .retryWhen(
+                                    Retry.onlyIf(rc -> !rSocket.isDisposed())
+                                         .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofMinutes(1))
+                                         .retryMax(Long.MAX_VALUE)
+                                )
+                                .subscribe();
+                      });
+
+        return registry;
     }
 
     @Bean

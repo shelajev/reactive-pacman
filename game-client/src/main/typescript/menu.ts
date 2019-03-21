@@ -51,7 +51,7 @@ export default class Menu extends Scene {
                 $("#radio .toggle-right").prop( "checked", true );
             }
 
-            var value = "";
+            let value = "";
             if (this.nickname != "" && this.nickname !== undefined && this.nickname !== null) {
                 //value = "value='" + this.nickname + "'";
                 value = this.nickname;
@@ -61,13 +61,12 @@ export default class Menu extends Scene {
             setTimeout(function() {
                 $("#nickname").focus();
             }, 500);
-    
-            var self = this;
+
             $(".avgrund-popup input[type='submit']").on("click", this.startGame.bind(this));
     
-            $(document).on("keypress", function(event) {
+            $(document).on("keypress", (event) => {
                 if (event.which == 13) {
-                    self.startGame();
+                    this.startGame();
                 }
             });
         }
@@ -85,61 +84,45 @@ export default class Menu extends Scene {
 
         $(".avgrund-popup input[type='submit']").off("click");
         $(document).off("keypress");
-        var self = this;
         this.nickname = $(".avgrund-popup input[type='text']").val() as string;
         //$(".avgrund-popup").remove();
-        self.closeAvgrund();
-        // self.showLoadingCircle(function() {
-           
-                    // var data = JSON.parse(rawData);
-                    // var ip = data.ip;
+        this.closeAvgrund();
 
-                    // var socket = io(ip);
 
-                    // socket.on('maze', function(mazeData) {
-                        // var data = {
-                            // maze: mazeData,
-                            // ip: ip,
-                            // nickname: nickname,
-                            // sizeData: self.sizeData,
-                            // quadrantMode: quadrantMode
-                        // };
-                        // socket.close();
-                        this.gameService.start({value: this.nickname})
-                                        .then((config: Config.AsObject) => {
-                                            console.log(config);
-                                            this.scene.start('Game', { 
-                                                ...this.config,
-                                                quadrantMode,
-                                                player: config.player,
-                                                players: config.playersList,
-                                                extras: config.extrasList,
-                                            });
-                                        })
-                    // });
+        console.log("before here");
+        $("#to-scroll").show();
+        $("body").height($(window).height() + 1000);
+        // $("body").css("overflow", "scroll");
+        // $('#phaser-overlay').css("position", "relative");
+        $('#phaser-overlay-container').hide();
+        $(window).scrollTop(0);
+        $(window).on("scroll", (e) => {
+            if (window.scrollY > 500) {
+                $("#canvas-container").css("position", "absolute");
+                $(window).off("scroll");
+                $('#phaser-overlay-container').show();
+                // $('#phaser-overlay').css("position", "fixed");
+                $("html").css("overflow", "none");
+                $("body").css("overflow", "none");
+                $("body").height("100%");
+                $("#canvas-container").show();
 
-                    // self.nickname = nickname;
+                $("#to-scroll").remove();
+                console.log("hurrraaaay");
 
-                    // socket.on('connect_error', function(error) {
-                        // socket.close();
-                //         self.scene.start('Menu', {
-                //             type: "error",
-                //             title: "Connection Error",
-                //             text: "Failed to connect to the server"
-                //         });
-                //     });
-
-                //     socket.on('connect_timeout', (timeout) => {
-                //         socket.close();
-                //         self.scene.start('Menu', {
-                //             type: "error",
-                //             title: "Connection Timeout",
-                //             text: "Failed to connect to the server"
-                //         });
-                //     });
-                // }
-            // });
-        // });
+                this.game.canvas.requestFullscreen();
+                this.gameService.start({value: this.nickname})
+                    .then((config: Config.AsObject) => {
+                        console.log(config);
+                        this.scene.start('Game', {
+                            ...this.config,
+                            player: config.player,
+                            players: config.playersList,
+                            extras: config.extrasList,
+                        });
+                    })
+            }
+        });
     }
 }
 

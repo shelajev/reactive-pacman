@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package org.coinen.pacman.metrics;
 
+import "google/protobuf/empty.proto";
 import "metrics.proto";
 
 option java_package = "org.coinen.pacman.metrics";
@@ -9,6 +10,6 @@ option java_multiple_files = false;
 
 
 service MetricsSnapshotHandler {
-    rpc StreamMetrics (stream MetricsSnapshot) returns (stream Skew) {}
-    rpc SendMetrics (MetricsSnapshot) returns (Skew) {}
+    rpc StreamMetricsSnapshots (stream MetricsSnapshot) returns (google.protobuf.Empty) {}
+    rpc SendMetricsSnapshot (MetricsSnapshot) returns (google.protobuf.Empty) {}
 }

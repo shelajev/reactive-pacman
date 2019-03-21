@@ -1,4 +1,4 @@
-import { Flux } from "reactor-core-js/flux";
+import { Flux, DirectProcessor } from "reactor-core-js/flux";
 import { Single } from "rsocket-flowable";
 import { Player } from "game-idl";
 import { Location } from "game-idl";
@@ -12,6 +12,7 @@ import FlowableAdapter from "../FlowableAdapter";
 
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
     private service: any;
+    private sharedPlayersStream: DirectProcessor<Player.AsObject>;
 
     constructor(rSocket: ReactiveSocket<any, any>) {
         this.service = new RSocketRPCServices.PlayerServiceClient(rSocket);
@@ -47,7 +48,13 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
     }
 
     players(): Flux<Player.AsObject> {
-        return Flux.from<Player>(FlowableAdapter.wrap(this.service.players(new Empty())))
-            .map(player => player.toObject())
+        if (!this.sharedPlayersStream) {
+            this.sharedPlayersStream = new DirectProcessor()
+            Flux.from<Player>(FlowableAdapter.wrap(this.service.players(new Empty())))
+                .map(player => player.toObject())
+                .subscribe(this.sharedPlayersStream);
+        }
+        
+        return this.sharedPlayersStream;
     }
 }
