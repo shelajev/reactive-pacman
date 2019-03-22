@@ -55,8 +55,9 @@ public class ReactiveMetricsRegistry extends StepMeterRegistry implements
     public Flux<MetricsSnapshot> asFlux() {
         return Flux.create(s -> {
             synchronized (this) {
-                if(this.snapshotFluxSink != null) {
+                if (this.snapshotFluxSink != null) {
                     s.error(new IllegalStateException("Allowed only a single subscriber"));
+                    return;
                 }
 
                 this.snapshotFluxSink = s;
@@ -96,6 +97,6 @@ public class ReactiveMetricsRegistry extends StepMeterRegistry implements
 
     @Override
     protected TimeUnit getBaseTimeUnit() {
-        return TimeUnit.SECONDS;
+        return TimeUnit.NANOSECONDS;
     }
 }
