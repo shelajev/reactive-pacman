@@ -6,8 +6,10 @@ import java.util.Optional;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.opentracing.Tracer;
 import io.rsocket.RSocketFactory;
+import io.rsocket.resume.InMemoryResumableFramesStore;
 import io.rsocket.rpc.RSocketRpcService;
 import io.rsocket.rpc.rsocket.RequestHandlingRSocket;
+import io.rsocket.spring.boot.RSocketReceiverCustomizer;
 import io.rsocket.transport.netty.client.WebsocketClientTransport;
 import org.coinen.pacman.ExtrasServiceServer;
 import org.coinen.pacman.GameServiceServer;
@@ -53,6 +55,15 @@ public class RSocketConfig {
                       });
 
         return registry;
+    }
+
+//    @Bean
+    public RSocketReceiverCustomizer enableResumabilityCustomizer() {
+        return factory -> factory
+            .resume()
+            .resumeSessionDuration(Duration.ofMinutes(1))
+            .resumeStore(token -> new InMemoryResumableFramesStore("server", 16384))
+            .resumeStreamTimeout(Duration.ofMinutes(2));
     }
 
     @Bean

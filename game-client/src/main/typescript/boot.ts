@@ -105,14 +105,15 @@ export class Boot extends Scene {
                 BufferEncoders
             );
             const client = new RpcClient({
-                transport: new RSocketResumableTransport(
-                    () =>  rSocketWebSocketClient, // provider for low-level transport instances
-                    {
-                        bufferSize: 99999999, // max number of sent & pending frames to
-                        // buffer before failing
-                        resumeToken: uuid.v4(), // string to uniquely identify the session across connections
-                    }
-                ),
+                // transport: new RSocketResumableTransport(
+                //     () =>  rSocketWebSocketClient, // provider for low-level transport instances
+                //     {
+                //         bufferSize: 99999999, // max number of sent & pending frames to
+                //         // buffer before failing
+                //         resumeToken: uuid.v4(), // string to uniquely identify the session across connections
+                //     }
+                // ),
+                transport: rSocketWebSocketClient,
                 setup: {
                     keepAlive: 5000,
                     lifetime: 60000,
@@ -126,16 +127,13 @@ export class Boot extends Scene {
 
 
             this.showLoadingCircle(() => {
-
-                rSocketWebSocketClient.connect();
-                    client
-                        .connect()
-                        .then(rsocket => {
-                            console.log(rsocket);
-                            rSocket = rsocket;
-                        })
-                }
-            );
+                client
+                    .connect()
+                    .then(rsocket => {
+                        console.log(rsocket);
+                        rSocket = rsocket;
+                    })
+            });
         } else if (type === "grpc") {
 
             this.showLoadingCircle(() =>
