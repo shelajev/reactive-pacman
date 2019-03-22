@@ -9,13 +9,16 @@ import org.coinen.reactive.pacman.service.MapService;
 import org.lognet.springboot.grpc.GRpcService;
 import reactor.core.publisher.Mono;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+
 @GRpcService
 public class GrpcSetupController extends ReactorSetupServiceGrpc.SetupServiceImplBase {
 
     final MapService mapService;
     final MeterRegistry registry;
 
-    public GrpcSetupController(MapService mapService, MeterRegistry registry) {
+    public GrpcSetupController(MapService mapService,
+        @Qualifier("grpc") MeterRegistry registry) {
         this.mapService = mapService;
         this.registry = registry;
     }

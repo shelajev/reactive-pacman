@@ -12,12 +12,15 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+
 @GRpcService
 public class GrpcExtrasController extends ReactorExtrasServiceGrpc.ExtrasServiceImplBase {
     final ExtrasService extrasService;
     final MeterRegistry registry;
 
-    public GrpcExtrasController(ExtrasService service, MeterRegistry registry) {
+    public GrpcExtrasController(ExtrasService service,
+        @Qualifier("grpc") MeterRegistry registry) {
         extrasService = service;
         this.registry = registry;
     }

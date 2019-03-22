@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/http")
-public class MetricsController {
+public class HttpMetricsController {
 
     final MetricsService metricsService;
     final MeterRegistry registry;
 
-    public MetricsController(MetricsService service, MeterRegistry registry) {
+    public HttpMetricsController(MetricsService service, MeterRegistry registry) {
         this.metricsService = service;
         this.registry = registry;
     }

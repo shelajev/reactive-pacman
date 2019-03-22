@@ -12,13 +12,16 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+
 @GRpcService
 public class GrpcPlayerController extends ReactorPlayerServiceGrpc.PlayerServiceImplBase {
 
     final PlayerService playerService;
     final MeterRegistry registry;
 
-    public GrpcPlayerController(PlayerService playerService, MeterRegistry registry) {
+    public GrpcPlayerController(PlayerService playerService,
+        @Qualifier("grpc") MeterRegistry registry) {
         this.playerService = playerService;
         this.registry = registry;
     }

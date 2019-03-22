@@ -44,7 +44,7 @@ module.exports = {
     },
     output: {
         filename: 'bundle.js',
-        publicPath: path.resolve(__dirname, 'src/main/resources/public'),
-        path: path.resolve(__dirname, 'build')
+        publicPath: path.resolve('./', 'src/main/resources/public'),
+        path: path.resolve("./", 'build')
     }
 };

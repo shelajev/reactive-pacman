@@ -49,7 +49,7 @@ public class DefaultPlayerService implements PlayerService {
             .forEach(p -> {
                 if (System.currentTimeMillis() - p.getTimestamp() > 60000) {
                     this.disconnectPlayer()
-                        .subscriberContext(Context.of("uuid", p.getUuid()))
+                        .subscriberContext(Context.of("uuid", UUID.fromString(p.getUuid())))
                         .subscribe();
                 }
             });

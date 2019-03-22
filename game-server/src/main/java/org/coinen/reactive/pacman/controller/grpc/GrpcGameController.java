@@ -11,13 +11,16 @@ import org.lognet.springboot.grpc.GRpcService;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+
 @GRpcService
 public class GrpcGameController extends ReactorGameServiceGrpc.GameServiceImplBase {
 
     final GameService gameService;
     final MeterRegistry registry;
 
-    public GrpcGameController(GameService gameService, MeterRegistry registry) {
+    public GrpcGameController(GameService gameService,
+        @Qualifier("grpc") MeterRegistry registry) {
         this.gameService = gameService;
         this.registry = registry;
     }
