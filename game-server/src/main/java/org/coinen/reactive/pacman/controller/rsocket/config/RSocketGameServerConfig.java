@@ -1,5 +1,6 @@
 package org.coinen.reactive.pacman.controller.rsocket.config;
 
+import java.net.URI;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -27,18 +28,25 @@ import org.coinen.reactive.pacman.service.PlayerService;
 import reactor.retry.Retry;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
-public class RSocketConfig {
+public class RSocketGameServerConfig {
+
+    @Value("${rsocket.metrics-endpoint:ws://localhost:4000}")
+    String uri;
+
 
     @Bean
+    @Qualifier("rSocket")
     public MeterRegistry reactiveRSocketMeterRegistry() {
-        ReactiveMetricsRegistry registry = new ReactiveMetricsRegistry("game.server");
+        ReactiveMetricsRegistry registry = new ReactiveMetricsRegistry("rsocket.game.server");
         RSocketFactory.connect()
-                      .transport(WebsocketClientTransport.create(4000))
+                      .transport(WebsocketClientTransport.create(URI.create(uri)))
                       .start()
                       .retryBackoff(Integer.MAX_VALUE, Duration.ofSeconds(2))
                       .subscribe(rSocket -> {
@@ -69,7 +77,7 @@ public class RSocketConfig {
     @Bean
     public ExtrasServiceServer extrasServiceServer(
         ExtrasService extrasService,
-        MeterRegistry rSocketMeterRegistry,
+        @Qualifier("rSocket") MeterRegistry rSocketMeterRegistry,
         Optional<Tracer> tracer
     ) {
         return new ExtrasServiceServer(new ExtrasController(extrasService),
@@ -79,7 +87,7 @@ public class RSocketConfig {
     @Bean
     public GameServiceServer gameServiceServer(
         GameService gameService,
-        MeterRegistry rSocketMeterRegistry,
+        @Qualifier("rSocket") MeterRegistry rSocketMeterRegistry,
         Optional<Tracer> tracer
     ) {
         return new GameServiceServer(new GameController(gameService), Optional.of(rSocketMeterRegistry), tracer);
@@ -88,7 +96,7 @@ public class RSocketConfig {
     @Bean
     public PlayerServiceServer playerServiceServer(
         PlayerService playerService,
-        MeterRegistry rSocketMeterRegistry,
+        @Qualifier("rSocket") MeterRegistry rSocketMeterRegistry,
         Optional<Tracer> tracer
     ) {
         return new PlayerServiceServer(new PlayerController(playerService), Optional.of(rSocketMeterRegistry), tracer);

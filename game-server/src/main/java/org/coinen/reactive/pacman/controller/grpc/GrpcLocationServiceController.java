@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentMap;
 import com.google.protobuf.Empty;
 import org.coinen.pacman.Location;
 import org.coinen.pacman.ReactorLocationServiceGrpc;
+import org.coinen.reactive.pacman.controller.grpc.config.UUIDHolder;
 import org.coinen.reactive.pacman.service.PlayerService;
 import org.jctools.maps.NonBlockingHashMap;
 import org.lognet.springboot.grpc.GRpcService;

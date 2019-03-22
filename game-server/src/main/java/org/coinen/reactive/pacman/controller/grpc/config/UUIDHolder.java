@@ -1,4 +1,4 @@
-package org.coinen.reactive.pacman.controller.grpc;
+package org.coinen.reactive.pacman.controller.grpc.config;
 
 import java.util.UUID;
 
