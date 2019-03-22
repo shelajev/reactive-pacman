@@ -1,4 +1,6 @@
-# REACTIVE PAC-MAN (POWERED BY [RSOCKET](http://rsocket.io) and [NETIFI, INC](https://www.netifi.com))
+# REACTIVE PAC-MAN 
+
+POWERED BY [RSOCKET](http://rsocket.io) and [NETIFI, INC](https://www.netifi.com)
 
 ## BUILD 
 
