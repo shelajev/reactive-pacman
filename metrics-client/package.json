@@ -13,6 +13,7 @@
   "dependencies": {
     "metrics-idl": "^0.0.1",
     "@types/google-protobuf": "^3.2.7",
+    "@types/node": "^11.11.5",
     "google-protobuf": "^3.6.1",
     "reactor-core-js": "^0.5.0",
     "rsocket-flowable": "^0.0.10",

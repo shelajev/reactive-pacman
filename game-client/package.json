@@ -17,6 +17,7 @@
     "@types/express": "^4.16.1",
     "@types/google-protobuf": "^3.2.7",
     "@types/jquery": "^3.3.29",
+    "@types/node": "^11.11.5",
     "@types/uuid": "^3.4.4",
     "express": "^4.16.4",
     "fastbitset": "^0.2.8",

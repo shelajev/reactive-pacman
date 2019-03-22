@@ -19,6 +19,7 @@
   "types": "build/src/main/typescript/index.d.ts",
   "dependencies": {
     "@types/google-protobuf": "^3.2.7",
+    "@types/node": "^11.11.5",
     "google-protobuf": "^3.7.0",
     "grpc-web": "^1.0.3",
     "rsocket-flowable": "^0.0.10",
