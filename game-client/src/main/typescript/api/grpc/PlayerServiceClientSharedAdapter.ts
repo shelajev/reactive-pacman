@@ -18,7 +18,7 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
         const urlParams = new URLSearchParams(window.location.search);
         const endpoint = urlParams.get('endpoint');
         this.service = new GRPCServices.PlayerServiceClient(endpoint || "http://localhost:8000", {}, {});
-        this.locationServiceFallback = new GRPCServices.LocationServiceClient("http://localhost:8000", {}, {});
+        this.locationServiceFallback = new GRPCServices.LocationServiceClient(endpoint || "http://localhost:8000", {}, {});
     }
 
     locate(locationStream: Flux<Location.AsObject>): Single<void> {
