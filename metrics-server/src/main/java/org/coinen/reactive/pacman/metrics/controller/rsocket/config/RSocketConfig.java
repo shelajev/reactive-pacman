@@ -11,6 +11,7 @@ import org.coinen.reactive.pacman.metrics.controller.rsocket.MetricsController;
 import org.coinen.reactive.pacman.metrics.service.MetricsService;
 import reactor.core.publisher.Mono;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -19,8 +20,8 @@ import org.springframework.context.annotation.Scope;
 public class RSocketConfig {
 
     @Bean
-    public SocketAcceptor metricsSocketAcceptor(RequestHandlingRSocket requestHandlingRSocket) {
-        return (setup, sendingSocket) -> Mono.just(requestHandlingRSocket);
+    public SocketAcceptor metricsSocketAcceptor(ObjectProvider<RequestHandlingRSocket> requestHandlingRSocketObjectProvider) {
+        return (setup, sendingSocket) -> Mono.fromSupplier(requestHandlingRSocketObjectProvider::getIfAvailable);
     }
 
     @Bean

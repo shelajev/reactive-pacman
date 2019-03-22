@@ -5,17 +5,18 @@ import { Extra } from "game-idl";
 import { Flux } from "reactor-core-js/flux";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import FlowableAdapter from "../FlowableAdapter";
+import {IMeterRegistry} from "rsocket-rpc-metrics";
 
 export default class ExtrasServiceClientAdapter implements ExtrasService {
 
-    private service: any;
+    private service: RSocketRPCServices.ExtrasService;
 
-    constructor(rSocket: ReactiveSocket<any, any>) {
-        this.service = new RSocketRPCServices.ExtrasServiceClient(rSocket);
+    constructor(rSocket: ReactiveSocket<any, any>, meterRegistry: IMeterRegistry) {
+        this.service = new RSocketRPCServices.ExtrasServiceClient(rSocket, undefined, meterRegistry);
     }
 
     extras(): Flux<Extra.AsObject> {
-        return Flux.from<Extra>(FlowableAdapter.wrap(this.service.extras(new Empty())))
+        return Flux.from<Extra>(FlowableAdapter.wrap(this.service.extras(new Empty()) as any))
             .map(extra => extra.toObject());
     }
 }

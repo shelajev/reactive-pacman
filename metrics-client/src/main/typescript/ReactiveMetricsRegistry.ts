@@ -28,6 +28,7 @@ export default class ReactiveMetricsRegistry extends SimpleMeterRegistry {
                             new MetricsSnapshot(),
                         )
                 );
+                this.requestedFromDownstream--;
             }
         }, 300)
     }

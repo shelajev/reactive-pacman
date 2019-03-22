@@ -9,13 +9,15 @@ import { Point } from "game-idl";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { Disposable } from "reactor-core-js";
 import FlowableAdapter from "../FlowableAdapter";
+import {IMeterRegistry} from "rsocket-rpc-metrics";
 
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
-    private service: any;
+
+    private service: RSocketRPCServices.PlayerService;
     private sharedPlayersStream: DirectProcessor<Player.AsObject>;
 
-    constructor(rSocket: ReactiveSocket<any, any>) {
-        this.service = new RSocketRPCServices.PlayerServiceClient(rSocket);
+    constructor(rSocket: ReactiveSocket<any, any>, meterRegistry: IMeterRegistry) {
+        this.service = new RSocketRPCServices.PlayerServiceClient(rSocket, undefined, meterRegistry);
     }
 
     locate(locationStream: Flux<Location.AsObject>): Single<void> {
@@ -38,7 +40,7 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
                     return locationProto;
                 })
-                .compose(flux => FlowableAdapter.wrap(this.service.locate(flux)))
+                .compose(flux => FlowableAdapter.wrap(this.service.locate(flux as any) as any))
                 .consume(
                     () => {},
                     (e: Error) => subject.onError(e),
@@ -49,8 +51,8 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
     players(): Flux<Player.AsObject> {
         if (!this.sharedPlayersStream) {
-            this.sharedPlayersStream = new DirectProcessor()
-            Flux.from<Player>(FlowableAdapter.wrap(this.service.players(new Empty())))
+            this.sharedPlayersStream = new DirectProcessor();
+            Flux.from<Player>(FlowableAdapter.wrap(this.service.players(new Empty()) as any))
                 .map(player => player.toObject())
                 .subscribe(this.sharedPlayersStream);
         }

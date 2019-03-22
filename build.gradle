@@ -61,7 +61,7 @@ allprojects {
 			dependency group: 'com.salesforce.servicelibs', name: 'reactor-grpc-stub', version: '0.10.0-RC1'
 
 			dependency group:'io.github.lognet', name: 'grpc-spring-boot-starter', version: '3.1.0'
-			dependency group: 'com.github.collaborationinencapsulation.spring-boot-rsocket', name: 'spring-boot-starter-rsocket', version: 'c1bd9a7c10'
+			dependency group: 'com.github.collaborationinencapsulation.spring-boot-rsocket', name: 'spring-boot-starter-rsocket', version: 'dec35e4a10'
 		}
 	}
 }

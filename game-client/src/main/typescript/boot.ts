@@ -1,10 +1,11 @@
 import RSocketWebSocketClient from 'rsocket-websocket-client';
 import { Scene, Game } from 'phaser';
 import { RpcClient } from 'rsocket-rpc-core';
-import { BufferEncoders } from 'rsocket-core';
+import { BufferEncoders, RSocketResumableTransport } from 'rsocket-core';
 import { ReactiveSocket } from 'rsocket-types';
 import { RSocketRPCServices } from 'game-idl';
 import { Map } from 'game-idl';
+import { ReactiveMetricsRegistry } from 'metrics-client';
 import { GameScene } from './Game';
 import Menu from './menu';
 import { CompassScene } from './Compass';
@@ -13,6 +14,11 @@ import * as $ from 'jquery';
 import * as RSocketApi from './api/rsocket';
 import * as HttpApi from './api/http';
 import * as GrpcApi from './api/grpc';
+import { RSocketRPCServices as MetricsRSocketRPCServices } from 'metrics-idl';
+import FlowableAdapter from "./api/FlowableAdapter";
+import {Flowable} from 'rsocket-flowable';
+import {Empty} from "google-protobuf/google/protobuf/empty_pb";
+import uuid = require("uuid");
 
 export class Boot extends Scene {
 
@@ -40,11 +46,12 @@ export class Boot extends Scene {
         const urlParams = new URLSearchParams(window.location.search);
         const type = urlParams.get('type');
         if(type === "rsocket") {
-            let rSocket: ReactiveSocket<any, any>;
-            const client = new RpcClient({
+            const meterRegistry: ReactiveMetricsRegistry = new ReactiveMetricsRegistry();
+
+            const metricsClient = new RpcClient({
                 transport: new RSocketWebSocketClient(
                     {
-                        url: urlParams.get('endpoint') || 'ws://localhost:3000',
+                        url: urlParams.get('metrics-endpoint') || 'ws://localhost:4000',
                     },
                     BufferEncoders
                 ),
@@ -52,21 +59,82 @@ export class Boot extends Scene {
                     keepAlive: 5000,
                     lifetime: 60000,
                 },
+            });
+
+            let rSocketReconnectionNumber = 0;
+
+            const connectMetrics = () => {
+                metricsClient.connect()
+                    .then(rSocket => {
+                        rSocketReconnectionNumber = 0;
+
+                        let times = 0;
+
+                        const rpcCall = () => {
+                            const metricsSnapshotHandlerClient = new MetricsRSocketRPCServices.MetricsSnapshotHandlerClient(rSocket);
+
+                            ((metricsSnapshotHandlerClient.streamMetricsSnapshots(meterRegistry.asFlowable()) as any) as Flowable<Empty>)
+                                .subscribe({
+                                    onSubscribe: (s) => s.request(Number.MAX_SAFE_INTEGER),
+                                    onNext: () => {},
+                                    onComplete: () => {},
+                                    onError: () => {
+                                        if (times++ < 10) {
+                                            setTimeout(() => connectMetrics(), 1000);
+                                        }
+                                        else {
+                                            connectMetrics();
+                                        }
+                                    }
+                                })
+                        };
+
+                        rpcCall();
+                    }, () => {
+                        setTimeout(() => connectMetrics(), ++rSocketReconnectionNumber * 1000)
+                    });
+            };
+
+            connectMetrics();
+
+            let rSocket: ReactiveSocket<any, any>;
+            const rSocketWebSocketClient = new RSocketWebSocketClient(
+                {
+                    url: urlParams.get('endpoint') || 'ws://localhost:3000',
+                },
+                BufferEncoders
+            );
+            const client = new RpcClient({
+                transport: new RSocketResumableTransport(
+                    () =>  rSocketWebSocketClient, // provider for low-level transport instances
+                    {
+                        bufferSize: 99999999, // max number of sent & pending frames to
+                        // buffer before failing
+                        resumeToken: uuid.v4(), // string to uniquely identify the session across connections
+                    }
+                ),
+                setup: {
+                    keepAlive: 5000,
+                    lifetime: 60000,
+                },
                 responder: new RSocketRPCServices.MapServiceServer({
                     setup: (map: Map) => {
-                        this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(rSocket), extrasService: new RSocketApi.ExtrasServiceClientAdapter(rSocket), gameService: new RSocketApi.GameServiceClientAdapter(rSocket) });
+                        this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(rSocket, meterRegistry), extrasService: new RSocketApi.ExtrasServiceClientAdapter(rSocket, meterRegistry), gameService: new RSocketApi.GameServiceClientAdapter(rSocket, meterRegistry) });
                     }
-                })
+                }, undefined, meterRegistry)
             });
 
 
-            this.showLoadingCircle(() =>
-                client
-                    .connect()
-                    .then(rsocket => {
-                        console.log(rsocket);
-                        rSocket = rsocket;
-                    })
+            this.showLoadingCircle(() => {
+
+                rSocketWebSocketClient.connect();
+                    client
+                        .connect()
+                        .then(rsocket => {
+                            console.log(rsocket);
+                            rSocket = rsocket;
+                        })
+                }
             );
         } else if (type === "grpc") {
 
