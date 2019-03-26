@@ -1,12 +1,13 @@
+import { v4 as uuid } from 'uuid';
 import { MapService } from '@shared/service_rsocket_pb';
 import { PlayerService } from '../PlayerService';
 import { GameService } from '../GameService';
 import { Nickname, Player } from '@shared/player_pb';
-import { Mono } from 'reactor-core-js/flux';
 import { Config } from '@shared/config_pb';
 import { Score } from '@shared/score_pb';
 import { PlayerRepository } from '../../repository/PlayerRepository';
-import { v4 as uuid } from 'uuid';
+import { ExtrasRepository } from '../../repository/ExtrasRepository';
+
 export class DefaultGameService implements GameService {
   constructor(
     private playerService: PlayerService,
@@ -30,7 +31,8 @@ export class DefaultGameService implements GameService {
       this.playerRepository.findAll()
         .filter((p: Player) => !p.getUuid())
         .forEach((player, i) => config.addPlayers(player, i));
-      config.addExtras(this.extrasRepository.findAll());
+      this.extrasRepository.findAll()
+        .forEach((extra, i) => config.addExtras(extra, i));
         this.playerRepository.findAll()
           .map((p: Player) => {
             const score = new Score();

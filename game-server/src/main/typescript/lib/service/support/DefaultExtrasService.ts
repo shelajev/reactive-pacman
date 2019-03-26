@@ -4,10 +4,10 @@ import { Extra } from '@shared/extra_pb';
 import { ExtrasService } from '../ExtrasService';
 import { extrasProcessor } from 'lib/processors';
 import { PlayerRepository } from '../../repository/PlayerRepository';
+import { ExtrasRepository } from '../../repository/ExtrasRepository';
 
 export class DefaultExtrasService implements ExtrasService {
     extrasProcessor: DirectProcessor<Extra> = new DirectProcessor();
-    extrasFluxSink: FluxSink<Extra> = extrasProcessor.serialize().sink();
 
     powerUpTimer: NodeJS.Timeout;
     powerUpActive: boolean;
@@ -42,7 +42,7 @@ export class DefaultExtrasService implements ExtrasService {
             const extra = new Extra();
             extra.setLast(retainedExtra);
             extra.setCurrent(addedExtra); 
-            extrasFluxSink.next(extra);
+            extrasProcessor.onNext(extra);
 
             return retainedExtra;
         }

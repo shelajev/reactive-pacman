@@ -4,16 +4,14 @@ import { Player } from '@shared/player_pb';
 import { ExtrasService } from '../ExtrasService';
 import { MapService } from '../MapService';
 import { Location, Direction } from '@shared/location_pb';
-import distance from 'lib/distance';
 import { PlayerRepository } from '../../repository/PlayerRepository';
 import { playersProcessor } from 'lib/processors';
 import { Point } from '@shared/point_pb';
-
+import { DefaultMapService } from './DefaultMapService';
 
 export class DefaultPlayerService implements PlayerService {
 
   private playersProcessor = new DirectProcessor<Player>();
-  private playersSink = new DirectProcessor<Player>();
 
   constructor(
     private playerRepository: PlayerRepository,
@@ -51,7 +49,7 @@ export class DefaultPlayerService implements PlayerService {
         const collisions: Player[] = this.playerRepository.findAll()
           .filter(p => p.getState() === Player.State.ACTIVE)
           .filter(p => p.getType() !== player.getType())
-          .filter(p => distance(
+          .filter(p => DefaultMapService.distance2(
               p.getLocation().getPosition(),
               player.getLocation().getPosition()
             ) < 100
@@ -128,7 +126,7 @@ export class DefaultPlayerService implements PlayerService {
     const player = this.playerRepository.delete(uuid);
     if (player) {
       player.setState(Player.State.DISCONNECTED);
-      this.playersSink.onNext(player);
+      this.playersProcessor.onNext(player);
     }
   }
 
@@ -163,7 +161,7 @@ export class DefaultPlayerService implements PlayerService {
       }
       for (let player of players) {
         if (playerType !== player.getType()) {
-          const dist = distance(player.getLocation().getPosition(), point);
+          const dist = DefaultMapService.distance2(player.getLocation().getPosition(), point);
           if (dist > 5) {
             return point;
           }

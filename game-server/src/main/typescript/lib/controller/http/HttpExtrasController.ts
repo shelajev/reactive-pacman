@@ -1,15 +1,15 @@
 
-import { Express } from 'express';
+import { Express, Request, Response } from 'express';
 import { SSE } from 'express-sse';
-import { extrasService } from 'lib/services';
+import { ExtrasService } from '../../service/ExtrasService';
 
 
-export default (app: Express) => {
-    app.get('/extras', (req: Express.Request, res: Express.Response) => {
+export default (app: Express, extrasService: ExtrasService) => {
+    app.get('/extras', (req: Request, res: Response) => {
         const sse = new SSE();
         sse.init(req, res);
         extrasService.extras()
             .doOnNext(sse.send)
-            .subscribe();
+            .consume();
     });
 }

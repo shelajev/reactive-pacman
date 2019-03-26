@@ -1,12 +1,10 @@
-import { Express } from 'express';
-import { SSE } from 'express-sse';
-import { gameService, playerService } from 'lib/services';
-import { Nickname } from '@shared/player_pb';
+import { Express, Response, Request } from 'express';
+import { playerService } from 'lib/services';
 import { DirectProcessor } from 'reactor-core-js/flux';
 
 
 export default (app: Express) => {
-    app.post('locate', (req: Express.Request, res: Express.Response) => {
+    app.post('locate', (req: Request, res: Response) => {
         const location = req.body.location as Location;
         const uuid = req.uuid;
         playerService.locate(new DirectProcessor(), uuid);
