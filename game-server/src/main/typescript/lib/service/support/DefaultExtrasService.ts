@@ -23,7 +23,7 @@ export default class DefaultExtrasService implements ExtrasService {
 
     check(x: number, y: number): number {
         const retainedExtra = this.extrasRepository.collideExtra(x, y);
-        
+
         if (retainedExtra != 0) {
             if (Math.sign(retainedExtra) < 0) {
                 if (this.powerUpActive)

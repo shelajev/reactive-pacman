@@ -3,7 +3,7 @@ import * as express from 'express';
 import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
 import * as grpc from 'grpc';
-import { 
+import {
     SetupServiceService,
     GameServiceService,
     ExtrasServiceService,
@@ -12,7 +12,7 @@ import {
 } from './src/generated/javascript/service_grpc_pb';
 import httpAPI from './lib/controller/http';
 import { SetupController as rsocketAPI} from './lib/controller/rsocket/SetupController';
-import { 
+import {
     DefaultPlayerService,
     DefaultExtrasService,
     DefaultGameService,
@@ -38,7 +38,7 @@ const options: cors.CorsOptions = {
   };
 
 app.use(bodyParser.json());
-  
+
 app.use(cors(options));
 
 const playerRepository = new InMemoryPlayerRepository();

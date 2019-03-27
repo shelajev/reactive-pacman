@@ -18,7 +18,7 @@ export default (app: Express, playerService: PlayerService) => {
         }
 
         processor.onNext(location);
-        
+
     });
 
     app.get('/http/players', (req: Request, res: Response) => {
