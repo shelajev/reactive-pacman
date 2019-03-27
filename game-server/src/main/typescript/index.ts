@@ -29,19 +29,22 @@ app.use(bodyParser.json());
   
 app.use(cors(options));
 
+const playerRepository = new InMemoryPlayerRepository();
+const extrasRepository = new InMemoryExtrasRepository();
+const mapService = new DefaultMapService();
+const extrasService = new DefaultExtrasService(extrasRepository, playerRepository);
+const playerService = new DefaultPlayerService(playerRepository, extrasService, mapService)
+const gameService = new DefaultGameService(playerService, extrasRepository, playerRepository);
+
+const rsocket = new rsocketAPI(mapService, extrasService, playerService, gameService, playerRepository, app);
+const rsocketServer = new RSocketServer({
+    getRequestHandler: rsocket.handler,
+    transport: rsocket.transport()
+});
+rsocketServer.start();
+
 app.listen(3000, () => {
-    const playerRepository = new InMemoryPlayerRepository();
-    const extrasRepository = new InMemoryExtrasRepository();
-    const mapService = new DefaultMapService();
-    const extrasService = new DefaultExtrasService(extrasRepository, playerRepository);
-    const playerService = new DefaultPlayerService(playerRepository, extrasService, mapService)
-    const gameService = new DefaultGameService(playerService, extrasRepository, playerRepository);
-    const rsocket = new rsocketAPI(mapService, extrasService, playerService, gameService, playerRepository, app);
-    const rsocketServer = new RSocketServer({
-        getRequestHandler: rsocket.handler,
-        transport: rsocket.transport()
-    });
-    rsocketServer.start();
-    // httpAPI(app, extrasService, gameService, playerService, mapService);
+
+    httpAPI(app, extrasService, gameService, playerService, mapService);
     console.log('Server started');
 });
