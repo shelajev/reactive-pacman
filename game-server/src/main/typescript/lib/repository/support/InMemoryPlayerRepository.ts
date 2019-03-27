@@ -1,7 +1,7 @@
-import { PlayerRepository } from '../PlayerRepository';
+import PlayerRepository from '../PlayerRepository';
 import { Player } from '@shared/player_pb';
 
-export class InMemoryPlayerRepository implements PlayerRepository {
+export default class InMemoryPlayerRepository implements PlayerRepository {
     store: Map<string, Player> = new Map()
 
     findAll(): Player[] {

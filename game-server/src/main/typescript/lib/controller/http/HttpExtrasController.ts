@@ -1,7 +1,7 @@
 
 import { Express, Request, Response } from 'express';
 import { SSE } from 'express-sse';
-import { ExtrasService } from '../../service/ExtrasService';
+import { ExtrasService } from '../../service';
 
 
 export default (app: Express, extrasService: ExtrasService) => {

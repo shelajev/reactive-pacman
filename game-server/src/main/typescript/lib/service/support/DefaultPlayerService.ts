@@ -1,15 +1,14 @@
-import { PlayerService } from '../PlayerService';
+import PlayerService from '../PlayerService';
 import { DirectProcessor, Flux, Mono } from 'reactor-core-js/flux';
 import { Player } from '@shared/player_pb';
-import { ExtrasService } from '../ExtrasService';
-import { MapService } from '../MapService';
+import { ExtrasService, MapService} from '../';
 import { Location, Direction } from '@shared/location_pb';
-import { PlayerRepository } from '../../repository/PlayerRepository';
+import { PlayerRepository } from '../../repository/';
 import { playersProcessor } from 'lib/processors';
 import { Point } from '@shared/point_pb';
-import { DefaultMapService } from './DefaultMapService';
+import DefaultMapService from './DefaultMapService';
 
-export class DefaultPlayerService implements PlayerService {
+export default class DefaultPlayerService implements PlayerService {
 
   private playersProcessor = new DirectProcessor<Player>();
 

@@ -1,4 +1,4 @@
-export interface ExtrasRepository {
+export default interface ExtrasRepository {
 
     collideExtra(x: number, y: number): number;
 

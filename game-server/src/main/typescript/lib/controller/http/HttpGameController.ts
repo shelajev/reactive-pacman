@@ -1,6 +1,6 @@
 import { Express, Request, Response } from 'express';
 import { SSE } from 'express-sse';
-import { GameService } from '../../service/GameService';
+import { GameService } from '../../service/';
 import { Nickname } from '@shared/player_pb';
 
 

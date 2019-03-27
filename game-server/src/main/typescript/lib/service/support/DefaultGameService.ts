@@ -1,19 +1,15 @@
 import { v4 as uuid } from 'uuid';
-import { MapService } from '@shared/service_rsocket_pb';
-import { PlayerService } from '../PlayerService';
-import { GameService } from '../GameService';
+import { PlayerService, GameService } from '../';
 import { Nickname, Player } from '@shared/player_pb';
 import { Config } from '@shared/config_pb';
 import { Score } from '@shared/score_pb';
-import { PlayerRepository } from '../../repository/PlayerRepository';
-import { ExtrasRepository } from '../../repository/ExtrasRepository';
+import { PlayerRepository, ExtrasRepository } from '../../repository';
 
-export class DefaultGameService implements GameService {
+export default class DefaultGameService implements GameService {
   constructor(
     private playerService: PlayerService,
     private extrasRepository: ExtrasRepository,
     private playerRepository: PlayerRepository,
-    private mapService: MapService
   ) {
 
   }

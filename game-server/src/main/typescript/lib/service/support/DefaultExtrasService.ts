@@ -1,12 +1,11 @@
 import { Disposable } from 'reactor-core-js';
 import { DirectProcessor, Flux, Mono } from 'reactor-core-js/flux';
 import { Extra } from '@shared/extra_pb';
-import { ExtrasService } from '../ExtrasService';
+import  ExtrasService from '../ExtrasService';
 import { extrasProcessor } from 'lib/processors';
-import { PlayerRepository } from '../../repository/PlayerRepository';
-import { ExtrasRepository } from '../../repository/ExtrasRepository';
+import { PlayerRepository, ExtrasRepository } from '../../repository';
 
-export class DefaultExtrasService implements ExtrasService {
+export default class DefaultExtrasService implements ExtrasService {
     extrasProcessor: DirectProcessor<Extra> = new DirectProcessor();
 
     powerUpTimer: NodeJS.Timeout;

@@ -1,6 +1,6 @@
-import { ExtrasRepository } from '../ExtrasRepository';
+import ExtrasRepository from '../ExtrasRepository';
 
-export class InMemoryExtrasRepository implements ExtrasRepository {
+export default class InMemoryExtrasRepository implements ExtrasRepository {
 
     tileSize = 100;
     mapHeight = 60;

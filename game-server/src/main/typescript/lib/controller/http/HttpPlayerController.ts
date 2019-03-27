@@ -1,41 +1,32 @@
 import { Express, Response, Request } from 'express';
-import { playerService } from 'lib/services';
+import { PlayerService } from '../../service/';
 import { DirectProcessor } from 'reactor-core-js/flux';
+import { Location } from '@shared/location_pb';
+import { SSE } from 'express-sse';
 
+export default (app: Express, playerService: PlayerService) => {
+    const locationDirectionProcessors: Map<string, DirectProcessor<Location>> = new Map();
 
-export default (app: Express) => {
     app.post('locate', (req: Request, res: Response) => {
         const location = req.body.location as Location;
         const uuid = req.uuid;
-        playerService.locate(new DirectProcessor(), uuid);
-        location
+        let processor = locationDirectionProcessors.get(uuid);
+        if (!processor) {
+            processor = new DirectProcessor<Location>();
+            playerService.locate(uuid, processor);
+            locationDirectionProcessors.set(uuid, processor);
+        }
+
+        processor.onNext(location);
+        
+    });
+
+    app.get('/players', (req: Request, res: Response) => {
+        const sse = new SSE();
+        sse.init(req, res);
+
+        playerService.players()
+            .doOnNext(sse.send)
+            .consume();
     });
 }
-
-//         UnicastProcessor<Location> processor = locationDirectProcessors.computeIfAbsent(uuid, __ -> {
-//             UnicastProcessor<Location> unicastProcessor =
-//                 UnicastProcessor.create(
-//                     Queues.<Location>unboundedMultiproducer().get(),
-//                     () -> locationDirectProcessors.remove(uuid)
-//                 );
-
-//             playerService.locate(unicastProcessor)
-//                          .subscriberContext(Context.of("uuid", uuid))
-//                          .subscribe();
-
-//             return unicastProcessor;
-//         });
-
-//         processor.onNext(location);
-//     }
-
-//     @GetMapping("/players")
-//     @CrossOrigin(origins = "*", methods = RequestMethod.GET, allowedHeaders = "*", allowCredentials = "true")
-//     public Flux<String> players(@CookieValue("uuid") String uuid) {
-//         return playerService.players()
-//                             .map(e -> Arrays.toString(e.toByteArray()))
-//                             .onBackpressureDrop()
-//                             .transform(Metrics.<String>timed(registry, "http.server", "service", org.coinen.pacman.PlayerService.SERVICE, "method", org.coinen.pacman.PlayerService.METHOD_PLAYERS))
-//                             .subscriberContext(Context.of("uuid", UUID.fromString(uuid)));
-//     }
-// }

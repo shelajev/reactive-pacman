@@ -1,10 +1,10 @@
-import { MapService } from '../MapService';
+import MapService from '../MapService';
 import { Map } from '@shared/map_pb';
 import { Point } from '@shared/point_pb';
 import { Size } from '@shared/size_pb';
 import { Tile } from '@shared/tile_pb';
 
-export class DefaultMapService implements MapService {
+export default class DefaultMapService implements MapService {
     private map: Map
     private tilesPosition: Point[];
 

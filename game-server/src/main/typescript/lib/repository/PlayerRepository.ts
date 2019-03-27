@@ -1,6 +1,6 @@
 import { Player } from "@shared/player_pb";
 
-export interface PlayerRepository {
+export default interface PlayerRepository {
 
     findAll(): Player[];
 
