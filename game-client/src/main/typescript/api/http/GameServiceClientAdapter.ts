@@ -16,7 +16,10 @@ export default class GameServiceClientAdapter implements GameService {
             subject.onSubscribe();
             fetch(`${endpoint || "http://localhost:3000"}/http/start`, {
                 method: "POST",
-                body: nicknameProto.serializeBinary(),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ nickname: nicknameProto.serializeBinary()}),
                 credentials: "include"
             })
             .then(response => response.arrayBuffer())

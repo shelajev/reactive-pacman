@@ -11,6 +11,10 @@ export default class SetupServiceClientAdapter {
             fetch(`${endpoint || "http://localhost:3000"}/http/setup`, {
                 credentials: "include"
             })
+            .then(res => {
+                console.log('got res', res.body);
+                return res;
+            })
             .then(response => response.arrayBuffer())
             .then(buffer => subject.onComplete(Map.deserializeBinary(new Uint8Array(buffer)).toObject()), error => subject.onError(error))
         })

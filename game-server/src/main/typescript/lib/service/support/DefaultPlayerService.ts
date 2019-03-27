@@ -4,7 +4,7 @@ import { Player } from '@shared/player_pb';
 import { ExtrasService, MapService} from '../';
 import { Location, Direction } from '@shared/location_pb';
 import { PlayerRepository } from '../../repository/';
-import { playersProcessor } from 'lib/processors';
+import { playersProcessor } from '../../processors';
 import { Point } from '@shared/point_pb';
 import DefaultMapService from './DefaultMapService';
 
@@ -17,7 +17,8 @@ export default class DefaultPlayerService implements PlayerService {
     private extrasService: ExtrasService,
     private mapService: MapService
   ) {
-    setInterval(this.checkPlayers, 5000);
+    console.log('def pl ser', this.playerRepository, playerRepository);
+    setInterval(this.checkPlayers.bind(this), 5000);
   }
 
   checkPlayers(el: number): void {

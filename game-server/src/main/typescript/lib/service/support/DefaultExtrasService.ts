@@ -2,7 +2,7 @@ import { Disposable } from 'reactor-core-js';
 import { DirectProcessor, Flux, Mono } from 'reactor-core-js/flux';
 import { Extra } from '@shared/extra_pb';
 import  ExtrasService from '../ExtrasService';
-import { extrasProcessor } from 'lib/processors';
+import { extrasProcessor } from '../../processors';
 import { PlayerRepository, ExtrasRepository } from '../../repository';
 
 export default class DefaultExtrasService implements ExtrasService {
