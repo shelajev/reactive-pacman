@@ -17,9 +17,9 @@ export class PlayerController implements PlayerServicePB {
             let disposable: Disposable = {
                 dispose: () => {}
             };
-            
+
             subject.onSubscribe({
-                request: () => {}, 
+                request: () => {},
                 cancel: () => disposable.dispose()
             });
 

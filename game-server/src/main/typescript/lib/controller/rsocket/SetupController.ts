@@ -39,7 +39,7 @@ export class SetupController {
           console.log('err', e.message);
         }
       const handler = new RequestHandlingRSocket();
-    
+
       handler.addService('org.coinen.pacman.GameService', new GameServiceServer(new GameController(uuid, this.gameService)));
       handler.addService('org.coinen.pacman.PlayerService', new PlayerServiceServer(new PlayerController(this.playerService, uuid)));
       handler.addService('org.coinen.pacman.ExtrasService', new ExtrasServiceServer(new ExtrasController(this.extrasService)));
