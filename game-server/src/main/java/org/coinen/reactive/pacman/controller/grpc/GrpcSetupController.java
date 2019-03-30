@@ -25,8 +25,7 @@ public class GrpcSetupController extends ReactorSetupServiceGrpc.SetupServiceImp
 
     @Override
     public Mono<Map> get(Mono<Empty> request) {
-        return Mono.just(mapService.getMap())
-                   .transform(Metrics.<Map>timed(registry, "grpc.server", "service", org.coinen.pacman.SetupService.SERVICE, "method", org.coinen.pacman.SetupService.METHOD_GET));
+        return Mono.just(mapService.getMap());
     }
 
 }

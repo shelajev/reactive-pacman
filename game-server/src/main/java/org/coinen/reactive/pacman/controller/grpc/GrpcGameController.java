@@ -5,13 +5,14 @@ import io.rsocket.rpc.metrics.Metrics;
 import org.coinen.pacman.Config;
 import org.coinen.pacman.Nickname;
 import org.coinen.pacman.ReactorGameServiceGrpc;
-import org.coinen.reactive.pacman.controller.grpc.config.UUIDHolder;
 import org.coinen.reactive.pacman.service.GameService;
 import org.lognet.springboot.grpc.GRpcService;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import static org.coinen.reactive.pacman.controller.grpc.config.UUIDInterceptor.CONTEXT_UUID_KEY;
 
 @GRpcService
 public class GrpcGameController extends ReactorGameServiceGrpc.GameServiceImplBase {
@@ -28,7 +29,6 @@ public class GrpcGameController extends ReactorGameServiceGrpc.GameServiceImplBa
     @Override
     public Mono<Config> start(Mono<Nickname> message) {
         return message.flatMap(gameService::start)
-                      .transform(Metrics.<Config>timed(registry, "grpc.server", "service", org.coinen.pacman.GameService.SERVICE, "method", org.coinen.pacman.GameService.METHOD_START))
-                      .subscriberContext(Context.of("uuid", UUIDHolder.get()));
+                      .subscriberContext(Context.of("uuid", CONTEXT_UUID_KEY.get()));
     }
 }

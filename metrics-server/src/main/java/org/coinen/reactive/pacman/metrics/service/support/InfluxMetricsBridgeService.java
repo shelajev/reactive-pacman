@@ -1,27 +1,19 @@
 package org.coinen.reactive.pacman.metrics.service.support;
 
-import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executors;
 import java.util.function.DoubleConsumer;
 
-import com.google.common.util.concurrent.AtomicDouble;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.DistributionSummary;
-import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Timer;
 import io.micrometer.influx.InfluxMeterRegistry;
 import org.coinen.reactive.pacman.metrics.service.MetricsService;
 import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,15 +31,16 @@ public class InfluxMetricsBridgeService implements MetricsService, Subscription 
 
     private final InfluxMeterRegistry registry;
 
-    private final ConcurrentHashMap<Subscription, Class<?>> subscriptions = new ConcurrentHashMap<>();
-    private final Map<Meter.Id, DoubleConsumer>       consumers     = new HashMap<>();
+    private final ConcurrentHashMap<Subscriber, RequestAwareSubscription> subscriptions =
+        new ConcurrentHashMap<>();
+    private final Map<Meter.Id, DoubleConsumer> consumers = new HashMap<>();
 
     private final MonoProcessor<Void> terminateProcessor = MonoProcessor.create();
     private final TopicProcessor<Meter> metersProcessor  =
         TopicProcessor.<Meter>builder().autoCancel(false)
                                        .bufferSize(8192)
                                        .requestTaskExecutor(Executors.newWorkStealingPool())
-                                       .waitStrategy(WaitStrategy.yielding())
+                                       .waitStrategy(WaitStrategy.liteBlocking())
                                        .executor(Executors.newSingleThreadExecutor())
                                        .share(true)
                                        .build();
@@ -60,140 +53,99 @@ public class InfluxMetricsBridgeService implements MetricsService, Subscription 
 
     @Override
     public Mono<Void> metrics(Publisher<Meter> metersFlux) {
+        BaseSubscriber<Meter> subscriber = new BaseSubscriber<>() {
+            long received = 0;
+            @Override
+            protected void hookOnSubscribe(Subscription subscription) {
+                int size = subscriptions.size();
+                RequestAwareSubscription requestAwareSubscription = new RequestAwareSubscription(subscription);
+                subscriptions.put(this, requestAwareSubscription);
+
+                if (size == 0) {
+                    requestAwareSubscription.request(metersProcessor.getAvailableCapacity());
+                }
+
+                LOGGER.info("Subscribed. S: [{}]", this);
+                LOGGER.info("Active Subscribers. N: [{}]", subscriptions.size());
+            }
+
+            @Override
+            protected void hookOnNext(Meter value) {
+                received++;
+                metersProcessor.onNext(value);
+            }
+
+            @Override
+            protected void hookFinally(SignalType type) {
+                RequestAwareSubscription subscription = subscriptions.remove(this);
+                long requested = subscription.requested;
+
+                if (requested != Long.MAX_VALUE) {
+                    InfluxMetricsBridgeService.this.request(requested - received);
+                }
+
+                LOGGER.info("Unsubscribed. S: [{}]", this);
+                LOGGER.info("Active Subscribers. N: [{}]", subscriptions.size());
+            }
+        };
+
         Flux.from(metersFlux)
-            .subscribe(new BaseSubscriber<>() {
-                @Override
-                protected void hookOnSubscribe(Subscription subscription) {
-                    int size = subscriptions.size() + 1;
-                    int requestPerSubscription = (int) Math.ceil(8192 / size);
+            .subscribe(subscriber);
 
-                    subscription.request(requestPerSubscription);
-                    subscriptions.put(subscription, InfluxMetricsBridgeService.class);
-                }
-
-                @Override
-                protected void hookOnNext(Meter value) {
-                    metersProcessor.onNext(value);
-                }
-
-                @Override
-                protected void hookFinally(SignalType type) {
-                    subscriptions.remove(upstream());
-                }
-            });
-
-        return terminateProcessor;
+        return terminateProcessor.doFinally(__ -> subscriber.dispose());
     }
 
     @Override
     public void request(long n) {
-        final List<Subscription> subscriptions = new ArrayList<>(this.subscriptions.keySet());
+        try {
+            LOGGER.info("Request In. n: [{}]", n);
+            final List<Subscription> subscriptions = new ArrayList<>(this.subscriptions.values());
 
-        int size = subscriptions.size();
+            int size = subscriptions.size();
 
-        if (size == 0) {
-            return;
+            if (size == 0) {
+                return;
+            }
+
+            Collections.shuffle(subscriptions);
+            while (n > 0) {
+                for (Subscription s : subscriptions) {
+                    s.request(1);
+
+                    if (--n <= 0) {
+                        break;
+                    }
+                }
+            }
         }
-
-        int requestPerSubscription = (int) Math.ceil(n / size);
-
-        for (Subscription s: subscriptions) {
-            s.request(requestPerSubscription);
+        catch (Throwable t) {
+            LOGGER.error("Error Requesting.", t);
         }
+        LOGGER.info("Request Out. n: [{}]", n);
     }
 
     @Override
     public void cancel() { }
 
     private void initMetersProcessing() {
+        final Map<Meter.Id, DoubleConsumer> consumers = this.consumers;
+        final InfluxMeterRegistry registry = this.registry;
+
         metersProcessor.onSubscribe(this);
         metersProcessor
+            .doOnCancel(() -> {
+                LOGGER.error("Ops something went wrong. Cancelling");
+            })
             .subscribe(
-                this::record, terminateProcessor::onError, terminateProcessor::onComplete
-            );
-    }
-
-    private void record(Meter meter) {
-        try {
-            Meter.Id id = meter.getId();
-            Iterable<Tag> tags = id.getTagsAsIterable();
-            Meter.Type type = id.getType();
-            String description = id.getDescription();
-
-            for (Measurement measurement: meter.measure()) {
-                switch (type) {
-                    case GAUGE:
-                        consumers
-                            .computeIfAbsent(
-                                id,
-                                i -> {
-                                    AtomicDouble holder = new AtomicDouble();
-                                    registry.gauge(generateInfluxDbFriendNames(i), tags, holder);
-                                    return holder::set;
-                                })
-                            .accept(measurement.getValue());
-                        break;
-                    case LONG_TASK_TIMER:
-                    case TIMER:
-                        consumers
-                            .computeIfAbsent(
-                                id,
-                                i ->
-                                    new DoubleConsumer() {
-                                        Timer timer = registry.timer(generateInfluxDbFriendNames(i), tags);
-
-                                        @Override
-                                        public void accept(double value) {
-                                            timer.record(Duration.ofNanos((long) value));
-                                        }
-                                    })
-                            .accept(measurement.getValue());
-                        break;
-                    case COUNTER:
-                        consumers
-                            .computeIfAbsent(
-                                id,
-                                i ->
-                                    new DoubleConsumer() {
-                                        Counter counter = registry.counter(generateInfluxDbFriendNames(i), tags);
-
-                                        @Override
-                                        public void accept(double value) {
-                                            counter.increment(value);
-                                        }
-                                    })
-                            .accept(measurement.getValue());
-                        break;
-                    case DISTRIBUTION_SUMMARY:
-                        consumers
-                            .computeIfAbsent(
-                                id,
-                                i ->
-                                    new DoubleConsumer() {
-
-                                        DistributionSummary counter =
-                                            DistributionSummary.builder(generateInfluxDbFriendNames(i))
-                                                               .tags(i.getTags())
-                                                               .baseUnit(i.getBaseUnit())
-                                                               .description(description)
-                                                               .register(registry);
-
-                                        @Override
-                                        public void accept(double value) {
-                                            counter.record(value);
-                                        }
-                                    })
-                            .accept(measurement.getValue());
-                        break;
-                    default:
+                (meter) -> Recorder.record(meter, consumers, registry),
+                cause ->  {
+                    LOGGER.error("Ops something went wrong", cause);
+                    terminateProcessor.onError(cause);
+                },
+                () -> {
+                    LOGGER.error("Ops something went wrong");
+                    terminateProcessor.onComplete();
                 }
-            }
-        } catch (Throwable t) {
-            LOGGER.debug("error recording metric for " + meter.getId().getName(), t);
-        }
-    }
-
-    private String generateInfluxDbFriendNames(Meter.Id id) {
-        return id.getName();
+            );
     }
 }

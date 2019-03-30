@@ -20,11 +20,9 @@ import org.springframework.web.server.ServerWebExchange;resetTileCheckresetTileC
 @RequestMapping("/http")
 public class HttpSetupController {
 
-    final RequestHandlingRSocket serverRSocket;
     final MapService mapService;
 
-    public HttpSetupController(RequestHandlingRSocket socket, MapService service) {
-        serverRSocket = socket;
+    public HttpSetupController(MapService service) {
         mapService = service;
     }
 

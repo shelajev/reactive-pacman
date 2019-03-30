@@ -28,7 +28,7 @@ public class ReactiveMetricsRegistry extends StepMeterRegistry implements
 
             @Override
             public Duration step() {
-                return Duration.ofMillis(200);
+                return Duration.ofSeconds(1);
             }
 
             @Override

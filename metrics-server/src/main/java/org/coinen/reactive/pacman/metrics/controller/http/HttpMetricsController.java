@@ -29,11 +29,11 @@ public class HttpMetricsController {
     @PostMapping("/metrics")
     @CrossOrigin(origins = "*", methods = RequestMethod.POST, allowedHeaders = "*", allowCredentials = "true")
     public Empty metrics(@RequestBody MetricsSnapshot metricsSnapshot) {
-        metricsService.metrics(
-            Flux.fromStream(metricsSnapshot.getMetersList()
-                                           .stream()
-                                           .map(MappingUtils::mapMeter))
-        );
+//        metricsService.metrics(
+//            Flux.fromStream(metricsSnapshot.getMetersList()
+//                                           .stream()
+//                                           .map(MappingUtils::mapMeter))
+//        );
 
         return Empty.getDefaultInstance();
     }

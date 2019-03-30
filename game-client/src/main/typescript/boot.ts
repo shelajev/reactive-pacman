@@ -48,62 +48,7 @@ export class Boot extends Scene {
         if(type === "rsocket") {
             const meterRegistry: ReactiveMetricsRegistry = new ReactiveMetricsRegistry();
 
-            const metricsClient = new RpcClient({
-                transport: new RSocketWebSocketClient(
-                    {
-                        url: urlParams.get('metrics-endpoint') || 'ws://localhost:4000',
-                    },
-                    BufferEncoders
-                ),
-                setup: {
-                    keepAlive: 5000,
-                    lifetime: 60000,
-                },
-            });
-
-            let rSocketReconnectionNumber = 0;
-
-            const connectMetrics = () => {
-                metricsClient.connect()
-                    .then(rSocket => {
-                        rSocketReconnectionNumber = 0;
-
-                        let times = 0;
-
-                        const rpcCall = () => {
-                            const metricsSnapshotHandlerClient = new MetricsRSocketRPCServices.MetricsSnapshotHandlerClient(rSocket);
-
-                            ((metricsSnapshotHandlerClient.streamMetricsSnapshots(meterRegistry.asFlowable()) as any) as Flowable<Empty>)
-                                .subscribe({
-                                    onSubscribe: (s) => s.request(Number.MAX_SAFE_INTEGER),
-                                    onNext: () => {},
-                                    onComplete: () => {},
-                                    onError: () => {
-                                        if (times++ < 10) {
-                                            setTimeout(() => connectMetrics(), 1000);
-                                        }
-                                        else {
-                                            connectMetrics();
-                                        }
-                                    }
-                                })
-                        };
-
-                        rpcCall();
-                    }, () => {
-                        setTimeout(() => connectMetrics(), ++rSocketReconnectionNumber * 1000)
-                    });
-            };
-
-            // connectMetrics();
-
             let rSocket: ReactiveSocket<any, any>;
-            const rSocketWebSocketClient = new RSocketWebSocketClient(
-                {
-                    url: urlParams.get('endpoint') || 'ws://localhost:3000',
-                },
-                BufferEncoders
-            );
             const client = new RpcClient({
                 // transport: new RSocketResumableTransport(
                 //     () =>  rSocketWebSocketClient, // provider for low-level transport instances
@@ -113,28 +58,60 @@ export class Boot extends Scene {
                 //         resumeToken: uuid.v4(), // string to uniquely identify the session across connections
                 //     }
                 // ),
-                transport: rSocketWebSocketClient,
+                transport: new RSocketWebSocketClient(
+                    {
+                        url: urlParams.get('endpoint') || 'ws://localhost:3000',
+                    },
+                    BufferEncoders
+                ),
                 setup: {
                     keepAlive: 5000,
                     lifetime: 60000,
                 },
                 responder: new RSocketRPCServices.MapServiceServer({
                     setup: (map: Map) => {
-                        console.log('got map', map);
                         this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(rSocket, meterRegistry), extrasService: new RSocketApi.ExtrasServiceClientAdapter(rSocket, meterRegistry), gameService: new RSocketApi.GameServiceClientAdapter(rSocket, meterRegistry) });
                     }
                 }, undefined, meterRegistry)
             });
 
+            let rSocketReconnectionNumber = 0;
 
-            this.showLoadingCircle(() => {
-                client
-                    .connect()
-                    .then(rsocket => {
-                        console.log(rsocket);
-                        rSocket = rsocket;
-                    })
-            });
+            const connect = () => {
+                this.showLoadingCircle(() => {
+                    client
+                        .connect()
+                        .then(preparedRSocket => {
+                            rSocketReconnectionNumber = 0;
+                            rSocket = preparedRSocket;
+                            let times = 0;
+
+                            const rpcCall = () => {
+                                const metricsSnapshotHandlerClient = new MetricsRSocketRPCServices.MetricsSnapshotHandlerClient(preparedRSocket);
+
+                                ((metricsSnapshotHandlerClient.streamMetricsSnapshots(meterRegistry.asFlowable()) as any) as Flowable<Empty>)
+                                    .subscribe({
+                                        onSubscribe: (s) => s.request(Number.MAX_SAFE_INTEGER),
+                                        onNext: () => {},
+                                        onComplete: () => {},
+                                        onError: (e) => {
+                                            if (times++ < 100) {
+                                                setTimeout(() => rpcCall(), 2000);
+                                                return;
+                                            }
+                                            throw e;
+                                        }
+                                    })
+                            };
+
+                            rpcCall();
+                        }, () => {
+                            setTimeout(() => connect(), ++rSocketReconnectionNumber * 1000)
+                        });
+                });
+            };
+
+            connect();
         } else if (type === "grpc") {
 
             this.showLoadingCircle(() =>
