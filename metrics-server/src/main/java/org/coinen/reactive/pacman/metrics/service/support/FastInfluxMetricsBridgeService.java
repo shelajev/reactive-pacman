@@ -85,17 +85,20 @@ public class FastInfluxMetricsBridgeService implements MetricsService {
                       long n = capacity - remaining();
 
                       if (n <= 0) {
+                          LOGGER.info("Still alive but nothing to send");
                           return;
                       }
 
-                      LOGGER.info("Request In. n: [{}]", n);
                       final List<RequestAwareSubscription> subscriptions = new ArrayList<>(this.subscriptions.values());
 
                       int size = subscriptions.size();
 
                       if (size == 0) {
+                          LOGGER.info("Still alive but no subscribers so far");
                           return;
                       }
+
+                      LOGGER.info("Request In. n: [{}]", n);
 
                       Collections.shuffle(subscriptions);
                       while (n > 0) {
