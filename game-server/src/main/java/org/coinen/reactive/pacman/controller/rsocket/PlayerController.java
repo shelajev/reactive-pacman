@@ -25,6 +25,7 @@ public class PlayerController implements org.coinen.pacman.PlayerService {
 
     @Override
     public Flux<Player> players(Empty message, ByteBuf metadata) {
-        return playerService.players();
+        return playerService.players()
+                            .onBackpressureDrop();
     }
 }
