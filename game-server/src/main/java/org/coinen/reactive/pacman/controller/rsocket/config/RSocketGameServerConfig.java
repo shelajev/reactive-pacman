@@ -23,6 +23,7 @@ import org.coinen.reactive.pacman.controller.rsocket.GameController;
 import org.coinen.reactive.pacman.controller.rsocket.MetricsSnapshotHandlerProxyController;
 import org.coinen.reactive.pacman.controller.rsocket.PlayerController;
 import org.coinen.reactive.pacman.controller.rsocket.SetupController;
+import org.coinen.reactive.pacman.controller.rsocket.support.ConnectingRSocket;
 import org.coinen.reactive.pacman.metrics.ReactiveMetricsRegistry;
 import org.coinen.reactive.pacman.metrics.rsocket.ServerMetricsAwareRSocket;
 import org.coinen.reactive.pacman.service.ExtrasService;
@@ -86,19 +87,12 @@ public class RSocketGameServerConfig {
     @Bean
     @Qualifier("rSocket")
     public MetricsSnapshotHandlerClient metricsSnapshotHandlerClient() {
-//        ConnectingRSocket connectingRSocket = new ConnectingRSocket(
-
-//        );
-         RSocket connectingRSocket = RSocketFactory
-             .connect()
-             .frameDecoder(PayloadDecoder.ZERO_COPY)
-             .transport(WebsocketClientTransport.create(URI.create(uri)))
-             .start()
-//                      .retryBackoff(
-//                          Integer.MAX_VALUE,
-//                          Duration.ofSeconds(2)
-//                      )
-             .block();
+        ConnectingRSocket connectingRSocket = new ConnectingRSocket(
+            RSocketFactory.connect()
+                          .frameDecoder(PayloadDecoder.ZERO_COPY)
+                          .transport(WebsocketClientTransport.create(URI.create(uri)))
+                          .start()
+                          .retryBackoff(Integer.MAX_VALUE, Duration.ofSeconds(2)));
 
         return new MetricsSnapshotHandlerClient(connectingRSocket);
     }

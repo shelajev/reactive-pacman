@@ -1,6 +1,7 @@
 package org.coinen.reactive.pacman.controller.grpc.config;
 
 import java.net.URI;
+import java.time.Duration;
 
 import io.grpc.ManagedChannel;
 import io.grpc.netty.NettyChannelBuilder;
@@ -52,6 +53,7 @@ public class GrpcGameServerConfig {
                                           .usePlaintext()
                                           .build();
             })
+            .retryBackoff(Integer.MAX_VALUE, Duration.ofSeconds(2))
             .block();
 
         return ReactorMetricsSnapshotHandlerGrpc.newReactorStub(managedChannel);
