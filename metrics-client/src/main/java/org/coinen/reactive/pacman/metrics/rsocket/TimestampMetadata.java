@@ -8,6 +8,9 @@ import io.netty.buffer.Unpooled;
 
 abstract class TimestampMetadata {
 
+
+    private static final long MAX_SECOND = 31556889864403199L;
+
     private static final int METADATA_OFFSET = Long.BYTES + Integer.BYTES;
 
     private TimestampMetadata() {}
@@ -26,9 +29,17 @@ abstract class TimestampMetadata {
 
     static Instant time(ByteBuf metadata) {
         int metadataLength = metadata.readableBytes() - METADATA_OFFSET;
-        return metadataLength >= 0
-            ? Instant.ofEpochSecond(metadata.getLong(metadataLength), metadata.getInt(metadataLength + Long.BYTES))
-            : null;
+
+        if (metadataLength >= 0) {
+            long seconds = metadata.getLong(metadataLength);
+            int nanos = metadata.getInt(metadataLength + Long.BYTES);
+
+            if (seconds > 0 && seconds < MAX_SECOND&& nanos >= 0) {
+                return Instant.ofEpochSecond(seconds, nanos);
+            }
+        }
+
+        return null;
     }
 
     static ByteBuf metadata(ByteBuf byteBuf) {
