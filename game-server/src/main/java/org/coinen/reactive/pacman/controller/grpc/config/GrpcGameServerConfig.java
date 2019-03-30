@@ -64,15 +64,15 @@ public class GrpcGameServerConfig {
     }
 
 
-    @Bean
-    @GRpcGlobalInterceptor
-    public ClientMetricsInterceptor clientLatencyInterceptor() {
-        return new ClientMetricsInterceptor();
-    }
-
-    @Bean
-    @GRpcGlobalInterceptor
-    public ServerMetricsInterceptor serverLatencyInterceptor(@Qualifier("grpc") MeterRegistry registry) {
-        return new ServerMetricsInterceptor(registry);
-    }
+//    @Bean
+//    @GRpcGlobalInterceptor
+//    public ClientMetricsInterceptor clientLatencyInterceptor() {
+//        return new ClientMetricsInterceptor();
+//    }
+//
+//    @Bean
+//    @GRpcGlobalInterceptor
+//    public ServerMetricsInterceptor serverLatencyInterceptor(@Qualifier("grpc") MeterRegistry registry) {
+//        return new ServerMetricsInterceptor(registry);
+//    }
 }

@@ -52,10 +52,10 @@ public class RSocketGameServerConfig {
         @Qualifier("rSocket") MeterRegistry rSocketMeterRegistry
     ) {
         return factory -> factory
-            .addServerPlugin(socket -> new ServerMetricsAwareRSocket(
-                socket,
-                rSocketMeterRegistry
-            ))
+//            .addServerPlugin(socket -> new ServerMetricsAwareRSocket(
+//                socket,
+//                rSocketMeterRegistry
+//            ))
             .frameDecoder(PayloadDecoder.ZERO_COPY);
 //            .resume()
 //            .resumeSessionDuration(Duration.ofMinutes(1))

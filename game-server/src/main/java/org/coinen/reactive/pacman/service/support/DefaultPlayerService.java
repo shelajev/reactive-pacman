@@ -138,6 +138,11 @@ public class DefaultPlayerService implements PlayerService {
                            });
 
 
+                           if (updatedPlayer == null) {
+                               return;
+                           }
+
+
                            if (updatedPlayer.getState() == Player.State.DISCONNECTED) {
                                playerRepository.delete(uuid);
                            }
