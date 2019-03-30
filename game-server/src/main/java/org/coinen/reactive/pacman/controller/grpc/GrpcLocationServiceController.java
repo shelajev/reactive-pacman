@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentMap;
 import com.google.protobuf.Empty;
 import org.coinen.pacman.Location;
 import org.coinen.pacman.ReactorLocationServiceGrpc;
-import org.coinen.reactive.pacman.controller.grpc.config.UUIDHolder;
 import org.coinen.reactive.pacman.service.PlayerService;
 import org.jctools.maps.NonBlockingHashMap;
 import org.lognet.springboot.grpc.GRpcService;
@@ -14,6 +13,8 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.UnicastProcessor;
 import reactor.util.concurrent.Queues;
 import reactor.util.context.Context;
+
+import static org.coinen.reactive.pacman.controller.grpc.config.UUIDInterceptor.CONTEXT_UUID_KEY;
 
 @GRpcService
 public class GrpcLocationServiceController extends ReactorLocationServiceGrpc.LocationServiceImplBase {
@@ -28,7 +29,7 @@ public class GrpcLocationServiceController extends ReactorLocationServiceGrpc.Lo
 
     @Override
     public Mono<Empty> locate(Mono<Location> messages) {
-        UUID uuid = UUIDHolder.get();
+        UUID uuid = CONTEXT_UUID_KEY.get();
 
         return messages.map(location -> {
             UnicastProcessor<Location> processor =

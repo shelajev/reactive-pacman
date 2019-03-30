@@ -4,13 +4,14 @@ import java.util.UUID;
 
 import io.rsocket.Payload;
 import io.rsocket.RSocket;
+import io.rsocket.ResponderRSocket;
 import io.rsocket.util.RSocketProxy;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
-public class UuidAwareRSocket extends RSocketProxy {
+public class UuidAwareRSocket extends RSocketProxy implements ResponderRSocket {
 
     private final UUID uuid;
 
@@ -42,5 +43,15 @@ public class UuidAwareRSocket extends RSocketProxy {
     @Override
     public Mono<Void> metadataPush(Payload payload) {
         return super.metadataPush(payload).subscriberContext(Context.of("uuid", uuid));
+    }
+
+    @Override
+    public Flux<Payload> requestChannel(Payload payload, Publisher<Payload> payloads) {
+        if (source instanceof ResponderRSocket) {
+            return ((ResponderRSocket) source).requestChannel(payload, payloads)
+                                              .subscriberContext(Context.of("uuid", uuid));
+        } else {
+            return requestChannel(payloads);
+        }
     }
 }
