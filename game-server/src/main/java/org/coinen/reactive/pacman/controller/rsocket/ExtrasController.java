@@ -15,6 +15,7 @@ public class ExtrasController implements org.coinen.pacman.ExtrasService {
 
     @Override
     public Flux<Extra> extras(Empty message, ByteBuf metadata) {
-        return extrasService.extras();
+        return extrasService.extras()
+                            .onBackpressureBuffer();
     }
 }

@@ -106,7 +106,7 @@ public class DefaultPlayerService implements PlayerService {
                                                    p -> p.toBuilder()
                                                          .setScore(p.getScore() + 100)
                                                          .build());
-                                           playersProcessor.onNext(collidedWith);
+                                           playersSink.next(collidedWith);
                                        });
                                    }
                                    else if (extrasService.isPowerupActive()
@@ -122,7 +122,7 @@ public class DefaultPlayerService implements PlayerService {
                                                    p -> p.toBuilder()
                                                          .setState(Player.State.DISCONNECTED)
                                                          .build());
-                                           playersProcessor.onNext(collidedWith);
+                                           playersSink.next(collidedWith);
                                        });
                                        playerBuilder.setScore(player.getScore() + 100 * collisions.size());
                                    }
@@ -142,7 +142,7 @@ public class DefaultPlayerService implements PlayerService {
                                playerRepository.delete(uuid);
                            }
 
-                           playersProcessor.onNext(updatedPlayer);
+                           playersSink.next(updatedPlayer);
                        })
                        .then()
                    );
