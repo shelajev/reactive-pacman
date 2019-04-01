@@ -16,7 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class HttpGameServerConfig {
 
-    @Value("${http.metrics-endpoint:http://localhost:4000}")
+    @Value("${http.metrics-endpoint}")
     String url;
 
     @Bean
