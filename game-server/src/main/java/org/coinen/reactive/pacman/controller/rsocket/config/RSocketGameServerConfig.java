@@ -45,7 +45,7 @@ import org.springframework.context.annotation.Scope;
 public class RSocketGameServerConfig {
 
     static final Logger LOGGER = LoggerFactory.getLogger(RSocketGameServerConfig.class);
-    @Value("${rsocket.metrics-endpoint:ws://localhost:4000}")
+    @Value("${rsocket.metrics-endpoint}")
     String uri;
 
     @Bean

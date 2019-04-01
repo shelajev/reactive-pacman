@@ -1,11 +1,61 @@
 version: '2.3'
 
 services:
+  game-client:
+    build: ./game-client
+    image: "reactive-game-client:0.0.1"
+    ports:
+      - "9000:80"
+    depends_on:
+      - game-server
+  game-server:
+    image: "reactive-pacman-game-server:0.0.1"
+    ports:
+      - "3000:3000"
+      - "9090:9090"
+    depends_on:
+      - envoy
+      - metrics-server
+    environment:
+      GRPC_METRICSENDPOINT: ws://host.docker.internal:9095
+      HTTP_METRICSENDPOINT: http://host.docker.internal:4000
+      RSOCKET_METRICSENDPOINT: ws://host.docker.internal:4000
+  metrics-server:
+    image: "reactive-pacman-metrics-server:0.0.1"
+    ports:
+      - "4000:4000"
+      - "9095:9095"
+    environment:
+      MANAGEMENT_METRICS_EXPORT_INFLUX_URI: http://host.docker.internal:8086
   envoy:
     image: "envoyproxy/envoy:latest"
     hostname: "envoy"
     ports:
-      - 8000:8080
+      - "8000:8080"
     volumes:
       - "./envoy.yaml:/etc/envoy/envoy.yaml"
     entrypoint: "/usr/local/bin/envoy -c /etc/envoy/envoy.yaml"
+  influxdb:
+    image: "influxdb"
+    volumes:
+      # Mount for influxdb data directory
+      - "./influxdb/data:/var/lib/influxdb"
+      # Mount for influxdb configuration
+      - "./influxdb/config/:/etc/influxdb/"
+    ports:
+      # The API for InfluxDB is served on port 8086
+      - "8086:8086"
+      - "8082:8082"
+      # UDP Port
+      - "8089:8089"
+  chronograf:
+    image: "chronograf"
+    volumes:
+      # Mount for chronograf database
+      - "./chronograf/data/:/var/lib/chronograf/"
+    ports:
+      # The WebUI for Chronograf is served on port 8888
+      - "8888:8888"
+    depends_on:
+      - influxdb
+    command: "--influxdb-url=http://host.docker.internal:8086"
