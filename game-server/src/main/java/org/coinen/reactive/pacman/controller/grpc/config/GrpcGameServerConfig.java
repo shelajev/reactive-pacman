@@ -25,7 +25,7 @@ public class GrpcGameServerConfig {
 
     static final Logger LOGGER = LoggerFactory.getLogger(GrpcGameServerConfig.class);
 
-    @Value("${grpc.metrics-endpoint:http://localhost:9095}")
+    @Value("${grpc.metrics-endpoint}")
     String url;
 
     @Bean
