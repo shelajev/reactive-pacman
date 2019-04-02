@@ -95,7 +95,7 @@ export class Boot extends Scene {
                     });
             };
 
-            connectMetrics();
+            // connectMetrics();
 
             let rSocket: ReactiveSocket<any, any>;
             const rSocketWebSocketClient = new RSocketWebSocketClient(
@@ -120,6 +120,7 @@ export class Boot extends Scene {
                 },
                 responder: new RSocketRPCServices.MapServiceServer({
                     setup: (map: Map) => {
+                        console.log('got map', map);
                         this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(rSocket, meterRegistry), extrasService: new RSocketApi.ExtrasServiceClientAdapter(rSocket, meterRegistry), gameService: new RSocketApi.GameServiceClientAdapter(rSocket, meterRegistry) });
                     }
                 }, undefined, meterRegistry)

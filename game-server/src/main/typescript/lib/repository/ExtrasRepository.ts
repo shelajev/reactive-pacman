@@ -4,7 +4,7 @@ export default interface ExtrasRepository {
 
     createExtra(size: number): number;
 
-    findAll(): number[];
+    findAll(): Set<number>;
 
     saveAll(extras: number[]): void;
 }

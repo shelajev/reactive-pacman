@@ -24,20 +24,19 @@ export default class DefaultGameService implements GameService {
       const player = this.playerService.createPlayer(id, name);
       const config = new Config();
       config.setPlayer(player);
-      this.playerRepository.findAll()
+      config.setPlayersList(this.playerRepository.findAll()
         .filter((p: Player) => !p.getUuid())
-        .forEach((player, i) => config.addPlayers(player, i));
-      this.extrasRepository.findAll()
-        .forEach((extra, i) => config.addExtras(extra, i));
-        this.playerRepository.findAll()
+      );
+      config.setExtrasList(Array.from(this.extrasRepository.findAll()));
+      config.setScoresList(this.playerRepository.findAll()
           .map((p: Player) => {
             const score = new Score();
             score.setUsername(p.getNickname());
             score.setScore(p.getScore());
             score.setUuid(p.getUuid());
             return score;
-          })
-          .forEach((score, i) => config.addScores(score, i));
+          }));
+      console.log(config.toObject().extrasList);
       return config;
     } else {
       throw new Error('Invalid nickname');

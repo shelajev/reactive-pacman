@@ -66,9 +66,7 @@ export default class DefaultMapService implements MapService {
     static generate(width: number, height: number, offset: number): Tile[] {
         const arr = [];
         for (let i = 0; i < width; i++) {
-            const column: number[] = [];
-            column.fill(-1, 0, height);
-            arr[i] = column;
+            arr[i] = new Array(height).fill(-1);
         }
         const tileIndices = DefaultMapService.generateTileCoordinates(width, height, offset, offset);
         const center = new Point();
@@ -141,16 +139,16 @@ export default class DefaultMapService implements MapService {
         for (let i = 0; i < width - 1; i++) {
             for (let j = 0; j < height - 1; j++) {
                 const walls = [false, false, false, false];
-                if (data[i][j] === data[i + 1][j] && data[i][j] !== undefined && data[i + 1][j] !== undefined) {
+                if (data[i][j] === data[i+1][j] && data[i][j] !== null && data[i+1][j] !== null) {
                     walls[0] = true;
                 }
-                if (data[i][j] === data[i][j + 1] && data[i][j] !== undefined && data[i][j + 1] !== undefined) {
+                if (data[i][j] === data[i][j+1] && data[i][j] !== null && data[i][j+1] !== null) {
                     walls[1] = true;
                 }
-                if (data[i][j + 1] === data[i + 1][j + 1] && data[i][j + 1] !== undefined && data[i + 1][j + 1] !== undefined) {
+                if (data[i][j+1] === data[i+1][j+1] && data[i][j+1] !== null && data[i+1][j+1] !== null) {
                     walls[2] = true;
                 }
-                if (data[i + 1][j] === data[i + 1][j + 1] && data[i + 1][j] !== undefined && data[i + 1][j + 1] !== undefined) {
+                if (data[i+1][j] === data[i+1][j+1] && data[i+1][j] !== null && data[i+1][j+1] !== null) {
                     walls[3] = true;
                 }
                 const tile = new TileInner();
@@ -160,9 +158,7 @@ export default class DefaultMapService implements MapService {
                 tiles.push(tile);
             }
         }
-        console.log('data', data);
         DefaultMapService.checkTiles(tiles, width, height, offset);
-
         return tiles.map(t => {
             const point = new Point();
             point.setX(t.x);
@@ -180,7 +176,6 @@ export default class DefaultMapService implements MapService {
         const minY = offset;
         const maxY = height - offset - 1;
         const bounds = [minX, maxX, minY, maxY];
-        console.log('map param', width, height, offset, bounds);
         let badTiles: TileInner[] = [];
         while (true) {
             DefaultMapService.resetTileCheck(bounds, tiles);
@@ -248,7 +243,6 @@ export default class DefaultMapService implements MapService {
                 DefaultMapService.checkTileRecursive(x, y + 1, bounds, tiles);
             }
         } catch(e) {
-            console.log(x, y, bounds, tiles);
             throw e;
         }
     }

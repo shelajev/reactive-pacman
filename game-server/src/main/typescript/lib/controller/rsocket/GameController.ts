@@ -13,7 +13,7 @@ export class GameController implements GameServicePB {
     constructor(private gameService: GameService) {}
 
     start(message: Nickname, metadata?: Buffer): rsocket_flowable.Single<Config> {
-        return FlowableAdapter.wrap(this.gameService.start(message) as any) as any;
+        return rsocket_flowable.Single.of(this.gameService.start(message));
     }
 
 }

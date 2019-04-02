@@ -36,6 +36,11 @@ declare module 'reactor-core-js/flux' {
     export class Mono<T> implements Publisher<T> {
         subscribe(): void;
         map<V> (mapper: (t: T) => V): Mono<V>;
+        consume(): Disposable;
+        consume(onNextCallback: (t: T) => void): Disposable;
+        consume(onNextCallback: (t: T) => void, onErrorCallback: (e: Error) => void): Disposable;
+        consume(onNextCallback: (t: T) => void, onErrorCallback: (e: Error) => void, onCompleteCallback: () => void): Disposable;
+
     }
 }
 

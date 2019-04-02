@@ -21,7 +21,7 @@ const options: cors.CorsOptions = {
     allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Access-Token"],
     credentials: true,
     methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
-    origin: 'http://localhost:9000',
+    origin: ['http://localhost:9000', 'ws://localhost:9000'],
     preflightContinue: false
   };
 
@@ -38,13 +38,9 @@ const gameService = new DefaultGameService(playerService, extrasRepository, play
 
 const rsocket = new rsocketAPI(mapService, extrasService, playerService, gameService, playerRepository, app);
 const rsocketServer = new RSocketServer({
-    getRequestHandler: rsocket.handler,
+    getRequestHandler: rsocket.handler.bind(rsocket),
     transport: rsocket.transport()
 });
+rsocket.server.listen(3000);
 rsocketServer.start();
 
-app.listen(3000, () => {
-
-    httpAPI(app, extrasService, gameService, playerService, mapService);
-    console.log('Server started');
-});

@@ -43,8 +43,14 @@ export class SetupController {
             this.playerService.disconnectPlayer(uuid);
           }
         });
-      new MapServiceClient(socket).setup(this.mapService.getMap());
+        try {
+        const map = this.mapService.getMap();
+        new MapServiceClient(socket).setup(map);
+        } catch(e) {
+          console.log('err', e.message);
+        }
       const handler = new RequestHandlingRSocket();
+    
       handler.addService('org.coinen.pacman.GameService', new GameServiceServer(new GameController(this.gameService)));
       handler.addService('org.coinen.pacman.PlayerService', new PlayerServiceServer(new PlayerController(this.playerService, uuid)));
       handler.addService('org.coinen.pacman.ExtrasService', new ExtrasServiceServer(new ExtrasController(this.extrasService)));

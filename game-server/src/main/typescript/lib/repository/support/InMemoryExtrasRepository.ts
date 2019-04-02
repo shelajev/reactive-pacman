@@ -7,30 +7,35 @@ export default class InMemoryExtrasRepository implements ExtrasRepository {
     mapWidth = 60;
     offset = 11;
 
-    bitmap: number[] = [];
+    bitmap: Set<number> = new Set();
 
     collideExtra(x: number, y: number): number {
+        console.log('bitmap', x, y);
         let i = Math.round(x / this.tileSize);
         let j = Math.round(y / this.tileSize);
 
         const flattenPosition = i + j * this.mapWidth;
-        this.bitmap[flattenPosition] = 0;
-        if (this.bitmap[flattenPosition] === 1) {
+        if (this.bitmap.has(flattenPosition)) {
+            this.bitmap.delete(flattenPosition);
             return flattenPosition;
-        } else if (this.bitmap[flattenPosition] === -1) {
+        } else if (this.bitmap.has(-flattenPosition)) {
+            this.bitmap.delete(flattenPosition);
             return -flattenPosition;
         }
 
         return 0;
     }
 
+
+    
     createExtra(size: number): number {
         let nextPosition = 0;
         do {
             nextPosition = InMemoryExtrasRepository.randomPosition(this.mapWidth, this.mapHeight, this.offset);
-        } while (this.bitmap[nextPosition] !== 0);
+        } while (this.bitmap.has(nextPosition) || this.bitmap.has(-nextPosition));
 
-        const powerupCount = this.bitmap.filter(v => v === -1).length;
+        let powerupCount = 0;
+        this.bitmap.forEach(el => Math.sign(el) < 0 ? powerupCount++ : {});
 
         var powerupAllowed = false;
         var totalSpace =
@@ -46,23 +51,24 @@ export default class InMemoryExtrasRepository implements ExtrasRepository {
         }
 
         if (powerupAllowed) {
-            this.bitmap[nextPosition] = -1;
+            this.bitmap.add(-nextPosition);
             return -nextPosition;
         }
         else {
-            this.bitmap[nextPosition] = 1;
+            this.bitmap.add(nextPosition);
             return nextPosition;
         }
     }
 
-    findAll(): number[] {
+    findAll(): Set<number> {
         return this.bitmap;
     }
 
     saveAll(extras: number[]): void {
         extras.forEach(extra => {
-            this.bitmap[extra] = 1;
-        })
+            this.bitmap.add(extra);
+        });
+        console.log('extras', this.bitmap);
     }
 
 

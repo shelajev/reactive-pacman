@@ -17,7 +17,6 @@ export default class DefaultPlayerService implements PlayerService {
     private extrasService: ExtrasService,
     private mapService: MapService
   ) {
-    console.log('def pl ser', this.playerRepository, playerRepository);
     setInterval(this.checkPlayers.bind(this), 5000);
   }
 
@@ -32,6 +31,7 @@ export default class DefaultPlayerService implements PlayerService {
 
   locate(uuid: string, locationStream: Flux<Location>): Mono<void> {
     return locationStream.doOnNext(location => {
+      console.log('location', location.toObject());
       const time = new Date().getMilliseconds();
       const updatedPlayer = this.playerRepository.update(uuid, (player: Player) => {
         const foundPlayer = this.playerRepository.findOne(uuid);
@@ -58,6 +58,7 @@ export default class DefaultPlayerService implements PlayerService {
             if (
               this.extrasService.isPowerupActive() && player.getType() === Player.Type.GHOST ||
               !this.extrasService.isPowerupActive() && player.getType() === Player.Type.PACMAN) {
+                console.log('colided 1');
                 pl.setState(Player.State.DISCONNECTED);
                 collisions.forEach(collision => {
                   const collidedWith = this.playerRepository
@@ -67,10 +68,10 @@ export default class DefaultPlayerService implements PlayerService {
                     });
                   playersProcessor.onNext(collidedWith);
                 });
-              }
           } else if (
             this.extrasService.isPowerupActive() && player.getType() === Player.Type.PACMAN
             || !this.extrasService.isPowerupActive() && player.getType() === Player.Type.GHOST) {
+              console.log('colieded 2');
               collisions.forEach(collision => {
                 const collidedWith = this.playerRepository
                   .update(collision.getUuid(), (p: Player) => {
@@ -80,9 +81,11 @@ export default class DefaultPlayerService implements PlayerService {
                 playersProcessor.onNext(collidedWith);
               });
               pl.setScore(player.getScore() + 100 * collisions.length);
+            }
           } else if (player.getType() === Player.Type.PACMAN && this.extrasService.check(
             position.getX(),
             position.getY()) > 0) {
+              console.log('increment score');
               pl.setScore(player.getScore() + 1);
           }
           pl.setTimestamp(new Date().getMilliseconds());

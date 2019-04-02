@@ -25,7 +25,7 @@ export default class DefaultExtrasService implements ExtrasService {
 
     check(x: number, y: number): number {
         const retainedExtra = this.extrasRepository.collideExtra(x, y);
-
+        
         if (retainedExtra != 0) {
             if (Math.sign(retainedExtra) < 0) {
                 if (this.powerUpActive)
@@ -58,14 +58,15 @@ export default class DefaultExtrasService implements ExtrasService {
     }
 
     static generate(width: number, height: number, offset: number): number[] {
+        console.log('generating food');
         const iterations =
             ((width - 2 * offset) * (height - 2 * offset) * (0.3 + Math.random() * 0.3));
         const extras = []
-
+        console.log('iterations', iterations);
         for (let i = 0; i < iterations; i++) {
             extras[i] = DefaultExtrasService.randomPosition(width, height, offset);
         }
-
+        console.log('generated', extras);
         return extras;
     }
 

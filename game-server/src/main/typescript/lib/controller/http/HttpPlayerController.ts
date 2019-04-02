@@ -22,7 +22,7 @@ export default (app: Express, playerService: PlayerService) => {
     });
 
     app.get('/http/players', (req: Request, res: Response) => {
-        const sse = new SSE();
+        const sse = new SSE.default();
         sse.init(req, res);
 
         playerService.players()
