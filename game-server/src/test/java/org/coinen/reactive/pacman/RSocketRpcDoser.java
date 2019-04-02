@@ -56,7 +56,7 @@ public class RSocketRpcDoser {
                     .build()
             ));
 
-        Flux.range(0, 500)
+        Flux.range(0, 1)
             .doOnNext(i -> LOGGER.info("Connecting client number: {}", i))
             .concatMap(__ -> Mono
                 .defer(() ->
@@ -71,7 +71,7 @@ public class RSocketRpcDoser {
                                   })
                                   .transport(WebsocketClientTransport.create(URI.create("http://localhost:3000/")))
                                   .start()
-                                  .map(ClientMetricsAwareRSocket::new)
+//                                  .map(ClientMetricsAwareRSocket::new)
                 )
                 .doOnError(t -> LOGGER.error("Reconnecting. ", t))
                 .retryBackoff(10, Duration.ofSeconds(2), Duration.ofSeconds(5))

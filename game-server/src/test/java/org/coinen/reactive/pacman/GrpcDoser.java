@@ -48,7 +48,7 @@ public class GrpcDoser {
                     .build()
             ));
 
-        Flux.range(0, 100)
+        Flux.range(0, 200)
             .doOnNext(i -> LOGGER.info("Connecting client number: {}", i))
             .concatMap(__ ->
                 Mono.fromCallable(() -> NettyChannelBuilder
