@@ -14,14 +14,13 @@ export default class DefaultGameService implements GameService {
 
   }
 
-  start(nickname: Nickname): Config {
+  start(uuid: string, nickname: Nickname): Config {
     if (nickname.getValue().length <= 13) {
       let name = nickname.getValue().replace(/[^a-zA-Z0-9. ]/g, '');
       if (name.length === 0) {
         name = 'Boss of this gym';
       }
-      const id: string = uuid();
-      const player = this.playerService.createPlayer(id, name);
+      const player = this.playerService.createPlayer(uuid, name);
       const config = new Config();
       config.setPlayer(player);
       config.setPlayersList(this.playerRepository.findAll()

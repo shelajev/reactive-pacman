@@ -1,21 +1,11 @@
 
-import * as rsocket_flowable from 'rsocket-flowable';
-import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
-import { SetupService as SetupServicePB, MapServiceClient, GameServiceServer, PlayerServiceServer, ExtrasServiceServer } from "@shared/service_rsocket_pb";
-import FlowableAdapter from './support/FlowableAdapter';
+import { MapServiceClient, GameServiceServer, PlayerServiceServer, ExtrasServiceServer } from "@shared/service_rsocket_pb";
 import { ExtrasService, GameService, PlayerService, MapService } from '../../service';
-import { Location } from "@shared/location_pb";
-import { Map } from '@shared/map_pb';
-import { Mono } from 'reactor-core-js/flux';
-import { Config } from '@shared/config_pb';
-import { Publisher } from 'reactor-core-js/reactive-streams-spec';
-import { RSocketServer, BufferEncoders } from 'rsocket-core'
+import { BufferEncoders } from 'rsocket-core'
 import RSocketWebSocketServer from 'rsocket-websocket-server'
 import { RequestHandlingRSocket } from 'rsocket-rpc-core'
 import { v4 } from 'uuid';
-import { PlayerRepository } from 'lib/repository';
-import { Player } from '@shared/player_pb';
-import { ReactiveSocket, IPartialSubscriber, ConnectionStatus } from 'rsocket-types';
+import { ReactiveSocket, ConnectionStatus } from 'rsocket-types';
 import { GameController } from './GameController';
 import { PlayerController } from './PlayerController';
 import { ExtrasController } from './ExtrasController';
@@ -29,7 +19,6 @@ export class SetupController {
       private extrasService: ExtrasService,
       private playerService: PlayerService,
       private gameService: GameService,
-      private playerRepository: PlayerRepository,
       app: Express.Application
     ) {
       this.server = new Server(app);
@@ -51,7 +40,7 @@ export class SetupController {
         }
       const handler = new RequestHandlingRSocket();
     
-      handler.addService('org.coinen.pacman.GameService', new GameServiceServer(new GameController(this.gameService)));
+      handler.addService('org.coinen.pacman.GameService', new GameServiceServer(new GameController(uuid, this.gameService)));
       handler.addService('org.coinen.pacman.PlayerService', new PlayerServiceServer(new PlayerController(this.playerService, uuid)));
       handler.addService('org.coinen.pacman.ExtrasService', new ExtrasServiceServer(new ExtrasController(this.extrasService)));
       return handler;

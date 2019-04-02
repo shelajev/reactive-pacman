@@ -4,7 +4,6 @@ import { Player } from '@shared/player_pb';
 import { ExtrasService, MapService} from '../';
 import { Location, Direction } from '@shared/location_pb';
 import { PlayerRepository } from '../../repository/';
-import { playersProcessor } from '../../processors';
 import { Point } from '@shared/point_pb';
 import DefaultMapService from './DefaultMapService';
 
@@ -17,7 +16,7 @@ export default class DefaultPlayerService implements PlayerService {
     private extrasService: ExtrasService,
     private mapService: MapService
   ) {
-    setInterval(this.checkPlayers.bind(this), 5000);
+    // setInterval(this.checkPlayers.bind(this), 5000);
   }
 
   checkPlayers(el: number): void {
@@ -29,7 +28,7 @@ export default class DefaultPlayerService implements PlayerService {
       });
   }
 
-  locate(uuid: string, locationStream: Flux<Location>): Mono<void> {
+  locate(uuid: string, locationStream: Flux<Location>): Flux<Location> {
     return locationStream.doOnNext(location => {
       console.log('location', location.toObject());
       const time = new Date().getMilliseconds();
@@ -40,9 +39,8 @@ export default class DefaultPlayerService implements PlayerService {
           return null;
         }
 
-        const pl = new Player();
+        const pl = player;
         pl.setTimestamp(time);
-        pl.setState(Player.State.ACTIVE);
         pl.setLocation(location);
 
         const position: Point = location.getPosition();
@@ -51,7 +49,7 @@ export default class DefaultPlayerService implements PlayerService {
           .filter(p => p.getType() !== player.getType())
           .filter(p => DefaultMapService.distance2(
               p.getLocation().getPosition(),
-              player.getLocation().getPosition()
+              position
             ) < 100
           );
           if (collisions.length > 0) {
@@ -66,7 +64,7 @@ export default class DefaultPlayerService implements PlayerService {
                       p.setScore(p.getScore() + 100);
                       return p;
                     });
-                  playersProcessor.onNext(collidedWith);
+                  this.playersProcessor.onNext(collidedWith);
                 });
           } else if (
             this.extrasService.isPowerupActive() && player.getType() === Player.Type.PACMAN
@@ -78,7 +76,7 @@ export default class DefaultPlayerService implements PlayerService {
                     p.setState(Player.State.DISCONNECTED);
                     return p;
                   });
-                playersProcessor.onNext(collidedWith);
+                this.playersProcessor.onNext(collidedWith);
               });
               pl.setScore(player.getScore() + 100 * collisions.length);
             }
@@ -95,13 +93,12 @@ export default class DefaultPlayerService implements PlayerService {
         this.playerRepository.delete(uuid);
       }
 
-      playersProcessor.onNext(updatedPlayer);
-    })
-    .then();
+      this.playersProcessor.onNext(updatedPlayer);
+    });
   }
 
   players(): Flux<Player> {
-    return playersProcessor;
+    return this.playersProcessor;
   }
 
   createPlayer(uuid: string, nickname: string) {

@@ -9,6 +9,6 @@ export default (app: Express, gameService: GameService) => {
         const sse = new SSE.default();
         sse.init(req, res);
         const nickname = req.body.toString();
-        return res.send(gameService.start(nickname));
+        return res.send(gameService.start("", nickname));
     });
 }

@@ -36,7 +36,7 @@ const extrasService = new DefaultExtrasService(extrasRepository, playerRepositor
 const playerService = new DefaultPlayerService(playerRepository, extrasService, mapService)
 const gameService = new DefaultGameService(playerService, extrasRepository, playerRepository);
 
-const rsocket = new rsocketAPI(mapService, extrasService, playerService, gameService, playerRepository, app);
+const rsocket = new rsocketAPI(mapService, extrasService, playerService, gameService, app);
 const rsocketServer = new RSocketServer({
     getRequestHandler: rsocket.handler.bind(rsocket),
     transport: rsocket.transport()

@@ -7,9 +7,6 @@ declare module 'reactor-core-js/flux' {
 
         static from<T>(stream: Publisher<T>): Flux<T>;
 
-
-        then<T>(): Mono<void>;
-
         map<V> (mapper: (t: T) => V): Flux<V>;
         doOnNext(callback: (t: T) => void): Flux<T>;
 

@@ -4,6 +4,6 @@ import { Nickname } from '@shared/player_pb';
 
 export default interface GameService {
 
-    start(nickname: Nickname): Config;
+    start(uuid: string, nickname: Nickname): Config;
 
 }

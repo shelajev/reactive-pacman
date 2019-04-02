@@ -1,8 +1,6 @@
-import { Disposable } from 'reactor-core-js';
-import { DirectProcessor, Flux, Mono } from 'reactor-core-js/flux';
+import { DirectProcessor, Flux } from 'reactor-core-js/flux';
 import { Extra } from '@shared/extra_pb';
 import  ExtrasService from '../ExtrasService';
-import { extrasProcessor } from '../../processors';
 import { PlayerRepository, ExtrasRepository } from '../../repository';
 
 export default class DefaultExtrasService implements ExtrasService {
@@ -20,7 +18,7 @@ export default class DefaultExtrasService implements ExtrasService {
 
 
     extras(): Flux<Extra> {
-        return extrasProcessor;
+        return this.extrasProcessor;
     }
 
     check(x: number, y: number): number {
@@ -41,7 +39,7 @@ export default class DefaultExtrasService implements ExtrasService {
             const extra = new Extra();
             extra.setLast(retainedExtra);
             extra.setCurrent(addedExtra); 
-            extrasProcessor.onNext(extra);
+            this.extrasProcessor.onNext(extra);
 
             return retainedExtra;
         }

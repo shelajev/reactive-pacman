@@ -6,6 +6,7 @@
     "moduleResolution": "node",
     "target": "es5",
     "downlevelIteration": true,
+    "sourceMap": true,
     "allowJs": true,
     "typeRoots": [
       "./@types/",
