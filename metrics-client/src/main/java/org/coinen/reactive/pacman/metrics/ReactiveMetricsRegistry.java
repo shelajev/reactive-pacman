@@ -56,6 +56,7 @@ public class ReactiveMetricsRegistry extends StepMeterRegistry implements
         return Flux.create(s -> {
             synchronized (this) {
                 if (this.snapshotFluxSink != null) {
+                    System.out.println("Wow");
                     s.error(new IllegalStateException("Allowed only a single subscriber"));
                     return;
                 }
@@ -64,12 +65,14 @@ public class ReactiveMetricsRegistry extends StepMeterRegistry implements
             }
 
             s.onCancel(() -> {
+                System.out.println("Cancelled");
                 synchronized (this) {
                     this.snapshotFluxSink = null;
                 }
             });
 
             s.onDispose(() -> {
+                System.out.println("Disposed");
                 synchronized (this) {
                     this.snapshotFluxSink = null;
                 }
