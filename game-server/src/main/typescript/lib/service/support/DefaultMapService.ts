@@ -10,8 +10,7 @@ export default class DefaultMapService implements MapService {
 
     constructor() {
         this.map = new Map();
-        DefaultMapService.generate(60, 60, 10)
-            .forEach((tile, i) => this.map.addTiles(tile, i));
+        this.map.setTilesList(DefaultMapService.generate(60, 60, 10));
         const size = new Size();
         size.setWidth(60);
         size.setHeight(60);
@@ -165,7 +164,7 @@ export default class DefaultMapService implements MapService {
             point.setY(t.y);
             const tile = new Tile();
             tile.setPoint(point);
-            t.walls.forEach((wall, i) => tile.addWalls(wall, i));
+            tile.setWallsList(t.walls)
             return tile;
         });
     }
