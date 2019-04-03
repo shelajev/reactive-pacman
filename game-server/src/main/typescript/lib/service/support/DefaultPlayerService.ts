@@ -40,6 +40,7 @@ export default class DefaultPlayerService implements PlayerService {
         }
 
         const pl = player;
+        pl.setState(Player.State.ACTIVE);
         pl.setTimestamp(time);
         pl.setLocation(location);
 
