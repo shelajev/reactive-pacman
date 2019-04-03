@@ -104,9 +104,10 @@ export default class DefaultPlayerService implements PlayerService {
   createPlayer(uuid: string, nickname: string) {
     return this.playerRepository.save(uuid, () => {
       const playerType: Player.Type = this.generatePlayerType();
-      const playerPosition: Point = this.findBestStartingPosition(playerType);
-      playerPosition.setX(playerPosition.getX() * 100);
-      playerPosition.setY(playerPosition.getY() * 100);
+      const bestPosition: Point = this.findBestStartingPosition(playerType);
+      const playerPosition: Point = new Point();
+      playerPosition.setX(bestPosition.getX() * 100);
+      playerPosition.setY(bestPosition.getY() * 100);
       const location = new Location();
       location.setDirection(Direction.RIGHT);
       location.setPosition(playerPosition);

@@ -24,7 +24,7 @@ export default class DefaultGameService implements GameService {
       const config = new Config();
       config.setPlayer(player);
       config.setPlayersList(this.playerRepository.findAll()
-        .filter((p: Player) => !p.getUuid())
+        .filter((p: Player) => p.getUuid() !== player.getUuid())
       );
       config.setExtrasList(Array.from(this.extrasRepository.findAll()));
       config.setScoresList(this.playerRepository.findAll()

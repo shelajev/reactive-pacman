@@ -10,7 +10,6 @@ export default class InMemoryExtrasRepository implements ExtrasRepository {
     bitmap: Set<number> = new Set();
 
     collideExtra(x: number, y: number): number {
-        console.log('bitmap', x, y);
         let i = Math.round(x / this.tileSize);
         let j = Math.round(y / this.tileSize);
 
