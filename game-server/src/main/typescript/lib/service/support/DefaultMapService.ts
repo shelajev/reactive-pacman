@@ -28,7 +28,7 @@ export default class DefaultMapService implements MapService {
 
     getRandomPoint() {
         return this.tilesPosition[
-            DefaultMapService.getRandomIntInclusive(0, this.getTilesPositions.length - 1)
+            DefaultMapService.getRandomIntInclusive(0, this.getTilesPositions().length - 1)
         ];
     }
 

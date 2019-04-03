@@ -158,13 +158,16 @@ export default class DefaultPlayerService implements PlayerService {
 
     while (true) {
       let point = this.mapService.getRandomPoint();
+      const adjustedPoint = new Point();
+      adjustedPoint.setX(point.getX() * 100);
+      adjustedPoint.setY(point.getY() * 100);
       if (players.length === 0) {
         return point;
       }
       for (let player of players) {
         if (playerType !== player.getType()) {
-          const dist = DefaultMapService.distance2(player.getLocation().getPosition(), point);
-          if (dist > 5) {
+          const dist = DefaultMapService.distance2(player.getLocation().getPosition(), adjustedPoint);
+          if (dist > 500) {
             return point;
           }
         }
