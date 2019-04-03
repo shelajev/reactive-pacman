@@ -1,0 +1,24 @@
+{
+  "name": "metrics-ui",
+  "version": "0.0.1",
+  "description": "A frontend for displaying metrics from the game",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack-dev-server"
+  },
+  "collaborators": [
+    "Duncan Alexander <duncan@netifi.com>",
+    "Oleh Dokuka <oleh@netifi.com>"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "copy-webpack-plugin": "^5.0.2",
+    "vizceral": "^4.7.3"
+  },
+  "devDependencies": {
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0",
+    "webpack-dev-server": "^3.2.1"
+  }
+}

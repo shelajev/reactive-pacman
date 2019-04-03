@@ -3,7 +3,8 @@
     "game-idl",
     "metrics-idl",
     "game-client",
-    "metrics-client"
+    "metrics-client",
+    "metrics-ui"
   ],
   "version": "0.0.1"
 }
