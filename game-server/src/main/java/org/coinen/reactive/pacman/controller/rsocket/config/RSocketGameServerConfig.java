@@ -31,6 +31,7 @@ import org.coinen.reactive.pacman.service.MapService;
 import org.coinen.reactive.pacman.service.PlayerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.retry.Retry;
 
@@ -53,10 +54,10 @@ public class RSocketGameServerConfig {
         @Qualifier("rSocket") MeterRegistry rSocketMeterRegistry
     ) {
         return factory -> factory
-//            .addServerPlugin(socket -> new ServerMetricsAwareRSocket(
-//                socket,
-//                rSocketMeterRegistry
-//            ))
+            .addServerPlugin(socket -> new ServerMetricsAwareRSocket(
+                socket,
+                rSocketMeterRegistry
+            ))
             .frameDecoder(PayloadDecoder.ZERO_COPY);
     }
 
@@ -65,17 +66,11 @@ public class RSocketGameServerConfig {
     public MeterRegistry reactiveRSocketMeterRegistry(@Qualifier("rSocket") MetricsSnapshotHandlerClient metricsSnapshotHandlerClient) {
         ReactiveMetricsRegistry registry = new ReactiveMetricsRegistry("rsocket.game.server");
 
-        metricsSnapshotHandlerClient
-            .streamMetricsSnapshots(
-                registry.asFlux()
-            )
-            .retryWhen(
-                Retry.any()
-                     .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofMinutes(1))
-                     .retryMax(100)
-            )
-//            );
-            .subscribe();
+       Flux.defer(() -> metricsSnapshotHandlerClient.streamMetricsSnapshots(registry.asFlux()))
+           .retryWhen(Retry.any()
+                           .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofMinutes(1))
+                           .retryMax(100))
+           .subscribe();
 
         return registry;
 }
@@ -84,12 +79,13 @@ public class RSocketGameServerConfig {
     @Qualifier("rSocket")
     public MetricsSnapshotHandlerClient metricsSnapshotHandlerClient() {
         ReconnectingRSocket connectingRSocket = new ReconnectingRSocket(
-            Mono.defer(() -> RSocketFactory.connect()
-                                     .frameDecoder(PayloadDecoder.ZERO_COPY)
-                                     .transport(WebsocketClientTransport.create(URI.create(uri)))
-                                     .start()),
+            Mono.defer(
+            RSocketFactory.connect()
+                          .frameDecoder(PayloadDecoder.ZERO_COPY)
+                          .transport(WebsocketClientTransport.create(URI.create(uri)))
+                          ::start),
             Duration.ofMillis(500),
-            Duration.ofSeconds(4)
+            Duration.ofSeconds(1)
         );
 
         return new MetricsSnapshotHandlerClient(connectingRSocket);
