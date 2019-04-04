@@ -1,9 +1,9 @@
 package org.coinen.reactive.pacman.config;
 
 import org.coinen.reactive.pacman.repository.ExtrasRepository;
+import org.coinen.reactive.pacman.repository.PlayerRepository;
 import org.coinen.reactive.pacman.repository.support.InMemoryExtrasRepository;
 import org.coinen.reactive.pacman.repository.support.InMemoryPlayerRepository;
-import org.coinen.reactive.pacman.repository.PlayerRepository;
 import org.coinen.reactive.pacman.service.ExtrasService;
 import org.coinen.reactive.pacman.service.GameService;
 import org.coinen.reactive.pacman.service.MapService;

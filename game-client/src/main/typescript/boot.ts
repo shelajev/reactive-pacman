@@ -14,11 +14,11 @@ import * as $ from 'jquery';
 import * as RSocketApi from './api/rsocket';
 import * as HttpApi from './api/http';
 import * as GrpcApi from './api/grpc';
+import * as SocketIOApi from './api/socket.io';
 import { RSocketRPCServices as MetricsRSocketRPCServices } from 'metrics-idl';
-import FlowableAdapter from "./api/FlowableAdapter";
 import {Flowable} from 'rsocket-flowable';
 import {Empty} from "google-protobuf/google/protobuf/empty_pb";
-import uuid = require("uuid");
+import * as io from "socket.io-client";
 
 export class Boot extends Scene {
 
@@ -119,6 +119,17 @@ export class Boot extends Scene {
             .map()
                 .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new GrpcApi.PlayerServiceClientSharedAdapter(), extrasService: new GrpcApi.ExtrasServiceClientAdapter(), gameService: new GrpcApi.GameServiceClientAdapter() }))
             );
+        } else if (type === "socket.io") {
+            this.showLoadingCircle(() => {
+                const socket: SocketIOClient.Socket = io(urlParams.get('endpoint') || 'ws://localhost:3000', {
+                    transports: ["websocket"]
+                });
+
+                socket.on('setup', (data: Buffer) => {
+                    const map = Map.deserializeBinary(data);
+                    this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new SocketIOApi.PlayerServiceClientSharedAdapter(socket, undefined), extrasService: new SocketIOApi.ExtrasServiceClientAdapter(socket, undefined), gameService: new SocketIOApi.GameServiceClientAdapter(socket, undefined) });
+                });
+            });
         } else {
             this.showLoadingCircle(() =>
                 new HttpApi.SetupServiceClientAdapter()
