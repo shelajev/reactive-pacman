@@ -1,11 +1,23 @@
 package org.coinen.reactive.pacman.controller.socket.io.config;
 
+import java.net.URISyntaxException;
+import java.time.Duration;
+
 import com.corundumstudio.socketio.AckMode;
+import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.BroadcastOperations;
+import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.Transport;
+import com.corundumstudio.socketio.listener.DataListener;
+import com.corundumstudio.socketio.listener.DisconnectListener;
+import com.corundumstudio.socketio.transport.WebSocketTransport;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.socket.client.IO;
+import io.socket.client.Socket;
 import org.coinen.pacman.Location;
 import org.coinen.pacman.Nickname;
+import org.coinen.reactive.pacman.metrics.ReactiveMetricsRegistry;
 import org.coinen.reactive.pacman.service.ExtrasService;
 import org.coinen.reactive.pacman.service.GameService;
 import org.coinen.reactive.pacman.service.MapService;
@@ -13,12 +25,13 @@ import org.coinen.reactive.pacman.service.PlayerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.UnicastProcessor;
+import reactor.retry.Retry;
 import reactor.util.context.Context;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.event.ApplicationFailedEvent;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,12 +44,38 @@ public class SocketIOGameServerConfig {
     private static final String LOCATION_FLUX_KEY = "locationFlux";
 
     static final Logger LOGGER = LoggerFactory.getLogger(SocketIOGameServerConfig.class);
-    @Value("${rsocket.metrics-endpoint}")
+    @Value("${socket.io.metrics-endpoint}")
     String uri;
+
+    @Bean
+    @Qualifier("socket.io")
+    public Socket metricsSocketClient() throws URISyntaxException {
+        IO.Options options = new IO.Options();
+        options.transports = new String[] {WebSocketTransport.NAME};
+
+        return IO.socket(uri, options).connect();
+    }
+
+    @Bean
+    @Qualifier("socket.io")
+    public MeterRegistry socketIOMeterRegistry(@Qualifier("socket.io") Socket socket) {
+        ReactiveMetricsRegistry registry = new ReactiveMetricsRegistry("rsocket.game.server");
+
+            registry.asFlux()
+                    .doOnNext(metricsSnapshot -> socket.emit("streamMetricsSnapshots", (Object) metricsSnapshot.toByteArray()))
+                    .retryWhen(Retry.any()
+                            .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofMinutes(1))
+                            .retryMax(100))
+                    .subscribe();
+
+        return registry;
+    }
 
 
     @Bean
+    @Qualifier("socket.io")
     public CommandLineRunner socketIOServerRunner(
+        Socket metricsSocketClient,
         ConfigurableApplicationContext context,
         GameService gameService,
         ExtrasService extrasService,
@@ -97,6 +136,23 @@ public class SocketIOGameServerConfig {
             server.addEventListener("locate", byte[].class, (client, data, ackRequest) -> {
                 UnicastProcessor<Location> locationFlux =  client.get(LOCATION_FLUX_KEY);
                 locationFlux.onNext(Location.parseFrom(data));
+            });
+
+            server.addEventListener("streamMetricsSnapshots", byte[].class,
+                new DataListener<byte[]>() {
+                    @Override
+                    public void onData(SocketIOClient client,
+                        byte[] data,
+                        AckRequest ackSender) throws Exception {
+                        metricsSocketClient.emit("streamMetricsSnapshots", (Object) data);
+                    }
+                });
+
+            server.addDisconnectListener(new DisconnectListener() {
+                @Override
+                public void onDisconnect(SocketIOClient client) {
+                    LOGGER.info("Someone disconnected");
+                }
             });
 
             server.startAsync();
