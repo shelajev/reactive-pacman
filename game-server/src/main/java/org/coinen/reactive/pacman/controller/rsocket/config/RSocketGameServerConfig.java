@@ -73,7 +73,7 @@ public class RSocketGameServerConfig {
            .subscribe();
 
         return registry;
-}
+    }
 
     @Bean
     @Qualifier("rSocket")
