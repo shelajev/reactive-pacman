@@ -7,53 +7,54 @@ viz.setOptions({
   allowDraggingOfNodes: true
 });
 
-viz.updateStyles({
-  colorText: 'rgb(214, 214, 214)',
-  colorTextDisabled: 'rgb(129, 129, 129)',
-  colorTraffic: {
-    normal: 'rgb(186, 213, 237)',
-    normalDonut: 'rgb(91, 91, 91)',
-    warning: 'rgb(268, 185, 73)',
-    danger: 'rgb(184, 36, 36)',
-  },
-  colorNormalDimmed: 'rgb(101, 117, 128)',
-  colorBackgroundDark: 'rgb(35, 35, 35)',
-  colorLabelBorder: 'rgb(16, 17, 18)',
-  colorLabelText: 'rgb(0, 0, 0)',
-  colorDonutInternalColor: 'rgb(35, 35, 35)',
-  colorDonutInternalColorHighlighted: 'rgb(255, 255, 255)',
-  colorConnectionLine: 'rgb(91, 91, 91)',
-  colorPageBackground: 'rgb(45, 45, 45)',
-  colorPageBackgroundTransparent: 'rgba(45, 45, 45, 0)',
-  colorBorderLines: 'rgb(137, 137, 137)',
-  colorArcBackground: 'rgb(60, 60, 60)'
-});
+// viz.updateStyles({
+//   colorText: 'rgb(214, 214, 214)',
+//   colorTextDisabled: 'rgb(129, 129, 129)',
+//   colorTraffic: {
+//     normal: 'rgb(186, 213, 237)',
+//     normalDonut: 'rgb(91, 91, 91)',
+//     warning: 'rgb(268, 185, 73)',
+//     danger: 'rgb(184, 36, 36)',
+//   },
+//   colorNormalDimmed: 'rgb(101, 117, 128)',
+//   colorBackgroundDark: 'rgb(35, 35, 35)',
+//   colorLabelBorder: 'rgb(16, 17, 18)',
+//   colorLabelText: 'rgb(0, 0, 0)',
+//   colorDonutInternalColor: 'rgb(35, 35, 35)',
+//   colorDonutInternalColorHighlighted: 'rgb(255, 255, 255)',
+//   colorConnectionLine: 'rgb(91, 91, 91)',
+//   colorPageBackground: 'rgb(45, 45, 45)',
+//   colorPageBackgroundTransparent: 'rgba(45, 45, 45, 0)',
+//   colorBorderLines: 'rgb(137, 137, 137)',
+//   colorArcBackground: 'rgb(60, 60, 60)'
+// });
 
-viz.updateDefinitions({
-  volume: {
-    default: {
-      top: { header: '% RPS', data: 'data.volumePercent', format: '0.00%' },
-      bottom: { header: 'ERROR RATE', data: 'data.classPercents.danger', format: '0.00%' },
-      donut: {},
-      arc: {}
-    },
-    region: {
-      top: { header: 'SERVICE RPS', data: 'data.volume', format: '0.0' }
-    },
-    entry: {
-      top: { header: 'TOTAL RPS', data: 'data.volume', format: '0.0' }
-    }
-  }
-});
+// viz.updateDefinitions({
+//   volume: {
+//     default: {
+//       top: { header: '% RPS', data: 'data.volumePercent', format: '0.00%' },
+//       bottom: { header: 'ERROR RATE', data: 'data.classPercents.danger', format: '0.00%' },
+//       donut: {},
+//       arc: {}
+//     },
+//     region: {
+//       top: { header: 'SERVICE RPS', data: 'data.volume', format: '0.0' }
+//     },
+//     entry: {
+//       top: { header: 'TOTAL RPS', data: 'data.volume', format: '0.0' }
+//     }
+//   }
+// });
 
 viz.updateData({
   renderer: 'global',
   name: 'edge',
-  maxVolume: 100000,
   entryNode: 'INTERNET',
+  layout: 'dns',
   nodes: [
     {
-      name: 'INTERNET'
+      name: 'INTERNET',
+      class: 'normal'
     },
     {
       renderer: 'region',
@@ -65,20 +66,38 @@ viz.updateData({
         {
           renderer: 'region',
           name: 'dummy-1'
+        },
+        {
+          renderer: 'region',
+          name: 'dummy-3'
         }
       ],
-      connections: [{
-        source: 'dummy-1',
-        target: 'us-east-2',
-        metrics: {
-          normal: 10000,
-          danger: 107,
-          warning: 0
+      connections: [
+        {
+          source: 'dummy-1',
+          target: 'us-east-2',
+          metrics: {
+            normal: 10000,
+            danger: 107,
+            warning: 0
+          },
+          notices: [
+          ],
+          class: 'normal'
         },
-        notices: [
-        ],
-        class: 'normal'
-      }]
+        {
+          source: 'dummy-1',
+          target: 'dummy-3',
+          metrics: {
+            normal: 2000,
+            danger: 200,
+            warning: 0
+          },
+          notices: [
+          ],
+          class: 'normal'
+        }
+      ]
     },
     {
       renderer: 'region',
@@ -115,8 +134,7 @@ viz.updateData({
         danger: 107,
         warning: 0
       },
-      notices: [
-      ],
+      notices: [],
       class: 'normal'
     },
     {
@@ -127,8 +145,7 @@ viz.updateData({
         danger: 107,
         warning: 0
       },
-      notices: [
-      ],
+      notices: [],
       class: 'normal'
     }
   ]
