@@ -1,149 +1,137 @@
 import Vizceral from 'vizceral';
 const canvas = document.getElementById('vizceral');
-canvas.width = canvas.height = 500;
 const viz = new Vizceral(canvas);
 
+viz.setOptions({
+  showLabels: true,
+  allowDraggingOfNodes: true
+});
+
+viz.updateStyles({
+  colorText: 'rgb(214, 214, 214)',
+  colorTextDisabled: 'rgb(129, 129, 129)',
+  colorTraffic: {
+    normal: 'rgb(186, 213, 237)',
+    normalDonut: 'rgb(91, 91, 91)',
+    warning: 'rgb(268, 185, 73)',
+    danger: 'rgb(184, 36, 36)',
+  },
+  colorNormalDimmed: 'rgb(101, 117, 128)',
+  colorBackgroundDark: 'rgb(35, 35, 35)',
+  colorLabelBorder: 'rgb(16, 17, 18)',
+  colorLabelText: 'rgb(0, 0, 0)',
+  colorDonutInternalColor: 'rgb(35, 35, 35)',
+  colorDonutInternalColorHighlighted: 'rgb(255, 255, 255)',
+  colorConnectionLine: 'rgb(91, 91, 91)',
+  colorPageBackground: 'rgb(45, 45, 45)',
+  colorPageBackgroundTransparent: 'rgba(45, 45, 45, 0)',
+  colorBorderLines: 'rgb(137, 137, 137)',
+  colorArcBackground: 'rgb(60, 60, 60)'
+});
+
+viz.updateDefinitions({
+  volume: {
+    default: {
+      top: { header: '% RPS', data: 'data.volumePercent', format: '0.00%' },
+      bottom: { header: 'ERROR RATE', data: 'data.classPercents.danger', format: '0.00%' },
+      donut: {},
+      arc: {}
+    },
+    region: {
+      top: { header: 'SERVICE RPS', data: 'data.volume', format: '0.0' }
+    },
+    entry: {
+      top: { header: 'TOTAL RPS', data: 'data.volume', format: '0.0' }
+    }
+  }
+});
+
 viz.updateData({
-  "renderer": "region",
-  "name": "quickstart.clients-client1",
-  "entryNode": "quickstart.clients-client1",
-  "maxVolume": 0.0,
-  "class": "normal",
-  "updated": 1536240246639000,
-  "nodes": [
+  renderer: 'global',
+  name: 'edge',
+  maxVolume: 100000,
+  entryNode: 'INTERNET',
+  nodes: [
     {
-      "renderer": "",
-      "name": "quickstart.services.helloservices-helloservice-d3875b6f-6069-4355-a05f-eb376c76abdc",
-      "entryNode": "",
-      "maxVolume": 18.0,
-      "class": "normal",
-      "updated": 1536240017785000,
-      "nodes": [],
-      "connections": [],
-      "displayName": "quickstart.services.helloservices-helloservice-d3875b6f-6069-4355-a05f-eb376c76abdc",
-      "metadata": []
+      name: 'INTERNET'
     },
     {
-      "renderer": "",
-      "name": "quickstart.services.helloservices-helloservice-95613c6a-bb6d-4e39-a047-8d9624234838",
-      "entryNode": "",
-      "maxVolume": 284.0,
-      "class": "normal",
-      "updated": 1536239980285000,
-      "nodes": [],
-      "connections": [],
-      "displayName": "quickstart.services.helloservices-helloservice-95613c6a-bb6d-4e39-a047-8d9624234838",
-      "metadata": []
+      renderer: 'region',
+      name: 'us-east-1',
+      maxVolume: 50000,
+      class: 'normal',
+      updated: 1466838546805,
+      nodes: [
+        {
+          renderer: 'region',
+          name: 'dummy-1'
+        }
+      ],
+      connections: [{
+        source: 'dummy-1',
+        target: 'us-east-2',
+        metrics: {
+          normal: 10000,
+          danger: 107,
+          warning: 0
+        },
+        notices: [
+        ],
+        class: 'normal'
+      }]
     },
     {
-      "renderer": "",
-      "name": "quickstart.clients-client1",
-      "entryNode": "",
-      "maxVolume": 0.0,
-      "class": "normal",
-      "updated": 1536240246639000,
-      "nodes": [],
-      "connections": [],
-      "displayName": "quickstart.clients-client1",
-      "metadata": []
-    },
-    {
-      "renderer": "",
-      "name": "quickstart.services.helloservices-helloservice-7182b26f-d18f-475a-8700-fac9a08644cb",
-      "entryNode": "",
-      "maxVolume": 409.0,
-      "class": "normal",
-      "updated": 1536239656231000,
-      "nodes": [],
-      "connections": [],
-      "displayName": "quickstart.services.helloservices-helloservice-7182b26f-d18f-475a-8700-fac9a08644cb",
-      "metadata": []
-    },
-    {
-      "renderer": "",
-      "name": "quickstart.services.helloservices-helloservice-9facf5e5-3529-437d-8a8c-bae4edd89b80",
-      "entryNode": "",
-      "maxVolume": 4.0,
-      "class": "normal",
-      "updated": 1536240246639000,
-      "nodes": [],
-      "connections": [],
-      "displayName": "quickstart.services.helloservices-helloservice-9facf5e5-3529-437d-8a8c-bae4edd89b80",
-      "metadata": []
+      renderer: 'region',
+      name: 'us-east-2',
+      maxVolume: 50000,
+      class: 'normal',
+      updated: 1466838546805,
+      nodes: [
+        {
+          renderer: 'region',
+          name: 'dummy-2'
+        }
+      ],
+      connections: [{
+        source: 'dummy-2',
+        target: 'us-east-1',
+        metrics: {
+          normal: 10000,
+          danger: 107,
+          warning: 0
+        },
+        notices: [
+        ],
+        class: 'normal'
+      }]
     }
   ],
-  "connections": [
+  connections: [
     {
-      "source": "quickstart.clients-client1",
-      "target": "quickstart.services.helloservices-helloservice-95613c6a-bb6d-4e39-a047-8d9624234838",
-      "metrics": {
-        "danger": 0.0,
-        "normal": 1.0,
-        "warning": 0.0
+      source: 'us-east-1',
+      target: 'us-east-2',
+      metrics: {
+        normal: 10000,
+        danger: 107,
+        warning: 0
       },
-      "notices": [
-        {
-          "severity": 1,
-          "title": "io.netifi.proteus.quickstart.service.HelloService",
-          "link": ""
-        }
+      notices: [
       ],
-      "updated": 1536239980285000
+      class: 'normal'
     },
     {
-      "source": "quickstart.clients-client1",
-      "target": "quickstart.services.helloservices-helloservice-9facf5e5-3529-437d-8a8c-bae4edd89b80",
-      "metrics": {
-        "danger": 0.0,
-        "normal": 1.0,
-        "warning": 0.0
+      source: 'us-east-2',
+      target: 'us-east-1',
+      metrics: {
+        normal: 10000,
+        danger: 107,
+        warning: 0
       },
-      "notices": [
-        {
-          "severity": 1,
-          "title": "io.netifi.proteus.quickstart.service.HelloService",
-          "link": ""
-        }
+      notices: [
       ],
-      "updated": 1536240246639000
-    },
-    {
-      "source": "quickstart.clients-client1",
-      "target": "quickstart.services.helloservices-helloservice-7182b26f-d18f-475a-8700-fac9a08644cb",
-      "metrics": {
-        "danger": 0.0,
-        "normal": 1.0,
-        "warning": 0.0
-      },
-      "notices": [
-        {
-          "severity": 1,
-          "title": "io.netifi.proteus.quickstart.service.HelloService",
-          "link": ""
-        }
-      ],
-      "updated": 1536239656231000
-    },
-    {
-      "source": "quickstart.clients-client1",
-      "target": "quickstart.services.helloservices-helloservice-d3875b6f-6069-4355-a05f-eb376c76abdc",
-      "metrics": {
-        "danger": 0.0,
-        "normal": 1.0,
-        "warning": 0.0
-      },
-      "notices": [
-        {
-          "severity": 1,
-          "title": "io.netifi.proteus.quickstart.service.HelloService",
-          "link": ""
-        }
-      ],
-      "updated": 1536240017785000
+      class: 'normal'
     }
-  ],
-  "displayName": "quickstart.clients-client1",
-  "metadata": []
+  ]
 });
 viz.setView();
 viz.animate();
