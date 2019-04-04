@@ -40,7 +40,7 @@ subprojects {
 				entry 'protoc-gen-grpc-java'
 			}
 
-			dependencySet (group: 'io.rsocket', version: '0.12.1-RC3-SNAPSHOT-TEST') {
+			dependencySet (group: 'io.rsocket', version: '0.12.1-RC3-SNAPSHOT') {
 				entry 'rsocket-core'
 				entry 'rsocket-transport-netty'
 			}
