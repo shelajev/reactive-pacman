@@ -9,19 +9,14 @@
     "sourceMap": true,
     "allowJs": true,
     "typeRoots": [
-      "./@types/",
+      "./src/main/@types/",
       "node_modules/@types/",
-      "../../../../game-idl/src/@types/typescript",
+      "../game-idl/src/@types/typescript"
     ],
     "lib": [
       "es6",
-      "scripthost",
-      "dom"
-    ],
-    "baseUrl": "./",
-    "paths": {
-      "@shared/*": ["../../../../game-idl/src/generated/main/javascript/*"]
-    }
+      "scripthost"
+    ]
   },
   "include": [
     "./"

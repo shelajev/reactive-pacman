@@ -1,5 +1,5 @@
 import { Express, Response, Request } from 'express';
-import { PlayerService } from '../../service/';
+import { PlayerService } from '../../service';
 import { DirectProcessor } from 'reactor-core-js/flux';
 import { Location } from '@shared/location_pb';
 import * as SSE from 'express-sse';

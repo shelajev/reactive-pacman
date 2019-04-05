@@ -1,9 +1,9 @@
 import PlayerService from '../PlayerService';
 import { DirectProcessor, Flux, Mono } from 'reactor-core-js/flux';
 import { Player } from '@shared/player_pb';
-import { ExtrasService, MapService} from '../';
+import { ExtrasService, MapService} from '../index';
 import { Location, Direction } from '@shared/location_pb';
-import { PlayerRepository } from '../../repository/';
+import { PlayerRepository } from './DefaultPlayerService';
 import { Point } from '@shared/point_pb';
 import DefaultMapService from './DefaultMapService';
 

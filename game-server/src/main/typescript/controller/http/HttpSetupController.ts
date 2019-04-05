@@ -1,6 +1,6 @@
 import { Express, Response, Request } from "express";
 import { v4 } from "uuid";
-import { MapService } from "../../service/";
+import { MapService } from "../../service";
 
 export default (app: Express, mapService: MapService) => {
   app.get("/http/setup", (req: Request, res: Response) => {

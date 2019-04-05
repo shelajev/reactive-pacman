@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { PlayerService, GameService } from '../';
+import { PlayerService, GameService } from '../index';
 import { Nickname, Player } from '@shared/player_pb';
 import { Config } from '@shared/config_pb';
 import { Score } from '@shared/score_pb';
