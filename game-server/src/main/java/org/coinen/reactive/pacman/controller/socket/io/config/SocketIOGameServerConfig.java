@@ -89,7 +89,7 @@ public class SocketIOGameServerConfig {
             configuration.setHostname("localhost");
             configuration.setPort(5900);
             configuration.setPingTimeout(60);
-            configuration.setAckMode(AckMode.MANUAL);
+            configuration.setAckMode(AckMode.AUTO);
 
             final SocketIOServer server = new SocketIOServer(configuration);
 
