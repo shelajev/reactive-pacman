@@ -11,7 +11,8 @@
     "protocall": "npm run protocrpc ; npm run protocgrpc ; npm run protocts ; node ../scripts/postprocess-generated-ts.js ./src/generated/main/javascript/service_pb.d.ts",
     "protocts": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/main/proto --js_out=import_style=commonjs,binary:src/generated/main/javascript --ts_out=service=false:src/generated/main/javascript --plugin=protoc-gen-ts=node_modules/.bin/protoc-gen-ts src/main/proto/*.proto node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto",
     "protocrpc": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/main/proto --js_out=import_style=commonjs,binary:src/generated/main/javascript --rsocket_rpc_out=src/generated/main/javascript --plugin=protoc-gen-rsocket_rpc=node_modules/.bin/rsocket_rpc_js_protoc_plugin src/main/proto/*.proto node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto",
-    "protocgrpc": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/main/proto -I=src/main/proto service.proto --plugin=protoc-gen-grpc-web=node_modules/.bin/protoc-gen-grpc-web.exe --grpc-web_out=import_style=commonjs+dts,mode=grpcwebtext:src/generated/main/javascript"
+    "protocgrpc": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/main/proto -I=src/main/proto service.proto --plugin=protoc-gen-grpc-web=node_modules/.bin/protoc-gen-grpc-web.exe --grpc-web_out=import_style=commonjs+dts,mode=grpcwebtext:src/generated/main/javascript",
+    "protocgrpcnode": "grpc_tools_node_protoc --js_out=import_style=commonjs,binary:src/generated/main/javascript --grpc_out=src/generated/main/javascript/grpc --proto_path=src/main/proto --proto_path=node_modules/rsocket-rpc-protobuf/proto --plugin=protoc-gen-grpc=node_modules/.bin/grpc_tools_node_protoc_plugin src/main/proto/*.proto"
   },
   "author": "Oleh Dokuka",
   "license": "ISC",
@@ -21,13 +22,14 @@
     "@types/google-protobuf": "^3.2.7",
     "@types/node": "^11.11.5",
     "google-protobuf": "^3.7.0",
+    "grpc-tools": "^1.7.2",
     "grpc-web": "^1.0.3",
+    "module-alias": "^2.2.0",
     "rsocket-flowable": "^0.0.10",
     "rsocket-rpc-core": "^0.0.5-0",
     "rsocket-rpc-metrics": "^0.0.1",
     "rsocket-rpc-tracing": "^0.0.3",
-    "rsocket-types": "^0.0.10",
-    "module-alias": "^2.2.0"
+    "rsocket-types": "^0.0.10"
   },
   "devDependencies": {
     "ncp": "^2.0.0",
