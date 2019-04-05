@@ -34,8 +34,9 @@ abstract class ReactiveMetrics {
                 Instant now = Instant.now();
                 Duration duration = Duration.between(time, now);
                 timer.record(duration);
-                counter.increment();
             }
+
+            counter.increment();
 
             return payload;
         };

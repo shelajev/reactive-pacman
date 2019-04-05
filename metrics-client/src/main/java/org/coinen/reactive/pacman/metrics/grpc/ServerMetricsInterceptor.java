@@ -41,9 +41,14 @@ public class ServerMetricsInterceptor implements ServerInterceptor {
     ) {
         Instant now = Instant.now();
         Instant time = headers.get(Constants.INSTANT_KEY);
-        Duration duration = Duration.between(time, now);
 
-        timer.record(duration);
+        if (time != null) {
+            Duration duration = Duration.between(time, now);
+            timer.record(duration);
+        }
+
+        counter.increment();
+
 
         return new ForwardingServerCallListener.SimpleForwardingServerCallListener<ReqT>(next.startCall(call, headers)) {
             @Override
