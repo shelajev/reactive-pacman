@@ -108,14 +108,19 @@ public class SocketIOGameServerConfig {
                 );
 
 
-            server.addConnectListener(client -> client.sendEvent("setup", (Object) mapService.getMap().toByteArray()));
+            server.addConnectListener(client -> {
+                LOGGER.info("Client {} connected. Total count: {}", client.getSessionId(), server.getAllClients().size());
+                client.sendEvent("setup",
+                    (Object) mapService.getMap().toByteArray());
+            });
 
-            server.addDisconnectListener(client ->
-                playerService
-                    .disconnectPlayer()
-                    .subscriberContext(Context.of("uuid", client.getSessionId()))
-                    .subscribe()
-            );
+            server.addDisconnectListener(client -> {
+                LOGGER.info("Client {} disconnected. Total count: {}",
+                    client.getSessionId(), server.getAllClients().size());
+                playerService.disconnectPlayer()
+                             .subscriberContext(Context.of("uuid", client.getSessionId()))
+                             .subscribe();
+            });
 
             server.addEventListener("start", byte[].class, (client, data, ackSender) -> {
                 UnicastProcessor<Location> processor = UnicastProcessor.create();
@@ -147,13 +152,6 @@ public class SocketIOGameServerConfig {
                         metricsSocketClient.emit("streamMetricsSnapshots", (Object) data);
                     }
                 });
-
-            server.addDisconnectListener(new DisconnectListener() {
-                @Override
-                public void onDisconnect(SocketIOClient client) {
-                    LOGGER.info("Someone disconnected");
-                }
-            });
 
             server.startAsync();
 
