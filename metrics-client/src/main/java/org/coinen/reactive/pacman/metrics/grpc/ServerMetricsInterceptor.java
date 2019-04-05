@@ -65,8 +65,9 @@ public class ServerMetricsInterceptor implements ServerInterceptor {
                         Duration duration = Duration.between(time, now);
 
                         timer.record(duration);
-                        counter.increment();
                     }
+
+                    counter.increment();
                 }
                 super.onMessage(message);
             }
