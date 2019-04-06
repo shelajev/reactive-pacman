@@ -14,7 +14,9 @@
   "dependencies": {
     "@types/google-protobuf": "^3.2.7",
     "@types/uuid": "^3.4.4",
+    "@types/socket.io": "^2.1.2",
     "body-parser": "^1.18.3",
+    "socket.io": "^2.2.0",
     "game-idl": "0.0.1",
     "metrics-idl": "0.0.1",
     "metrics-client": "0.0.1",

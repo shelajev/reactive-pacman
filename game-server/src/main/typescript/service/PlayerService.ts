@@ -7,7 +7,7 @@ export default interface PlayerService {
 
     disconnectPlayer(uuid: string): void;
 
-    locate(uuid: string, locationStream: Flux<Location>): Flux<Location>;
+    locate(uuid: string, location: Location): void;
 
     players(): Flux<Player> ;
 

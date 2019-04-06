@@ -20,15 +20,18 @@ import { GrpcGameController } from './controller/grpc/GameController';
 import { GrpcExtrasController } from './controller/grpc/ExtrasController';
 import { GrpcLocationController } from './controller/grpc/LocationController';
 import { GrpcPlayerController } from './controller/grpc/PlayerController';
-
+import * as io from 'socket.io';
+import { Server } from "http";
+import {socketIOSetup} from './controller/socket.io/socketio';
 
 const app = express();
+const httpServer = new Server();
 
 const options: cors.CorsOptions = {
     allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "X-Access-Token"],
     credentials: true,
     methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
-    origin: ['http://localhost:9000', 'ws://localhost:9000'],
+    origin: ['*'],
     preflightContinue: false
   };
 
@@ -43,12 +46,21 @@ const extrasService = new DefaultExtrasService(extrasRepository, playerRepositor
 const playerService = new DefaultPlayerService(playerRepository, extrasService, mapService)
 const gameService = new DefaultGameService(playerService, extrasRepository, playerRepository);
 
-const rsocket = new rsocketAPI(mapService, extrasService, playerService, gameService, app);
+const rsocket = new rsocketAPI(mapService, extrasService, playerService, gameService, httpServer);
 const rsocketServer = new RSocketServer({
     getRequestHandler: rsocket.handler.bind(rsocket),
     transport: rsocket.transport()
 });
-rsocket.server.listen(3000);
+
+const sIOServer = new Server();
+const socketIOServer = io(sIOServer, {
+    transports: ["websocket"]
+});
+sIOServer.listen(5900);
+
+socketIOSetup(mapService, extrasService, playerService, gameService, socketIOServer);
+
+httpServer.listen(3000);
 rsocketServer.start();
 
 const server = new grpc.Server();

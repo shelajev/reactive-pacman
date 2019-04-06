@@ -26,8 +26,7 @@ export default class DefaultPlayerService implements PlayerService {
       });
   }
 
-  locate(uuid: string, locationStream: Flux<Location>): Flux<Location> {
-    return locationStream.doOnNext(location => {
+  locate(uuid: string, location: Location): void {
       console.log('location', location.toObject());
       const time = new Date().getMilliseconds();
       const updatedPlayer = this.playerRepository.update(uuid, (player: Player) => {
@@ -93,7 +92,6 @@ export default class DefaultPlayerService implements PlayerService {
       }
 
       this.playersProcessor.onNext(updatedPlayer);
-    });
   }
 
   players(): Flux<Player> {
