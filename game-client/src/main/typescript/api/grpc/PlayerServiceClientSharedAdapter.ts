@@ -3,22 +3,22 @@ import {Flowable, Single} from "rsocket-flowable";
 import { Player } from "game-idl";
 import { Location } from "game-idl";
 import PlayerService from "../PlayerService";
-import { GRPCServices } from "game-idl";
+import { GRPCWebServices } from "game-idl";
 import { Point } from "game-idl";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { Disposable } from "reactor-core-js";
 import FlowableAdapter from "../FlowableAdapter";
 
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
-    private service: GRPCServices.PlayerServiceClient;
-    private locationServiceFallback: GRPCServices.LocationServiceClient;
+    private service: GRPCWebServices.PlayerServiceClient;
+    private locationServiceFallback: GRPCWebServices.LocationServiceClient;
     private sharedPlayersStream: DirectProcessor<Player.AsObject>;
 
     constructor() {
         const urlParams = new URLSearchParams(window.location.search);
         const endpoint = urlParams.get('endpoint');
-        this.service = new GRPCServices.PlayerServiceClient(endpoint || "http://localhost:8000", {}, {});
-        this.locationServiceFallback = new GRPCServices.LocationServiceClient(endpoint || "http://localhost:8000", {}, {});
+        this.service = new GRPCWebServices.PlayerServiceClient(endpoint || "http://localhost:8000", {}, {});
+        this.locationServiceFallback = new GRPCWebServices.LocationServiceClient(endpoint || "http://localhost:8000", {}, {});
     }
 
     locate(locationStream: Flux<Location.AsObject>): Single<void> {

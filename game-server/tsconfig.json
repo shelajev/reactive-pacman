@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "outDir": "build",
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es5",
+    "downlevelIteration": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "typeRoots": [
+      "src/main/@types/typescript",
+      "node_modules/@types/"
+    ],
+    "lib": [
+      "es6",
+      "scripthost",
+      "dom"
+    ]
+  },
+  "include": [
+    "./src/main/typescript"
+  ],
+  "exclude": [
+    "./build",
+    "./src/main/@types/**/*",
+    "./node_modules/**/*"
+  ]
+}

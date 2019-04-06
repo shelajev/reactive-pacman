@@ -8,7 +8,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/uuid": "^3.4.4",
     "follow-redirects": "^1.7.0",
     "lerna": "^3.13.1"
+  },
+  "dependencies": {
+    "@types/cookie-parser": "^1.4.1",
+    "cookie-parser": "^1.4.4",
+    "uuid": "^3.3.2"
   }
 }

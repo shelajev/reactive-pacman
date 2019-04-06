@@ -51,7 +51,8 @@ public class HttpPlayerController {
                     () -> locationDirectProcessors.remove(uuid)
                 );
 
-            playerService.locate(unicastProcessor)
+            playerService.
+        (unicastProcessor)
                          .subscriberContext(Context.of("uuid", uuid))
                          .subscribe();
 

@@ -7,9 +7,6 @@ declare module 'reactor-core-js/flux' {
 
         static from<T>(stream: Publisher<T>): Flux<T>;
 
-
-
-
         map<V> (mapper: (t: T) => V): Flux<V>;
         doOnNext(callback: (t: T) => void): Flux<T>;
 
@@ -34,7 +31,13 @@ declare module 'reactor-core-js/flux' {
 // declare module 'reactor-core-js/mono' {
 
     export class Mono<T> implements Publisher<T> {
-        subscribe(): void
+        subscribe(): void;
+        map<V> (mapper: (t: T) => V): Mono<V>;
+        consume(): Disposable;
+        consume(onNextCallback: (t: T) => void): Disposable;
+        consume(onNextCallback: (t: T) => void, onErrorCallback: (e: Error) => void): Disposable;
+        consume(onNextCallback: (t: T) => void, onErrorCallback: (e: Error) => void, onCompleteCallback: () => void): Disposable;
+
     }
 }
 

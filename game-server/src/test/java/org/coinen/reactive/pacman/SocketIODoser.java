@@ -52,7 +52,7 @@ public class SocketIODoser {
                     .build()
             ));
 
-        Flux.range(0, 200)
+        Flux.range(0, 5)
             .doOnNext(i -> LOGGER.info("Connecting client number: {}", i))
             .concatMap(__ -> Mono
                 .fromCallable(() -> {
@@ -62,12 +62,13 @@ public class SocketIODoser {
                 })
                 .doOnError(t -> LOGGER.error("Reconnecting. ", t))
                 .retryBackoff(10, Duration.ofSeconds(2), Duration.ofSeconds(5))
-                .delaySubscription(Duration.ofMillis(200)),
+                .delaySubscription(Duration.ofMillis(1000)),
                 1
             )
             .subscribe(socket -> {
                 socket.on(Socket.EVENT_CONNECT, (__) -> {
                     metricsSnapshotFlux.hide()
+                                       .limitRate(256)
                                        .doOnNext(metricsSnapshot -> {
                                            socket.emit("streamMetricsSnapshots",
                                                (Object) metricsSnapshot.toByteArray());
@@ -78,9 +79,19 @@ public class SocketIODoser {
                                        .retryBackoff(1000, Duration.ofSeconds(1))
                                        .subscribe();
                 })
+                .on(Socket.EVENT_CONNECT_ERROR, (__) -> {
+                    LOGGER.info("Gotta Connection Error");
+                })
                 .on(Socket.EVENT_ERROR, (__) -> {
                     LOGGER.info("Gotta Error");
+                })
+                .on(Socket.EVENT_RECONNECT, (__) -> {
+                    LOGGER.info("Gotta Reconnection Error");
+                })
+                .on(Socket.EVENT_RECONNECTING, (__) -> {
+                    LOGGER.info("Reconnecting...");
                 });
+
                 socket.connect();
             });
 
