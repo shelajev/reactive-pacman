@@ -1,5 +1,4 @@
-import { Map } from '@shared/map_pb';
-import { Point } from '@shared/point_pb';
+import {Map, Point} from 'game-idl';
 
 export default interface MapService {
 

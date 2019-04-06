@@ -3,17 +3,17 @@ import { Extra } from "game-idl";
 import { Flux } from "reactor-core-js/flux";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import FlowableAdapter from "../FlowableAdapter";
-import { GRPCServices } from "game-idl";
+import { GRPCWebServices } from "game-idl";
 import { Flowable } from "rsocket-flowable";
 
 export default class ExtrasServiceClientAdapter implements ExtrasService {
 
-    private service: GRPCServices.ExtrasServiceClient;
+    private service: GRPCWebServices.ExtrasServiceClient;
 
     constructor() {
         const urlParams = new URLSearchParams(window.location.search);
         const endpoint = urlParams.get('endpoint');
-        this.service = new GRPCServices.ExtrasServiceClient(endpoint || "http://localhost:8000", {}, {});
+        this.service = new GRPCWebServices.ExtrasServiceClient(endpoint || "http://localhost:8000", {}, {});
     }
 
     extras(): Flux<Extra.AsObject> {

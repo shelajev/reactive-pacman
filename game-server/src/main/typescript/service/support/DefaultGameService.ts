@@ -1,9 +1,6 @@
-import { v4 as uuid } from 'uuid';
-import { PlayerService, GameService } from '../index';
-import { Nickname, Player } from '@shared/player_pb';
-import { Config } from '@shared/config_pb';
-import { Score } from '@shared/score_pb';
-import { PlayerRepository, ExtrasRepository } from '../../repository';
+import {GameService, PlayerService} from '../index';
+import {Config, Nickname, Player, Score} from 'game-idl';
+import {ExtrasRepository, PlayerRepository} from '../../repository';
 
 export default class DefaultGameService implements GameService {
   constructor(

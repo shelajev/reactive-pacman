@@ -2,17 +2,17 @@ import GameService from "../GameService";
 import { Nickname } from "game-idl";
 import { Config } from "game-idl";
 import { Single } from "rsocket-flowable";
-import { GRPCServices } from "game-idl";
+import { GRPCWebServices } from "game-idl";
 import { ClientReadableStream } from "grpc-web";
 
 export default class GameServiceClientAdapter implements GameService {
 
-    private service: GRPCServices.GameServiceClient;
+    private service: GRPCWebServices.GameServiceClient;
 
     constructor() {
         const urlParams = new URLSearchParams(window.location.search);
         const endpoint = urlParams.get('endpoint');
-        this.service = new GRPCServices.GameServiceClient(endpoint || "http://localhost:8000", {}, {});
+        this.service = new GRPCWebServices.GameServiceClient(endpoint || "http://localhost:8000", {}, {});
     }
 
     start({ value }: Nickname.AsObject): Single<Config.AsObject> {

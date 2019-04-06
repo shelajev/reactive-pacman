@@ -1,8 +1,5 @@
 import MapService from '../MapService';
-import { Map } from '@shared/map_pb';
-import { Point } from '@shared/point_pb';
-import { Size } from '@shared/size_pb';
-import { Tile } from '@shared/tile_pb';
+import {Map, Point, Size, Tile} from 'game-idl';
 
 export default class DefaultMapService implements MapService {
     private map: Map

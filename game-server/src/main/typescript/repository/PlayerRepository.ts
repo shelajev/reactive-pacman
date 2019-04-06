@@ -1,4 +1,4 @@
-import { Player } from "@shared/player_pb";
+import { Player } from "game-idl";
 
 export default interface PlayerRepository {
 

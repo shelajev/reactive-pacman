@@ -1,4 +1,3 @@
-
 import { Express, Request, Response } from 'express';
 import * as SSE from 'express-sse';
 import { ExtrasService } from '../../service';

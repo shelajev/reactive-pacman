@@ -1,5 +1,5 @@
 import { Flux } from 'reactor-core-js/flux';
-import { Extra } from '@shared/extra_pb';
+import { Extra } from 'game-idl';
 
 export default interface ExtrasService {
 

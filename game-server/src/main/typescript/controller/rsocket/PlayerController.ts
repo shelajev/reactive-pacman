@@ -1,15 +1,12 @@
-
 import * as rsocket_flowable from 'rsocket-flowable';
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
-import { PlayerService as PlayerServicePB } from "@shared/service_rsocket_pb";
-import { PlayerService } from '../../service';
-import { Location } from "@shared/location_pb";
-import { Player } from '@shared/player_pb';
-import { Disposable } from 'reactor-core-js';
+import {Location, Player, RSocketRPCServices} from "game-idl";
+import {PlayerService} from '../../service';
+import {Disposable} from 'reactor-core-js';
 import FlowableAdapter from './support/FlowableAdapter';
-import { Flux } from 'reactor-core-js/flux';
+import {Flux} from 'reactor-core-js/flux';
 
-export class PlayerController implements PlayerServicePB {
+export class PlayerController implements RSocketRPCServices.PlayerService {
     constructor(private playerService: PlayerService, private uuid: string) {}
 
     locate(message: rsocket_flowable.Flowable<Location>, metadata?: Buffer): rsocket_flowable.Single<google_protobuf_empty_pb.Empty> {

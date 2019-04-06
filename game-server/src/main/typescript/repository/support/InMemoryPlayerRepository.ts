@@ -1,5 +1,5 @@
 import PlayerRepository from '../PlayerRepository';
-import { Player } from '@shared/player_pb';
+import { Player } from 'game-idl';
 
 export default class InMemoryPlayerRepository implements PlayerRepository {
     store: Map<string, Player> = new Map()

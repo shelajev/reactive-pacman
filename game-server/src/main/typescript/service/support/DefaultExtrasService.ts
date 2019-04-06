@@ -1,7 +1,7 @@
-import { DirectProcessor, Flux } from 'reactor-core-js/flux';
-import { Extra } from '@shared/extra_pb';
-import  ExtrasService from '../ExtrasService';
-import { PlayerRepository, ExtrasRepository } from '../../repository';
+import {DirectProcessor, Flux} from 'reactor-core-js/flux';
+import {Extra} from 'game-idl';
+import ExtrasService from '../ExtrasService';
+import {ExtrasRepository, PlayerRepository} from '../../repository';
 
 export default class DefaultExtrasService implements ExtrasService {
     extrasProcessor: DirectProcessor<Extra> = new DirectProcessor();
@@ -30,7 +30,7 @@ export default class DefaultExtrasService implements ExtrasService {
                     clearTimeout(this.powerUpTimer);
                 
                 
-                this.powerUpTimer = setTimeout(this.setPowerup.call(this, false), 10000);
+                this.powerUpTimer = setTimeout(this.setPowerup.bind(this, false), 10000);
                 this.powerUpActive = true;
             }
             const addedExtra = this.extrasRepository
@@ -59,7 +59,7 @@ export default class DefaultExtrasService implements ExtrasService {
         console.log('generating food');
         const iterations =
             ((width - 2 * offset) * (height - 2 * offset) * (0.3 + Math.random() * 0.3));
-        const extras = []
+        const extras = [];
         console.log('iterations', iterations);
         for (let i = 0; i < iterations; i++) {
             extras[i] = DefaultExtrasService.randomPosition(width, height, offset);

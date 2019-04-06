@@ -1,6 +1,4 @@
-import { Mono } from 'reactor-core-js/flux';
-import { Config } from '@shared/config_pb';
-import { Nickname } from '@shared/player_pb';
+import {Config, Nickname} from 'game-idl';
 
 export default interface GameService {
 

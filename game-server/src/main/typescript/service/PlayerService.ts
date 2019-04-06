@@ -1,6 +1,5 @@
-import { Flux, Mono } from 'reactor-core-js/flux';
-import { Player } from '@shared/player_pb';
-import { Location } from '@shared/location_pb';
+import {Flux} from 'reactor-core-js/flux';
+import {Location, Player} from 'game-idl';
 
 export default interface PlayerService {
 

@@ -1,11 +1,9 @@
 import PlayerService from '../PlayerService';
-import { DirectProcessor, Flux, Mono } from 'reactor-core-js/flux';
-import { Player } from '@shared/player_pb';
-import { ExtrasService, MapService} from '../index';
-import { Location, Direction } from '@shared/location_pb';
-import { PlayerRepository } from './DefaultPlayerService';
-import { Point } from '@shared/point_pb';
+import {DirectProcessor, Flux} from 'reactor-core-js/flux';
+import {Direction, Location, Player, Point} from 'game-idl';
+import {ExtrasService, MapService} from '../index';
 import DefaultMapService from './DefaultMapService';
+import {PlayerRepository} from "../../repository";
 
 export default class DefaultPlayerService implements PlayerService {
 

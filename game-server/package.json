@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "npm run build",
     "build": "rm -rf src/main/typescript/dist ; tsc",
     "start": "node src/main/typescript/dist/index.js",
     "start:dev": "src/main/typescript/node_modules/.bin/webpack-dev-server"
@@ -12,10 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "@types/google-protobuf": "^3.2.7",
-    "@types/jquery": "^3.3.29",
     "@types/uuid": "^3.4.4",
     "body-parser": "^1.18.3",
     "game-idl": "0.0.1",
+    "metrics-idl": "0.0.1",
+    "metrics-client": "0.0.1",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-sse": "^0.5.0",

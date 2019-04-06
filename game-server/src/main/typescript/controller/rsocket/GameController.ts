@@ -1,11 +1,8 @@
-
 import * as rsocket_flowable from 'rsocket-flowable';
-import { GameService as GameServicePB } from "@shared/service_rsocket_pb";
-import { GameService } from '../../service';
-import { Nickname } from '@shared/player_pb';
-import { Config } from '@shared/config_pb';
+import {Config, Nickname, RSocketRPCServices} from "game-idl";
+import {GameService} from '../../service';
 
-export class GameController implements GameServicePB {
+export class GameController implements RSocketRPCServices.GameService {
     constructor(private readonly uuid: string, private gameService: GameService) {}
 
     start(message: Nickname, metadata?: Buffer): rsocket_flowable.Single<Config> {

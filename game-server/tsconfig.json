@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
+    "outDir": "build",
     "noImplicitAny": true,
     "module": "commonjs",
     "moduleResolution": "node",
@@ -9,20 +9,21 @@
     "sourceMap": true,
     "allowJs": true,
     "typeRoots": [
-      "./src/main/@types/",
-      "node_modules/@types/",
-      "../game-idl/src/@types/typescript"
+      "src/main/@types/typescript",
+      "node_modules/@types/"
     ],
     "lib": [
       "es6",
-      "scripthost"
+      "scripthost",
+      "dom"
     ]
   },
   "include": [
-    "./"
+    "./src/main/typescript"
   ],
   "exclude": [
-    "./@types/**/*",
+    "./build",
+    "./src/main/@types/**/*",
     "./node_modules/**/*"
   ]
 }

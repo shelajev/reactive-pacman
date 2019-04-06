@@ -1,7 +1,7 @@
-import { Express, Response, Request } from 'express';
-import { PlayerService } from '../../service';
-import { DirectProcessor } from 'reactor-core-js/flux';
-import { Location } from '@shared/location_pb';
+import {Express, Request, Response} from 'express';
+import {PlayerService} from '../../service';
+import {DirectProcessor} from 'reactor-core-js/flux';
+import {Location} from 'game-idl';
 import * as SSE from 'express-sse';
 
 export default (app: Express, playerService: PlayerService) => {

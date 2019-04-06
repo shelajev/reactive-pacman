@@ -1,30 +1,25 @@
-import 'module-alias/register'
 import * as express from 'express';
 import * as cors from 'cors';
 import * as bodyParser from 'body-parser';
 import * as grpc from 'grpc';
 import {
-    SetupServiceService,
-    GameServiceService,
-    ExtrasServiceService,
-    PlayerServiceService,
-    LocationServiceService
-} from './src/generated/javascript/service_grpc_pb';
-import httpAPI from './lib/controller/http';
-import { SetupController as rsocketAPI} from './lib/controller/rsocket/SetupController';
+    GRPCServices
+} from 'game-idl';
+import httpAPI from './controller/http';
+import { SetupController as rsocketAPI} from './controller/rsocket/SetupController';
 import {
     DefaultPlayerService,
     DefaultExtrasService,
     DefaultGameService,
     DefaultMapService
-} from './lib/service'
-import { InMemoryPlayerRepository, InMemoryExtrasRepository } from './lib/repository';
+} from './service'
+import { InMemoryPlayerRepository, InMemoryExtrasRepository } from './repository';
 import { RSocketServer } from 'rsocket-core';
-import { GrpcSetupController } from './lib/controller/grpc/SetupController';
-import { GrpcGameController } from './lib/controller/grpc/GameController';
-import { GrpcExtrasController } from './lib/controller/grpc/ExtrasController';
-import { GrpcLocationController } from './lib/controller/grpc/LocationController';
-import { GrpcPlayerController } from './lib/controller/grpc/PlayerController';
+import { GrpcSetupController } from './controller/grpc/SetupController';
+import { GrpcGameController } from './controller/grpc/GameController';
+import { GrpcExtrasController } from './controller/grpc/ExtrasController';
+import { GrpcLocationController } from './controller/grpc/LocationController';
+import { GrpcPlayerController } from './controller/grpc/PlayerController';
 
 
 const app = express();
@@ -58,11 +53,11 @@ rsocketServer.start();
 
 const server = new grpc.Server();
 
-server.addService(SetupServiceService, new GrpcSetupController(mapService));
-server.addService(GameServiceService, new GrpcGameController(gameService));
-server.addService(ExtrasServiceService, new GrpcExtrasController(extrasService));
-server.addService(LocationServiceService, new GrpcLocationController(playerService));
-server.addService(PlayerServiceService, new GrpcPlayerController(playerService));
+server.addService(GRPCServices.SetupServiceService, new GrpcSetupController(mapService));
+server.addService(GRPCServices.GameServiceService, new GrpcGameController(gameService));
+server.addService(GRPCServices.ExtrasServiceService, new GrpcExtrasController(extrasService));
+server.addService(GRPCServices.LocationServiceService, new GrpcLocationController(playerService));
+server.addService(GRPCServices.PlayerServiceService, new GrpcPlayerController(playerService));
 server.bind('127.0.0.1:9090', grpc.ServerCredentials.createInsecure());
 server.start();
 console.log('grpc started');
