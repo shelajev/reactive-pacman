@@ -39,7 +39,6 @@
     "follow-redirects": "^1.7.0",
     "@grpc/proto-loader": "^0.4.0",
     "rsocket-rpc-protobuf": "^0.1.5",
-    "ts-protoc-gen": "^0.9.0",
     "typescript": "^3.3.3333"
   }
 }
