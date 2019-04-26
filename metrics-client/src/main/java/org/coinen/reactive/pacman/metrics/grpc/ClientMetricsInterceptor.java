@@ -2,7 +2,6 @@ package org.coinen.reactive.pacman.metrics.grpc;
 
 import java.time.Instant;
 
-import com.google.protobuf.AbstractMessage;
 import com.google.protobuf.Message;
 import com.google.protobuf.UnknownFieldSet;
 import io.grpc.CallOptions;

@@ -1,0 +1,110 @@
+<html>
+
+<head>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+  <!-- Bootstrap core CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Material Design Bootstrap -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.7.7/css/mdb.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://mdbootstrap.com/wp-content/themes/mdbootstrap4/css/compiled-4.7.5.min.css">
+  <style></style>
+  <style type="text/css">
+    /* Chart.js */
+    @-webkit-keyframes chartjs-render-animation {
+      from {
+        opacity: 0.99
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes chartjs-render-animation {
+      from {
+        opacity: 0.99
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .chartjs-render-monitor {
+      -webkit-animation: chartjs-render-animation 0.001s;
+      animation: chartjs-render-animation 0.001s;
+    }
+  </style>
+</head>
+
+<body aria-busy="true">
+  <div class="d-flex justify-content-center my-4">
+    <form class="range-field w-75" method="GET" action="/config">
+      <input class="border-0" name="capacity" type="range" min="1" max="500000" value="">
+      <input class="border-0" name="threshold" type="range" min="1" max="50000">
+      <input class="btn btn-primary" type="submit" value="Submit">
+    </form>
+  </div>
+  <!-- Grid row -->
+  <div class="row">
+
+    <!-- Grid column -->
+    <div class="col-md-6 text-center pb-5">
+
+      <h2><span class="badge blue lighten-2 mb-4">Capacity</span></h2>
+      <h2 class="display-8" style="color:#0d47a1">
+        <input value="100" type="number" id="capacity" />
+      </h2>
+
+    </div>
+    <!-- Grid column -->
+
+    <!-- Grid column -->
+    <div class="col-md-6 text-center pb-5">
+
+      <h2><span class="badge blue lighten-2 mb-4">Threshold</span></h2>
+      <h2 class="display-8" style="color:#0d47a1">
+        <input value="10" type="number" id="threshold" />
+      </h2>
+
+    </div>
+    <!-- Grid column -->
+
+  </div>
+  <!-- Grid row -->
+  <!-- JQuery -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!-- Bootstrap tooltips -->
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+  <!-- Bootstrap core JavaScript -->
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.7.7/js/mdb.min.js"></script>
+  <div class="hiddendiv common"></div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const capacity = urlParams.get('capacity') || 100;
+    const threshold = urlParams.get('threshold') || 10;
+    $('#capacity').on("input", function (e) {
+      $('input[name=capacity]').val($(this).val());
+    })
+    $('#threshold').on("input", function (e) {
+      $('input[name=threshold]').val($(this).val());
+    })
+    $('input[name=capacity]').on("input change", function (e) {
+      $('#capacity').val($(this).val());
+    })
+    $('input[name=threshold]').on("input change", function (e) {
+      $('#threshold').val($(this).val());
+    })
+    $('input[name=capacity]').val(capacity);
+    $('input[name=threshold]').val(threshold);
+    $('#capacity').val(capacity);
+    $('#threshold').val(threshold);
+  </script>
+</body>
+
+</html>

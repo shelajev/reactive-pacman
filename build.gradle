@@ -36,6 +36,7 @@ subprojects {
 			dependencySet (group: 'io.grpc', version: '1.19.0') {
 				entry 'grpc-stub'
 				entry 'grpc-netty'
+				entry 'grpc-okhttp'
 				entry 'grpc-protobuf'
 				entry 'protoc-gen-grpc-java'
 			}

@@ -1,5 +1,6 @@
 package org.coinen.reactive.pacman.controller.rsocket.support;
 
+import java.nio.channels.ClosedChannelException;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
@@ -20,19 +21,14 @@ public class ReconnectingRSocket extends BaseSubscriber<RSocket> implements RSoc
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReconnectingRSocket.class);
 
-    private final Duration backoff;
-    private final Duration backoffMax;
-
-    private volatile MonoProcessor<RSocket> rSocketMono;
+    private volatile MonoProcessor<RSocket>                                          rSocketMono;
     private static final AtomicReferenceFieldUpdater<ReconnectingRSocket, MonoProcessor> RSOCKET_MONO
         = AtomicReferenceFieldUpdater.newUpdater(ReconnectingRSocket.class, MonoProcessor.class, "rSocketMono");
 
     public ReconnectingRSocket(Mono<RSocket> rSocketMono, Duration backoff, Duration backoffMax) {
-        this.backoff = backoff;
-        this.backoffMax = backoffMax;
         this.rSocketMono = MonoProcessor.create();
 
-        rSocketMono.retryBackoff(Long.MAX_VALUE, backoff)
+        rSocketMono.retryBackoff(Long.MAX_VALUE, backoff, backoffMax)
                    .repeat()
                    .subscribe(this);
     }
@@ -65,15 +61,22 @@ public class ReconnectingRSocket extends BaseSubscriber<RSocket> implements RSoc
         return Mono
             .defer(() -> {
                 MonoProcessor<RSocket> rSocketMono = this.rSocketMono;
-                if (rSocketMono.isSuccess()) {
+                if(rSocketMono.isSuccess()) {
                     return rSocketMono.peek()
                                       .fireAndForget(payload)
-                                      .doOnError(__ -> RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create()));
-                }
-                else {
+                                      .doOnError(throwable -> {
+                                          if(throwable instanceof ClosedChannelException) {
+                                              RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create());
+                                          }
+                                      });
+                } else {
                     return rSocketMono.flatMap(rSocket ->
                         rSocket.fireAndForget(payload)
-                               .doOnError(__ -> RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create()))
+                               .doOnError(throwable -> {
+                                   if(throwable instanceof ClosedChannelException) {
+                                       RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create());
+                                   }
+                               })
                     );
                 }
             });
@@ -84,15 +87,22 @@ public class ReconnectingRSocket extends BaseSubscriber<RSocket> implements RSoc
         return Mono
             .defer(() -> {
                 MonoProcessor<RSocket> rSocketMono = this.rSocketMono;
-                if (rSocketMono.isSuccess()) {
+                if(rSocketMono.isSuccess()) {
                     return rSocketMono.peek()
                                       .requestResponse(payload)
-                                      .doOnError(__ -> RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create()));
-                }
-                else {
+                                      .doOnError(throwable -> {
+                                          if(throwable instanceof ClosedChannelException) {
+                                              RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create());
+                                          }
+                                      });
+                } else {
                     return rSocketMono.flatMap(rSocket ->
                         rSocket.requestResponse(payload)
-                               .doOnError(__ -> RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create()))
+                               .doOnError(throwable -> {
+                                   if(throwable instanceof ClosedChannelException) {
+                                       RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create());
+                                   }
+                               })
                     );
                 }
             });
@@ -103,15 +113,22 @@ public class ReconnectingRSocket extends BaseSubscriber<RSocket> implements RSoc
         return Flux
             .defer(() -> {
                 MonoProcessor<RSocket> rSocketMono = this.rSocketMono;
-                if (rSocketMono.isSuccess()) {
+                if(rSocketMono.isSuccess()) {
                     return rSocketMono.peek()
                                       .requestStream(payload)
-                                      .doOnError(__ -> RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create()));
-                }
-                else {
+                                      .doOnError(throwable -> {
+                                          if(throwable instanceof ClosedChannelException) {
+                                              RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create());
+                                          }
+                                      });
+                } else {
                     return rSocketMono.flatMapMany(rSocket ->
                         rSocket.requestStream(payload)
-                               .doOnError(__ -> RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create()))
+                               .doOnError(throwable -> {
+                                   if(throwable instanceof ClosedChannelException) {
+                                       RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create());
+                                   }
+                               })
                     );
                 }
             });
@@ -122,15 +139,22 @@ public class ReconnectingRSocket extends BaseSubscriber<RSocket> implements RSoc
         return Flux
             .defer(() -> {
                 MonoProcessor<RSocket> rSocketMono = this.rSocketMono;
-                if (rSocketMono.isSuccess()) {
+                if(rSocketMono.isSuccess()) {
                     return rSocketMono.peek()
                                       .requestChannel(payloads)
-                                      .doOnError(__ -> RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create()));
-                }
-                else {
+                                      .doOnError(throwable -> {
+                                          if(throwable instanceof ClosedChannelException) {
+                                              RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create());
+                                          }
+                                      });
+                } else {
                     return rSocketMono.flatMapMany(rSocket ->
                         rSocket.requestChannel(payloads)
-                               .doOnError(__ -> RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create()))
+                               .doOnError(throwable -> {
+                                   if(throwable instanceof ClosedChannelException) {
+                                       RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create());
+                                   }
+                               })
                     );
                 }
             });
@@ -141,12 +165,15 @@ public class ReconnectingRSocket extends BaseSubscriber<RSocket> implements RSoc
         return Mono
             .defer(() -> {
                 MonoProcessor<RSocket> rSocketMono = this.rSocketMono;
-                if (rSocketMono.isSuccess()) {
+                if(rSocketMono.isSuccess()) {
                     return rSocketMono.peek()
                                       .metadataPush(payload)
-                                      .doOnError(__ -> RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create()));
-                }
-                else {
+                                      .doOnError(throwable -> {
+                                          if(throwable instanceof ClosedChannelException) {
+                                              RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create());
+                                          }
+                                      });
+                } else {
                     return rSocketMono.flatMap(rSocket ->
                         rSocket.metadataPush(payload)
                                .doOnError(__ -> RSOCKET_MONO.compareAndSet(this, rSocketMono, MonoProcessor.create()))
@@ -173,10 +200,9 @@ public class ReconnectingRSocket extends BaseSubscriber<RSocket> implements RSoc
 
     @Override
     public Mono<Void> onClose() {
-        if (rSocketMono.isSuccess()) {
+        if(rSocketMono.isSuccess()) {
             return rSocketMono.peek().onClose();
-        }
-        else {
+        } else {
             return rSocketMono.flatMap(Closeable::onClose);
         }
     }

@@ -12,6 +12,7 @@ import io.rsocket.rpc.RSocketRpcService;
 import io.rsocket.rpc.rsocket.RequestHandlingRSocket;
 import io.rsocket.spring.boot.RSocketReceiverCustomizer;
 import io.rsocket.transport.netty.client.WebsocketClientTransport;
+import io.rsocket.util.ByteBufPayload;
 import org.coinen.pacman.ExtrasServiceServer;
 import org.coinen.pacman.GameServiceServer;
 import org.coinen.pacman.PlayerServiceServer;
@@ -56,28 +57,23 @@ public class RSocketGameServerConfig {
         return factory -> factory
             .addServerPlugin(socket -> new ServerMetricsAwareRSocket(
                 socket,
-                rSocketMeterRegistry
+                rSocketMeterRegistry,
+                "game"
             ))
             .frameDecoder(PayloadDecoder.ZERO_COPY);
     }
 
     @Bean
     @Qualifier("rSocket")
-    public MeterRegistry reactiveRSocketMeterRegistry(@Qualifier("rSocket") MetricsSnapshotHandlerClient metricsSnapshotHandlerClient) {
-        ReactiveMetricsRegistry registry = new ReactiveMetricsRegistry("rsocket.game.server");
-
-       Flux.defer(() -> metricsSnapshotHandlerClient.streamMetricsSnapshots(registry.asFlux()))
-           .retryWhen(Retry.any()
-                           .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofMinutes(1))
-                           .retryMax(100))
-           .subscribe();
-
-        return registry;
+    public ReactiveMetricsRegistry reactiveRSocketMeterRegistry() {
+        return new ReactiveMetricsRegistry("rsocket.game.server");
     }
 
     @Bean
     @Qualifier("rSocket")
-    public MetricsSnapshotHandlerClient metricsSnapshotHandlerClient() {
+    public MetricsSnapshotHandlerClient metricsSnapshotHandlerClient(
+        @Qualifier("rSocket") MeterRegistry rSocketMeterRegistry
+    ) {
         ReconnectingRSocket connectingRSocket = new ReconnectingRSocket(
             Mono.defer(
             RSocketFactory.connect()
@@ -88,16 +84,42 @@ public class RSocketGameServerConfig {
             Duration.ofSeconds(1)
         );
 
-        return new MetricsSnapshotHandlerClient(connectingRSocket);
+        return new MetricsSnapshotHandlerClient(connectingRSocket, rSocketMeterRegistry);
+    }
+    @Bean
+    @Qualifier("rSocket-VIP")
+    public MetricsSnapshotHandlerClient vipMetricsSnapshotHandlerClient(
+        @Qualifier("rSocket") ReactiveMetricsRegistry registry
+    ) {
+        ReconnectingRSocket connectingRSocket = new ReconnectingRSocket(
+            Mono.defer(
+                RSocketFactory.connect()
+                              .setupPayload(ByteBufPayload.create("vip"))
+                              .frameDecoder(PayloadDecoder.ZERO_COPY)
+                              .transport(WebsocketClientTransport.create(URI.create(uri)))
+                    ::start),
+            Duration.ofMillis(500),
+            Duration.ofSeconds(1)
+        );
+        MetricsSnapshotHandlerClient metricsSnapshotHandlerClient = new MetricsSnapshotHandlerClient(connectingRSocket);
+
+        Flux.defer(() -> metricsSnapshotHandlerClient.streamMetricsSnapshots(registry.asFlux()))
+            .retryWhen(Retry.any()
+                            .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofMinutes(1))
+                            .retryMax(100))
+            .subscribe();
+
+        return metricsSnapshotHandlerClient;
     }
 
     @Bean
     public MetricsSnapshotHandlerServer metricsSnapshotHandlerServer(
-        @Qualifier("rSocket") MetricsSnapshotHandlerClient metricsSnapshotHandlerClient
+        @Qualifier("rSocket") MetricsSnapshotHandlerClient metricsSnapshotHandlerClient,
+        @Qualifier("rSocket") MeterRegistry rSocketMeterRegistry
     ) {
         return new MetricsSnapshotHandlerServer(
             new MetricsSnapshotHandlerProxyController(metricsSnapshotHandlerClient),
-            Optional.empty(),
+            Optional.of(rSocketMeterRegistry),
             Optional.empty()
         );
     }

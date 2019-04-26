@@ -21,11 +21,11 @@ public class ClientMetricsAwareRSocket extends RSocketProxy {
         this.measured = Function.identity();
     }
 
-    public ClientMetricsAwareRSocket(RSocket source, MeterRegistry registry) {
+    public ClientMetricsAwareRSocket(RSocket source, MeterRegistry registry, String prefix) {
         super(source);
-        Counter counter = Counter.builder("rsocket.client.end.to.end.throughput")
+        Counter counter = Counter.builder(prefix + ".rsocket.client.end.to.end.throughput")
                                  .register(registry);
-        Timer timer = Timer.builder("rsocket.end.to.end.latency")
+        Timer timer = Timer.builder(prefix + ".rsocket.client.end.to.end.latency")
                            .publishPercentiles(0.5, 0.9, 0.95, 0.99)
                            .register(registry);
         this.measured = ReactiveMetrics.measured(timer, counter);

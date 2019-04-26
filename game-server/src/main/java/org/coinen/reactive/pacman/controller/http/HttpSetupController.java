@@ -4,7 +4,6 @@ import java.time.Clock;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-import io.rsocket.rpc.rsocket.RequestHandlingRSocket;
 import org.coinen.pacman.Map;
 import org.coinen.reactive.pacman.service.MapService;
 
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;resetTileCheckresetTileC
+import org.springframework.web.server.ServerWebExchange;
 
 @RestController
 @RequestMapping("/http")

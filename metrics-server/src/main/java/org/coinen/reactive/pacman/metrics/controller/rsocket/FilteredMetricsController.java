@@ -11,11 +11,11 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class MetricsController implements MetricsSnapshotHandler {
+public class FilteredMetricsController implements MetricsSnapshotHandler {
 
     private final MetricsService metricsService;
 
-    public MetricsController(MetricsService service) {
+    public FilteredMetricsController(MetricsService service) {
         metricsService = service;
     }
 
@@ -33,6 +33,11 @@ public class MetricsController implements MetricsSnapshotHandler {
                        Flux.fromStream(
                            ms.getMetersList()
                              .stream()
+                             .filter(meter -> {
+                                 Meter.Type type = meter.getId()
+                                                        .getType();
+                                 return type == Meter.Type.COUNTER || type == Meter.Type.TIMER;
+                             })
                              .map(MappingUtils::mapMeter)
                        )
                    )

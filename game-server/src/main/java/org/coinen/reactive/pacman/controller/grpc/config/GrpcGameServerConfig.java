@@ -35,9 +35,8 @@ public class GrpcGameServerConfig {
     ) {
         ReactiveMetricsRegistry registry = new ReactiveMetricsRegistry("grpc.game.server");
 
-
-        client.streamMetricsSnapshots(registry.asFlux())
-              .subscribe();
+//        client.streamMetricsSnapshots(registry.asFlux())
+//              .subscribe();
 
         return registry;
     }
@@ -49,6 +48,7 @@ public class GrpcGameServerConfig {
             .fromSupplier(() -> {
                 final URI uri = URI.create(url);
                 return NettyChannelBuilder.forAddress(uri.getHost(), uri.getPort())
+                                          .intercept(new ClientMetricsInterceptor())
                                           .usePlaintext()
                                           .build();
             })
@@ -64,7 +64,6 @@ public class GrpcGameServerConfig {
         return new UUIDInterceptor();
     }
 
-
     @Bean
     @GRpcGlobalInterceptor
     public ClientMetricsInterceptor clientLatencyInterceptor() {
@@ -73,7 +72,7 @@ public class GrpcGameServerConfig {
 
     @Bean
     @GRpcGlobalInterceptor
-    public ServerMetricsInterceptor serverLatencyInterceptor(@Qualifier("grpc") MeterRegistry registry) {
-        return new ServerMetricsInterceptor(registry);
+    public ServerMetricsInterceptor serverLatencyInterceptor(@Qualifier("rSocket") MeterRegistry registry) {
+        return new ServerMetricsInterceptor(registry, "game");
     }
 }
