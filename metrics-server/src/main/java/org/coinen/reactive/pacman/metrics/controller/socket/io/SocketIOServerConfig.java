@@ -29,7 +29,6 @@ public class SocketIOServerConfig {
             com.corundumstudio.socketio.Configuration
                 configuration = new com.corundumstudio.socketio.Configuration();
             configuration.setTransports(Transport.WEBSOCKET);
-            configuration.setHostname("localhost");
             configuration.setPort(6900);
             configuration.setPingTimeout(60);
             configuration.setAckMode(AckMode.MANUAL);
