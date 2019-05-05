@@ -16,10 +16,12 @@ export default class GameServiceClientAdapter implements GameService {
 
     start({ value }: Nickname.AsObject): Single<Config.AsObject> {
         const nicknameProto = new Nickname();
+        const uuid = localStorage.getItem("uuid");
+        const metadata = uuid ? Buffer.alloc(Buffer.byteLength(uuid), uuid, "utf8") : undefined;
 
         nicknameProto.setValue(value);
 
-        return this.service.start(nicknameProto)
+        return this.service.start(nicknameProto, metadata)
             .map((c: Config) => c.toObject());
     }
 }

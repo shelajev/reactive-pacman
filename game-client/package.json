@@ -12,8 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "game-idl": "^0.0.1",
-    "metrics-idl": "^0.0.1",
-    "metrics-client": "^0.0.1",
     "@types/socket.io-client": "^1.4.32",
     "@types/express": "^4.16.1",
     "@types/google-protobuf": "^3.2.7",
@@ -26,7 +24,6 @@
     "jquery": "^3.3.1",
     "phaser": "^3.16.2",
     "google-protobuf": "^3.6.1",
-    "grpc-web": "^1.0.3",
     "reactor-core-js": "^0.5.0",
     "roaring": "^1.0.3",
     "rsocket-flowable": "^0.0.10",
@@ -35,13 +32,11 @@
     "rsocket-rpc-tracing": "^0.0.3",
     "rsocket-types": "^0.0.10",
     "rsocket-websocket-client": "0.0.10",
-    "rsocket-websocket-server": "0.0.10",
+    "netifi-js-client": "^1.6.2-SNAPSHOT-1",
     "simplex-noise": "^2.4.0",
-    "socket.io-client": "^2.2.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@grpc/proto-loader": "^0.4.0",
     "async": "^2.6.2",
     "copy-webpack-plugin": "^5.0.1",
     "css-loader": "^2.1.0",

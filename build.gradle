@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.1.4.RELEASE' apply false
+	id 'org.springframework.boot' version '2.2.0.BUILD-SNAPSHOT' apply false
 	id 'com.bmuschko.docker-spring-boot-application' version '4.6.2' apply false
 	id 'com.google.protobuf' version '0.8.8' apply false
 }
@@ -27,21 +27,14 @@ subprojects {
 
 	dependencyManagement {
 		imports {
-			mavenBom 'org.springframework.boot:spring-boot-dependencies:2.1.4.RELEASE'
+			mavenBom 'org.springframework.boot:spring-boot-dependencies:2.2.0.BUILD-SNAPSHOT'
 			mavenBom 'com.google.protobuf:protobuf-bom:3.7.0'
+			mavenBom 'com.netifi:netifi-bom:1.6.3-SNAPSHOT'
 		}
 
 		dependencies {
 
-			dependencySet (group: 'io.grpc', version: '1.19.0') {
-				entry 'grpc-stub'
-				entry 'grpc-netty'
-				entry 'grpc-okhttp'
-				entry 'grpc-protobuf'
-				entry 'protoc-gen-grpc-java'
-			}
-
-			dependencySet (group: 'io.rsocket', version: '0.12.2-RC2') {
+			dependencySet (group: 'io.rsocket', version: '0.11.21') {
 				entry 'rsocket-core'
 				entry 'rsocket-transport-netty'
 			}

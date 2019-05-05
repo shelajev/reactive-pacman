@@ -22,6 +22,8 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
     locate(locationStream: Flux<Location.AsObject>): Single<void> {
         return new Single(subject => {
+            const uuid = localStorage.getItem("uuid");
+            const metadata = uuid ? Buffer.alloc(Buffer.byteLength(uuid), uuid, "utf8") : undefined;
             let disposable: Disposable = {
                 dispose: () => {}
             };
@@ -40,7 +42,7 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
                     return locationProto;
                 })
-                .compose(flux => FlowableAdapter.wrap(this.service.locate(flux as any) as any))
+                .compose(flux => FlowableAdapter.wrap(this.service.locate(flux as any, metadata) as any))
                 .consume(
                     () => {},
                     (e: Error) => subject.onError(e),
@@ -51,8 +53,10 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
     players(): Flux<Player.AsObject> {
         if (!this.sharedPlayersStream) {
+            const uuid = localStorage.getItem("uuid");
+            const metadata = uuid ? Buffer.alloc(Buffer.byteLength(uuid), uuid, "utf8") : undefined;
             this.sharedPlayersStream = new DirectProcessor();
-            Flux.from<Player>(FlowableAdapter.wrap(this.service.players(new Empty()) as any))
+            Flux.from<Player>(FlowableAdapter.wrap(this.service.players(new Empty(), metadata) as any))
                 .map(player => player.toObject())
                 .subscribe(this.sharedPlayersStream);
         }

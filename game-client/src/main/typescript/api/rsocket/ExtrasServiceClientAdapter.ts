@@ -16,7 +16,9 @@ export default class ExtrasServiceClientAdapter implements ExtrasService {
     }
 
     extras(): Flux<Extra.AsObject> {
-        return Flux.from<Extra>(FlowableAdapter.wrap(this.service.extras(new Empty()) as any))
+        const uuid = localStorage.getItem("uuid");
+        const metadata = uuid ? Buffer.alloc(Buffer.byteLength(uuid), uuid, "utf8") : undefined;
+        return Flux.from<Extra>(FlowableAdapter.wrap(this.service.extras(new Empty(), metadata) as any))
             .map(extra => extra.toObject());
     }
 }

@@ -1,24 +1,21 @@
 import RSocketWebSocketClient from 'rsocket-websocket-client';
 import { Scene, Game } from 'phaser';
 import { RpcClient } from 'rsocket-rpc-core';
+import { Netifi } from 'netifi-js-client';
+import { IMeterRegistry, SimpleMeterRegistry, MetricsExporter, MetricsSnapshotHandlerClient } from 'rsocket-rpc-metrics';
 import { BufferEncoders, RSocketResumableTransport } from 'rsocket-core';
 import { ReactiveSocket } from 'rsocket-types';
 import { RSocketRPCServices } from 'game-idl';
 import { Map } from 'game-idl';
-import { ReactiveMetricsRegistry } from 'metrics-client';
 import { GameScene } from './Game';
 import Menu from './menu';
 import { CompassScene } from './Compass';
+import { v4 } from 'uuid';
 
 import * as $ from 'jquery';
 import * as RSocketApi from './api/rsocket';
-import * as HttpApi from './api/http';
-import * as GrpcApi from './api/grpc';
-import * as SocketIOApi from './api/socket.io';
-import { RSocketRPCServices as MetricsRSocketRPCServices } from 'metrics-idl';
 import {Flowable} from 'rsocket-flowable';
 import {Empty} from "google-protobuf/google/protobuf/empty_pb";
-import * as io from "socket.io-client";
 
 export class Boot extends Scene {
 
@@ -45,8 +42,54 @@ export class Boot extends Scene {
     create(config : any) {
         const urlParams = new URLSearchParams(window.location.search);
         const type = urlParams.get('type');
-        if(type === "rsocket") {
-            const meterRegistry: ReactiveMetricsRegistry = new ReactiveMetricsRegistry();
+        const meterRegistry: IMeterRegistry = new SimpleMeterRegistry();
+
+        if (type === "netifi") {
+            this.showLoadingCircle(() => {
+                const uuid = v4();
+                localStorage.setItem("uuid", uuid);
+                const brokerClient = Netifi.create({
+                    setup: {
+                        group: 'game-client',
+                        destination: uuid,
+                        accessKey: 9007199254740991,
+                        accessToken: 'kTBDVtfRBO4tHOnZzSyY5ym2kfY='
+                    },
+                    transport: {
+                        url: urlParams.get('endpoint') || 'ws://localhost:8101',
+                    }
+                });
+
+                brokerClient.addService(
+                    "org.coinen.pacman.MapService",
+                    new RSocketRPCServices.MapServiceServer({
+                        setup: (map: Map) => {
+                            this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(brokerClient.group("game-server"), meterRegistry), extrasService: new RSocketApi.ExtrasServiceClientAdapter(brokerClient.group("game-server"), meterRegistry), gameService: new RSocketApi.GameServiceClientAdapter(brokerClient.group("game-server"), meterRegistry) });
+                        }
+                    })
+                );
+
+                brokerClient._connect()
+                            .subscribe({
+                                onComplete: () => {
+
+                                    // const metricsRSocket = brokerClient.group("com.netifi.broker.metrics");
+
+
+
+                                    // const metricsExporter = new MetricsExporter(
+                                    //     new MetricsSnapshotHandlerClient(metricsRSocket),
+                                    //     meterRegistry,
+                                    //     1,
+                                    //     1
+                                    // );
+                                    // metricsExporter.start();
+                                },
+                                onError: err => {
+                                }
+                            });
+            });
+        } else {
 
             let rSocket: ReactiveSocket<any, any>;
             const client = new RpcClient({
@@ -87,21 +130,21 @@ export class Boot extends Scene {
                             let times = 0;
 
                             const rpcCall = () => {
-                                const metricsSnapshotHandlerClient = new MetricsRSocketRPCServices.MetricsSnapshotHandlerClient(preparedRSocket);
-
-                                ((metricsSnapshotHandlerClient.streamMetricsSnapshots(meterRegistry.asFlowable()) as any) as Flowable<Empty>)
-                                    .subscribe({
-                                        onSubscribe: (s) => s.request(Number.MAX_SAFE_INTEGER),
-                                        onNext: () => {},
-                                        onComplete: () => {},
-                                        onError: (e) => {
-                                            if (times++ < 100) {
-                                                setTimeout(() => rpcCall(), 2000);
-                                                return;
-                                            }
-                                            throw e;
-                                        }
-                                    })
+                                // const metricsSnapshotHandlerClient = new MetricsRSocketRPCServices.MetricsSnapshotHandlerClient(preparedRSocket);
+                                //
+                                // ((metricsSnapshotHandlerClient.streamMetricsSnapshots(meterRegistry.asFlowable()) as any) as Flowable<Empty>)
+                                //     .subscribe({
+                                //         onSubscribe: (s) => s.request(Number.MAX_SAFE_INTEGER),
+                                //         onNext: () => {},
+                                //         onComplete: () => {},
+                                //         onError: (e) => {
+                                //             if (times++ < 100) {
+                                //                 setTimeout(() => rpcCall(), 2000);
+                                //                 return;
+                                //             }
+                                //             throw e;
+                                //         }
+                                //     })
                             };
 
                             rpcCall();
@@ -112,30 +155,6 @@ export class Boot extends Scene {
             };
 
             connect();
-        } else if (type === "grpc") {
-
-            this.showLoadingCircle(() =>
-            new GrpcApi.SetupServiceClientAdapter()
-            .map()
-                .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new GrpcApi.PlayerServiceClientSharedAdapter(), extrasService: new GrpcApi.ExtrasServiceClientAdapter(), gameService: new GrpcApi.GameServiceClientAdapter() }))
-            );
-        } else if (type === "socket.io") {
-            this.showLoadingCircle(() => {
-                const socket: SocketIOClient.Socket = io(urlParams.get('endpoint') || 'ws://localhost:3000', {
-                    transports: ["websocket"]
-                });
-
-                socket.on('setup', (data: Buffer) => {
-                    const map = Map.deserializeBinary(data);
-                    this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new SocketIOApi.PlayerServiceClientSharedAdapter(socket, undefined), extrasService: new SocketIOApi.ExtrasServiceClientAdapter(socket, undefined), gameService: new SocketIOApi.GameServiceClientAdapter(socket, undefined) });
-                });
-            });
-        } else {
-            this.showLoadingCircle(() =>
-                new HttpApi.SetupServiceClientAdapter()
-                    .map()
-                    .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new HttpApi.PlayerServiceClientSharedAdapter(), extrasService: new HttpApi.ExtrasServiceClientAdapter(), gameService: new HttpApi.GameServiceClientAdapter() }))
-            );
         }
     }
 

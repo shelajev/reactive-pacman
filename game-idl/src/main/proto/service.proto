@@ -26,11 +26,6 @@ service MapService {
     }
 }
 
-service SetupService {
-
-    rpc get(google.protobuf.Empty) returns (Map) {}
-}
-
 service GameService {
     rpc start (Nickname) returns (Config) {}
 }
@@ -39,10 +34,6 @@ service PlayerService {
     rpc locate(stream Location) returns (google.protobuf.Empty) {}
 
     rpc players(google.protobuf.Empty) returns (stream Player) {}
-}
-
-service LocationService {
-    rpc locate(Location) returns (google.protobuf.Empty) {}
 }
 
 service ExtrasService {
