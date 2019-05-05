@@ -26,6 +26,10 @@ import org.springframework.context.annotation.Scope;
 @Configuration
 public class RSocketGameServerConfig {
 
+//    @Bean MeterRegistry remoteMeterRegistry() {
+//        return
+//    }
+
     @Bean
     public ExtrasController extrasController(ExtrasService extrasService) {
         return new ExtrasController(extrasService);

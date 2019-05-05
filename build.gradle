@@ -29,7 +29,7 @@ subprojects {
 		imports {
 			mavenBom 'org.springframework.boot:spring-boot-dependencies:2.2.0.BUILD-SNAPSHOT'
 			mavenBom 'com.google.protobuf:protobuf-bom:3.7.0'
-			mavenBom 'com.netifi:netifi-bom:1.6.3-SNAPSHOT'
+			mavenBom 'com.netifi:netifi-bom:1.6.2'
 		}
 
 		dependencies {
