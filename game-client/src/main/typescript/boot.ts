@@ -112,6 +112,7 @@ export class Boot extends Scene {
         } else {
             this.showLoadingCircle(() => {
                 const uuid = v4();
+                let once = false;
                 localStorage.setItem("uuid", uuid);
                 const brokerClient = Netifi.create({
                     setup: {
@@ -129,7 +130,19 @@ export class Boot extends Scene {
                     "org.coinen.pacman.MapService",
                     new RSocketRPCServices.MapServiceServer({
                         setup: (map: Map) => {
-                            this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(brokerClient.group("game-server"), meterRegistry), extrasService: new RSocketApi.ExtrasServiceClientAdapter(brokerClient.group("game-server"), meterRegistry), gameService: new RSocketApi.GameServiceClientAdapter(brokerClient.group("game-server"), meterRegistry) });
+                            if (!once) {
+                                once = true;
+                                this.scene.start('Menu', {
+                                    sizeData: config,
+                                    maze: map.toObject(),
+                                    playerService: new RSocketApi.PlayerServiceClientSharedAdapter(
+                                        brokerClient.group("game-server"), meterRegistry),
+                                    extrasService: new RSocketApi.ExtrasServiceClientAdapter(
+                                        brokerClient.group("game-server"), meterRegistry),
+                                    gameService: new RSocketApi.GameServiceClientAdapter(
+                                        brokerClient.group("game-server"), meterRegistry)
+                                });
+                            }
                         }
                     })
                 );
