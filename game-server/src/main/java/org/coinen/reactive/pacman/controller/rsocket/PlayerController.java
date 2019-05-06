@@ -15,6 +15,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
+import org.springframework.stereotype.Controller;
+
+@Controller
 public class PlayerController implements org.coinen.pacman.PlayerService {
 
     final PlayerService playerService;

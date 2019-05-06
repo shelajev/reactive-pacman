@@ -12,6 +12,9 @@ import org.coinen.reactive.pacman.service.GameService;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
 
+import org.springframework.stereotype.Controller;
+
+@Controller
 public class GameController implements org.coinen.pacman.GameService {
 
     final GameService gameService;
