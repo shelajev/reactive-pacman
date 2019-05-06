@@ -6,8 +6,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: './src/main/typescript/boot.ts',
-    mode: 'development',
-    devtool: 'source-map',
+    mode: 'production',
     devServer: {
         contentBase: path.join(__dirname, 'build'),
         compress: true,
