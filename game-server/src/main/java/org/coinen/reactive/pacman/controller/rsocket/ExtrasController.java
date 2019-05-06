@@ -12,6 +12,9 @@ import org.coinen.reactive.pacman.service.ExtrasService;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
+import org.springframework.stereotype.Controller;
+
+@Controller
 public class ExtrasController implements org.coinen.pacman.ExtrasService {
     final ExtrasService extrasService;
 
