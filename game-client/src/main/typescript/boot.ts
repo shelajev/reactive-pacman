@@ -44,53 +44,7 @@ export class Boot extends Scene {
         const type = urlParams.get('type');
         const meterRegistry: IMeterRegistry = new SimpleMeterRegistry();
 
-        if (type === "netifi") {
-            this.showLoadingCircle(() => {
-                const uuid = v4();
-                localStorage.setItem("uuid", uuid);
-                const brokerClient = Netifi.create({
-                    setup: {
-                        group: 'game-client',
-                        destination: uuid,
-                        accessKey: 9007199254740991,
-                        accessToken: 'kTBDVtfRBO4tHOnZzSyY5ym2kfY='
-                    },
-                    transport: {
-                        url: urlParams.get('endpoint') || 'ws://localhost:8101',
-                    }
-                });
-
-                brokerClient.addService(
-                    "org.coinen.pacman.MapService",
-                    new RSocketRPCServices.MapServiceServer({
-                        setup: (map: Map) => {
-                            this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(brokerClient.group("game-server"), meterRegistry), extrasService: new RSocketApi.ExtrasServiceClientAdapter(brokerClient.group("game-server"), meterRegistry), gameService: new RSocketApi.GameServiceClientAdapter(brokerClient.group("game-server"), meterRegistry) });
-                        }
-                    })
-                );
-
-                brokerClient._connect()
-                            .subscribe({
-                                onComplete: () => {
-
-                                    // const metricsRSocket = brokerClient.group("com.netifi.broker.metrics");
-
-
-
-                                    // const metricsExporter = new MetricsExporter(
-                                    //     new MetricsSnapshotHandlerClient(metricsRSocket),
-                                    //     meterRegistry,
-                                    //     1,
-                                    //     1
-                                    // );
-                                    // metricsExporter.start();
-                                },
-                                onError: err => {
-                                }
-                            });
-            });
-        } else {
-
+        if (type === "rsocket") {
             let rSocket: ReactiveSocket<any, any>;
             const client = new RpcClient({
                 // transport: new RSocketResumableTransport(
@@ -103,7 +57,7 @@ export class Boot extends Scene {
                 // ),
                 transport: new RSocketWebSocketClient(
                     {
-                        url: urlParams.get('endpoint') || 'ws://localhost:3000',
+                        url: urlParams.get('endpoint') || 'ws://dinoman-broker.netifi.com:8101',
                     },
                     BufferEncoders
                 ),
@@ -155,6 +109,51 @@ export class Boot extends Scene {
             };
 
             connect();
+        } else {
+            this.showLoadingCircle(() => {
+                const uuid = v4();
+                localStorage.setItem("uuid", uuid);
+                const brokerClient = Netifi.create({
+                    setup: {
+                        group: 'game-client',
+                        destination: uuid,
+                        accessKey: 9007199254740991,
+                        accessToken: 'kTBDVtfRBO4tHOnZzSyY5ym2kfY='
+                    },
+                    transport: {
+                        url: urlParams.get('endpoint') || 'ws://localhost:8101',
+                    }
+                });
+
+                brokerClient.addService(
+                    "org.coinen.pacman.MapService",
+                    new RSocketRPCServices.MapServiceServer({
+                        setup: (map: Map) => {
+                            this.scene.start('Menu', { sizeData: config, maze: map.toObject(), playerService: new RSocketApi.PlayerServiceClientSharedAdapter(brokerClient.group("game-server"), meterRegistry), extrasService: new RSocketApi.ExtrasServiceClientAdapter(brokerClient.group("game-server"), meterRegistry), gameService: new RSocketApi.GameServiceClientAdapter(brokerClient.group("game-server"), meterRegistry) });
+                        }
+                    })
+                );
+
+                brokerClient._connect()
+                    .subscribe({
+                        onComplete: () => {
+
+                            // const metricsRSocket = brokerClient.group("com.netifi.broker.metrics");
+
+
+
+                            // const metricsExporter = new MetricsExporter(
+                            //     new MetricsSnapshotHandlerClient(metricsRSocket),
+                            //     meterRegistry,
+                            //     1,
+                            //     1
+                            // );
+                            // metricsExporter.start();
+                        },
+                        onError: err => {
+                        }
+                    });
+            });
         }
     }
 
