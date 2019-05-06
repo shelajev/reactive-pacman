@@ -39,7 +39,7 @@ subprojects {
 				entry 'rsocket-transport-netty'
 			}
 
-			dependencySet (group: 'io.rsocket.rpc', version: '0.2.15') {
+			dependencySet (group: 'io.rsocket.rpc', version: '0.2.18') {
 				entry 'rsocket-rpc-core'
 				entry 'rsocket-rpc-protobuf'
 				entry 'rsocket-rpc-protobuf-idl'
