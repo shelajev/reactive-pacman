@@ -13,8 +13,7 @@ dependencies {
   }
   
   implementation 'com.netifi:netifi-spring-boot-starter'
-  implementation 'com.netifi:netifi-broker-metrics'
-  implementation 'com.netifi:netifi-broker-tracing'
+  implementation 'com.netifi:netifi-metrics-micrometer'
 
   implementation 'org.springframework.boot:spring-boot-starter'
   implementation 'org.roaringbitmap:RoaringBitmap'
