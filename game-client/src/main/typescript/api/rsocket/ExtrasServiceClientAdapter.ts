@@ -11,7 +11,7 @@ export default class ExtrasServiceClientAdapter implements ExtrasService {
 
     private service: RSocketRPCServices.ExtrasService;
 
-    constructor(rSocket: ReactiveSocket<any, any>, meterRegistry: IMeterRegistry) {
+    constructor(rSocket: ReactiveSocket<any, any>, meterRegistry?: IMeterRegistry) {
         this.service = new RSocketRPCServices.ExtrasServiceClient(rSocket, undefined, meterRegistry);
     }
 

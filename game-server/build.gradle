@@ -8,13 +8,6 @@ dependencies {
   implementation 'io.rsocket:rsocket-core'
   implementation 'io.rsocket:rsocket-transport-netty'
 
-  implementation ('io.rsocket.rpc:rsocket-rpc-core') {
-      exclude group: 'io.rsocket', module: 'rsocket-core'
-  }
-  
-  implementation 'com.netifi:netifi-spring-boot-starter'
-  implementation 'com.netifi:netifi-metrics-micrometer'
-
   implementation 'org.springframework.boot:spring-boot-starter'
   implementation 'org.roaringbitmap:RoaringBitmap'
   implementation 'org.jctools:jctools-core'

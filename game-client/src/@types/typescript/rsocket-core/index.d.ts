@@ -21,7 +21,7 @@ declare module "rsocket-core" {
           metadataMimeType: string,
         },
         transport: DuplexConnection,
-        responder?: Responder<D, M>,
+        responder?: Responder<D, M> | PartialResponder<D, M>,
     };
       
       /**

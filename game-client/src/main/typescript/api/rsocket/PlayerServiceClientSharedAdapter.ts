@@ -16,7 +16,7 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
     private service: RSocketRPCServices.PlayerService;
     private sharedPlayersStream: DirectProcessor<Player.AsObject>;
 
-    constructor(rSocket: ReactiveSocket<any, any>, meterRegistry: IMeterRegistry) {
+    constructor(rSocket: ReactiveSocket<any, any>, meterRegistry?: IMeterRegistry) {
         this.service = new RSocketRPCServices.PlayerServiceClient(rSocket, undefined, meterRegistry);
     }
 

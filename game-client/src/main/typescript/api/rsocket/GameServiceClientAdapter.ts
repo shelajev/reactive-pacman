@@ -10,7 +10,7 @@ export default class GameServiceClientAdapter implements GameService {
 
     private service: RSocketRPCServices.GameService;
 
-    constructor(rSocket: ReactiveSocket<any, any>, meterRegistry: IMeterRegistry) {
+    constructor(rSocket: ReactiveSocket<any, any>, meterRegistry?: IMeterRegistry) {
         this.service = new RSocketRPCServices.GameServiceClient(rSocket, undefined, meterRegistry);
     }
 

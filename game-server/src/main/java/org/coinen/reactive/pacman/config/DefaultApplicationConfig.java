@@ -16,7 +16,6 @@ import org.coinen.reactive.pacman.service.support.DefaultPlayerService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
 public class DefaultApplicationConfig {
 
     @Bean
