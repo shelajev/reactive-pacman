@@ -57,7 +57,7 @@ export class Boot extends Scene {
                 // ),
                 transport: new RSocketWebSocketClient(
                     {
-                        url: urlParams.get('endpoint') || 'ws://dinoman-broker.netifi.com:8101',
+                        url: urlParams.get('endpoint') || 'ws://localhost:8101',
                     },
                     BufferEncoders
                 ),
@@ -122,7 +122,7 @@ export class Boot extends Scene {
                         accessToken: 'kTBDVtfRBO4tHOnZzSyY5ym2kfY='
                     },
                     transport: {
-                        url: urlParams.get('endpoint') || 'ws://localhost:8101',
+                        url: urlParams.get('endpoint') || 'ws://dinoman-broker.netifi.com:8101'
                     }
                 });
 
