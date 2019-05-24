@@ -170,8 +170,7 @@ export class Boot extends Scene {
             mode: Phaser.Scale.FIT,
             autoCenter: Phaser.Scale.CENTER_BOTH
         },
-        scene: [Boot, Menu, GameScene, CompassScene],
-        // scene: [Boot, Menu, GameLoader, Game, Compass]
+        scene: [new Boot(), new Menu(), new GameScene(), new CompassScene()],
     });
     const sizeData = {
         width: normalWidth * scale,

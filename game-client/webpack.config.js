@@ -1,12 +1,12 @@
 const path = require('path');
+const CompressionPlugin = require('compression-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: './src/main/typescript/boot.ts',
-    mode: 'development',
-    devtool: 'source-map',
+    mode: 'production',
     devServer: {
         contentBase: path.join(__dirname, 'build'),
         compress: true,
@@ -15,12 +15,13 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Hot Module Replacement',
+            title: 'Netifi Pac-Man',
             template: path.join(__dirname, 'src/main/resources/public/index.html')
         }),
         new CopyPlugin([
             { from: 'src/main/resources/public', to: './' },
         ]),
+        new CompressionPlugin(),
         new webpack.HotModuleReplacementPlugin()
     ],
     module: {

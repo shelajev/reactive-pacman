@@ -21,7 +21,7 @@ export default class ExtrasServiceClientAdapter implements ExtrasService {
                     subscriber.onNext(Extra.deserializeBinary(new Uint8Array(eval(e.data))));
                 };
 
-                eventSource.onerror = e => {
+                eventSource.onerror = (e: any) => {
                     subscriber.onError(e.data);
                 }
             })))

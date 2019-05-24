@@ -51,7 +51,11 @@ public class UuidAwareRSocket extends RSocketProxy implements ResponderRSocket {
             return ((ResponderRSocket) source).requestChannel(payload, payloads)
                                               .subscriberContext(Context.of("uuid", uuid));
         } else {
-            return requestChannel(payloads);
+            return requestChannel(
+                Flux.from(payloads)
+                    .skip(1)
+                    .startWith(payload)
+            );
         }
     }
 }

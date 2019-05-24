@@ -47,7 +47,7 @@ public class DefaultPlayerService implements PlayerService {
     private void checkPlayers(long el) {
         playerRepository.findAll()
             .forEach(p -> {
-                if (System.currentTimeMillis() - p.getTimestamp() > 60000) {
+                if (System.currentTimeMillis() - p.getTimestamp() > 120000) {
                     this.disconnectPlayer()
                         .subscriberContext(Context.of("uuid", UUID.fromString(p.getUuid())))
                         .subscribe();

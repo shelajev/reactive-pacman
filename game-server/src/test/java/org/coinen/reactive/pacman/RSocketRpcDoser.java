@@ -33,7 +33,6 @@ public class RSocketRpcDoser {
 
     public static void main(String[] args) throws InterruptedException {
 
-        Hooks.onOperatorDebug();
         SimpleMeterRegistry registry = new SimpleMeterRegistry();
 
         new JvmMemoryMetrics(Tags.empty()).bindTo(registry);

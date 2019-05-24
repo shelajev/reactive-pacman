@@ -71,7 +71,7 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
                     subscriber.onNext(Player.deserializeBinary(new Uint8Array(eval(e.data))));
                 };
 
-                eventSource.onerror = e => {
+                eventSource.onerror = (e: any) => {
                     subscriber.onError(e.data);
                 }
             })))
