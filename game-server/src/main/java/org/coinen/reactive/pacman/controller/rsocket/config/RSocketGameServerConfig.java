@@ -77,6 +77,7 @@ public class RSocketGameServerConfig {
         ReconnectingRSocket connectingRSocket = new ReconnectingRSocket(
             Mono.defer(
             RSocketFactory.connect()
+                          .keepAliveAckTimeout(Duration.ofDays(10000))
                           .frameDecoder(PayloadDecoder.ZERO_COPY)
                           .transport(WebsocketClientTransport.create(URI.create(uri)))
                           ::start),
@@ -94,6 +95,7 @@ public class RSocketGameServerConfig {
         ReconnectingRSocket connectingRSocket = new ReconnectingRSocket(
             Mono.defer(
                 RSocketFactory.connect()
+                              .keepAliveAckTimeout(Duration.ofDays(10000))
                               .setupPayload(ByteBufPayload.create("vip"))
                               .frameDecoder(PayloadDecoder.ZERO_COPY)
                               .transport(WebsocketClientTransport.create(URI.create(uri)))

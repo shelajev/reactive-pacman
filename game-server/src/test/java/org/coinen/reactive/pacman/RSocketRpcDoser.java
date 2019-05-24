@@ -55,11 +55,12 @@ public class RSocketRpcDoser {
                     .build()
             ));
 
-        Flux.range(0, 1000)
+        Flux.range(0, 200)
             .doOnNext(i -> LOGGER.info("Connecting client number: {}", i))
             .concatMap(__ -> Mono
                 .defer(() ->
                     RSocketFactory.connect()
+                                  .keepAliveAckTimeout(Duration.ofDays(10000))
                                   .frameDecoder(PayloadDecoder.ZERO_COPY)
                                   .acceptor((___) -> new AbstractRSocket() {
                                       @Override
