@@ -2,10 +2,11 @@ package org.coinen.reactive.pacman.service.support;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import io.netty.util.concurrent.FastThreadLocal;
 import org.coinen.pacman.Direction;
 import org.coinen.pacman.Location;
 import org.coinen.pacman.Player;
@@ -29,9 +30,16 @@ public class DefaultPlayerService implements PlayerService {
     final FluxSink<Player>        playersSink      = playersProcessor.serialize()
                                                                      .sink();
 
-    final PlayerRepository playerRepository;
-    final ExtrasService    extrasService;
-    final MapService       mapService;
+    final PlayerRepository                    playerRepository;
+    final ExtrasService                       extrasService;
+    final MapService                          mapService;
+        final FastThreadLocal<Collection<Player>> playersThreadLocal =
+        new FastThreadLocal<>() {
+            @Override
+            protected Collection<Player> initialValue() throws Exception {
+                return playerRepository.findAll();
+            }
+        };
 
     public DefaultPlayerService(PlayerRepository repository,
         ExtrasService extrasService,
@@ -57,100 +65,116 @@ public class DefaultPlayerService implements PlayerService {
 
     @Override
     public Mono<Void> locate(Flux<Location> locationStream) {
-        return Mono.subscriberContext()
-                   .map(c -> c.<UUID>get("uuid"))
-                   .flatMap(uuid -> locationStream
-                       .doOnNext(location -> {
-                           var time = Instant.now();
-                           var updatedPlayer = playerRepository.update(uuid, player -> {
-                               Player foundPlayer = playerRepository.findOne(uuid);
+        return Mono
+            .subscriberContext()
+            .map(c -> c.<UUID>get("uuid"))
+            .flatMap(uuid -> locationStream
+                .doOnNext(location -> {
+                    var time = Instant.now();
+                    var updatedPlayer = playerRepository.update(uuid, player -> {
+                        if (player == null) {
+                            return null;
+                        }
 
-                               if (foundPlayer == null) {
-                                   return null;
-                               }
+                        var playerBuilder = player.toBuilder()
+                                                  .setTimestamp(time.toEpochMilli())
+                                                  .setState(Player.State.ACTIVE)
+                                                  .setLocation(location);
+                        var position = location.getPosition();
+                        var isPowerActive = extrasService.isPowerupActive();
+                        var isGhostPlayer = player.getType().equals(Player.Type.GHOST);
+                        var isPacManPlayer = player.getType().equals(Player.Type.PACMAN);
 
-                               var playerBuilder = foundPlayer.toBuilder()
-                                                              .setTimestamp(time.toEpochMilli())
-                                                              .setState(Player.State.ACTIVE)
-                                                              .setLocation(location);
+                        if ((isPowerActive && isGhostPlayer) || (!isPowerActive && isPacManPlayer)) {
+                            Collection<Player> playerCollection = playersThreadLocal.get();
+                            for (var otherPlayer : playerCollection) {
+                                var isActivePlayer = otherPlayer.getState()
+                                                                .equals(Player.State.ACTIVE);
+                                var areDifferent = !otherPlayer.getType().equals(player.getType());
+                                var hasIntersection = distance(
+                                    otherPlayer.getLocation()
+                                               .getPosition(),
+                                    player.getLocation()
+                                          .getPosition()
+                                ) < 100;
 
-                               Point position = location.getPosition();
+                                if (isActivePlayer && areDifferent && hasIntersection) {
+                                    var collidedWithPlayer =
+                                        playerRepository.update(
+                                            UUID.fromString(otherPlayer.getUuid()),
+                                            p -> p.toBuilder()
+                                                  .setScore(p.getScore() + 25)
+                                                  .build()
+                                        );
+                                    playerBuilder.setState(Player.State.DISCONNECTED);
+                                    playersSink.next(collidedWithPlayer);
+                                    break;
+                                }
+                            }
+                        }
+                        else {
+                            var playerCollection = playersThreadLocal.get();
+                            var totalScore = 0;
 
-                               List<Player> collisions = playerRepository
-                                   .findAll()
-                                   .stream()
-                                   .filter(p -> p.getState()
-                                                 .equals(Player.State.ACTIVE))
-                                   .filter(p -> !p.getType()
-                                                  .equals(player.getType()))
-                                   .filter(p ->
-                                       distance(
-                                           p.getLocation().getPosition(),
-                                           player.getLocation().getPosition()
-                                       ) < 100
-                                   )
-                                   .collect(Collectors.toList());
-                               if (collisions.size() > 0) {
-                                   if (extrasService.isPowerupActive()
-                                       && player.getType()
-                                                .equals(Player.Type.GHOST)
-                                       || !extrasService.isPowerupActive()
-                                       && player.getType()
-                                                .equals(Player.Type.PACMAN)) {
+                            for (var otherPlayer : playerCollection) {
+                                var isActivePlayer = otherPlayer.getState()
+                                                                .equals(Player.State.ACTIVE);
+                                var areDifferent = !otherPlayer.getType().equals(player.getType());
+                                var hasIntersection = distance(
+                                    otherPlayer.getLocation()
+                                               .getPosition(),
+                                    player.getLocation()
+                                          .getPosition()
+                                ) < 100;
 
-                                       playerBuilder.setState(Player.State.DISCONNECTED);
-                                       collisions.forEach(collision -> {
-                                           Player collidedWith =
-                                               playerRepository.update(UUID.fromString(
-                                                   collision.getUuid()),
-                                                   p -> p.toBuilder()
-                                                         .setScore(p.getScore() + 100)
-                                                         .build());
-                                           playersSink.next(collidedWith);
-                                       });
-                                   }
-                                   else if (extrasService.isPowerupActive()
-                                       && player.getType()
-                                                .equals(Player.Type.PACMAN)
-                                       || !extrasService.isPowerupActive()
-                                       && player.getType()
-                                                .equals(Player.Type.GHOST)) {
-                                       collisions.forEach(collision -> {
-                                           Player collidedWith =
-                                               playerRepository.update(UUID.fromString(
-                                                   collision.getUuid()),
-                                                   p -> p.toBuilder()
-                                                         .setState(Player.State.DISCONNECTED)
-                                                         .build());
-                                           playersSink.next(collidedWith);
-                                       });
-                                       playerBuilder.setScore(player.getScore() + 100 * collisions.size());
-                                   }
-                               }
-                               else if (player.getType() == Player.Type.PACMAN && extrasService.check(
-                                   position.getX(),
-                                   position.getY()) > 0) {
-                                   playerBuilder.setScore(player.getScore() + 1);
-                                   // scoreProcessor.onNext({player, score: player.getScore() + 1});
-                               }
+                                if (isActivePlayer && areDifferent && hasIntersection) {
+                                    var collidedWithPlayer =
+                                        playerRepository.update(
+                                            UUID.fromString(otherPlayer.getUuid()),
+                                            p -> p.toBuilder()
+                                                  .setState(Player.State.DISCONNECTED)
+                                                  .build()
+                                        );
+                                    playersSink.next(collidedWithPlayer);
+                                    totalScore += 20;
+                                }
+                            }
 
-                               return playerBuilder.setTimestamp(Instant.now().toEpochMilli()).build();
-                           });
+                            if (totalScore > 0) {
+                                playerBuilder.setScore(player.getScore() + totalScore);
+                            }
+                        }
 
+                        var isNotKilled =
+                            !(playerBuilder.getState() == Player.State.DISCONNECTED);
 
-                           if (updatedPlayer == null) {
-                               return;
-                           }
+                        if (isNotKilled && isPacManPlayer) {
+                            var hasIntersectionWithExtra =
+                                extrasService.check(position.getX(), position.getY()) > 0;
+
+                            if (hasIntersectionWithExtra) {
+                                playerBuilder.setScore(player.getScore() + 1);
+                            }
+                        }
+
+                        return playerBuilder.setTimestamp(Instant.now().toEpochMilli()).build();
+                    });
 
 
-                           if (updatedPlayer.getState() == Player.State.DISCONNECTED) {
-                               playerRepository.delete(uuid);
-                           }
+                    if (updatedPlayer == null) {
+                        return;
+                    }
 
-                           playersSink.next(updatedPlayer);
-                       })
-                       .then()
-                   );
+                    var isKilled = updatedPlayer.getState() == Player.State.DISCONNECTED;
+
+                    if (isKilled) {
+                        playerRepository.delete(uuid);
+                    }
+
+                    playersSink.next(updatedPlayer);
+                })
+                .then()
+            );
     }
 
     @Override

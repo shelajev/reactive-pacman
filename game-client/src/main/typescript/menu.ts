@@ -107,9 +107,7 @@ export default class Menu extends Scene {
                     $("#canvas-container").show();
 
                     $("#to-scroll").remove();
-                    console.log("hurrraaaay");
 
-                    this.game.canvas.requestFullscreen();
                     this.gameService.start({value: this.nickname})
                         .then((config: Config.AsObject) => {
                             this.scene.start('Game', {

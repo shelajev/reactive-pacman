@@ -136,7 +136,10 @@ public class SocketIOGameServerConfig {
 
             server.addEventListener("locate", byte[].class, (client, data, ackRequest) -> {
                 UnicastProcessor<Location> locationFlux =  client.get(LOCATION_FLUX_KEY);
-                locationFlux.onNext(Location.parseFrom(data));
+                
+                if (locationFlux != null) {
+                    locationFlux.onNext(Location.parseFrom(data));
+                }
             });
 
             server.addEventListener("streamMetricsSnapshots", byte[].class,
