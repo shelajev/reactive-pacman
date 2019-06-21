@@ -31,7 +31,6 @@
     "rsocket-rpc-tracing": "^0.0.3",
     "rsocket-types": "^0.0.10",
     "rsocket-websocket-client": "0.0.10",
-    "rsocket-websocket-server": "0.0.10",
     "socket.io-client": "^2.2.0",
     "uuid": "^3.3.2"
   },

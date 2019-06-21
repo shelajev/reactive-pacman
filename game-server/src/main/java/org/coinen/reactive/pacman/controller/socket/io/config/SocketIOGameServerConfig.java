@@ -84,6 +84,7 @@ public class SocketIOGameServerConfig {
                 configuration = new com.corundumstudio.socketio.Configuration();
             configuration.setTransports(Transport.WEBSOCKET);
             configuration.setPort(5900);
+            configuration.setHostname("192.168.1.7");
             configuration.setPingTimeout(60);
             configuration.setAckMode(AckMode.AUTO);
 

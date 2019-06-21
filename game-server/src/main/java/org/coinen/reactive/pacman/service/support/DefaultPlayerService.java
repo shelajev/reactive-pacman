@@ -33,7 +33,7 @@ public class DefaultPlayerService implements PlayerService {
     final PlayerRepository                    playerRepository;
     final ExtrasService                       extrasService;
     final MapService                          mapService;
-        final FastThreadLocal<Collection<Player>> playersThreadLocal =
+    final FastThreadLocal<Collection<Player>> playersThreadLocal =
         new FastThreadLocal<>() {
             @Override
             protected Collection<Player> initialValue() throws Exception {
