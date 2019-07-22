@@ -13,7 +13,7 @@ export default class GameServiceClientAdapter implements GameService {
         nicknameProto.setValue(value);
 
         return new Single(subject => {
-            subject.onSubscribe();
+            subject.onSubscribe(undefined);//TODO: FIXME
             fetch(`${endpoint || "http://localhost:3000"}/http/start`, {
                 method: "POST",
                 body: nicknameProto.serializeBinary(),

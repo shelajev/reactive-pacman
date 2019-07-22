@@ -7,7 +7,7 @@ export default class SetupServiceClientAdapter {
         const urlParams = new URLSearchParams(window.location.search);
         const endpoint = urlParams.get('endpoint');
         return new Single(subject => {
-            subject.onSubscribe();
+            subject.onSubscribe(undefined); //TODO: FIXME
             fetch(`${endpoint || "http://localhost:3000"}/http/setup`, {
                 credentials: "include"
             })

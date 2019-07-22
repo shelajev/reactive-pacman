@@ -22,7 +22,7 @@ export default class GameServiceClientAdapter implements GameService {
 
         return new Single(subject => {
             let stream: ClientReadableStream<any>;
-            subject.onSubscribe();
+            subject.onSubscribe(undefined); //TODO: FIXME
             stream = this.service.start(nicknameProto as any, { "uuid": localStorage.getItem("uuid") }, (err, response) => {
                 if (err) {
                     subject.onError(new Error(`An Grpc Error was thrown. Code: [${err.code}]. Message: ${err.message}`));
