@@ -177,7 +177,10 @@ public class DefaultPlayerService implements PlayerService {
 
     @Override
     public Flux<Player> players() {
-        return playersProcessor;
+        return Flux.merge(
+            playersProcessor,
+            playerRepository.remotePlayers()
+        );
     }
 
     @Override

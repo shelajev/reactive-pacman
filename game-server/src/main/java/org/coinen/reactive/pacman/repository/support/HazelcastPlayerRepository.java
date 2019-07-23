@@ -27,14 +27,19 @@ public class HazelcastPlayerRepository implements PlayerRepository {
 
         final var remotePlayersUpdatesSink = remotePlayersUpdatesFlux.sink();
         store.addEntryListener((EntryAddedListener<UUID, Player>) event -> {
-            remotePlayersUpdatesSink.next(event.getValue());
+            if (!event.getMember().localMember()) {
+                remotePlayersUpdatesSink.next(event.getValue());
+            }
         }, true);
         store.addEntryListener((EntryRemovedListener<UUID, Player>) event -> {
-            remotePlayersUpdatesSink.next(event.getValue()
-                                               .toBuilder()
-                                               .setState(Player.State.DISCONNECTED)
-                                               .build()
-            );
+            if (!event.getMember().localMember()) {
+                remotePlayersUpdatesSink.next(event.getOldValue()
+                                                   .toBuilder()
+                                                   .setState(Player.State.DISCONNECTED)
+                                                   .build()
+
+                );
+            }
         }, true);
     }
 

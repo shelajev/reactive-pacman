@@ -9,7 +9,6 @@ import com.hazelcast.core.ILock;
 import com.hazelcast.core.ISet;
 import com.hazelcast.core.ItemEvent;
 import com.hazelcast.core.ItemListener;
-import com.hazelcast.cp.lock.FencedLock;
 import org.coinen.reactive.pacman.repository.ExtrasRepository;
 import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.Flux;
