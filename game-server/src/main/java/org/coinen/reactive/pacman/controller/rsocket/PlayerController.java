@@ -46,6 +46,6 @@ public class PlayerController implements org.coinen.pacman.PlayerService {
 
         return playerService.players()
                             .subscriberContext(context)
-                            .onBackpressureDrop();
+                            .onBackpressureBuffer();
     }
 }

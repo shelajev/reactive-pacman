@@ -11,10 +11,10 @@ dependencies {
   implementation ('io.rsocket.rpc:rsocket-rpc-core') {
       exclude group: 'io.rsocket', module: 'rsocket-core'
   }
-  
+
+  implementation 'com.hazelcast:hazelcast'
   implementation 'com.netifi:netifi-spring-boot-starter'
   implementation 'com.netifi:netifi-metrics-micrometer'
-
   implementation 'org.springframework.boot:spring-boot-starter'
   implementation 'org.roaringbitmap:RoaringBitmap'
   implementation 'org.jctools:jctools-core'

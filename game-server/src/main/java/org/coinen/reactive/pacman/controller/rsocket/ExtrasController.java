@@ -30,6 +30,7 @@ public class ExtrasController implements org.coinen.pacman.ExtrasService {
             : Context.empty();
 
         return extrasService.extras()
+                            .onBackpressureBuffer()
                             .subscriberContext(context);
     }
 }

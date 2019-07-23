@@ -38,4 +38,9 @@ public class InMemoryPlayerRepository implements PlayerRepository {
     public Player delete(UUID uuid) {
         return store.remove(uuid);
     }
+
+    @Override
+    public int count() {
+        return store.size();
+    }
 }

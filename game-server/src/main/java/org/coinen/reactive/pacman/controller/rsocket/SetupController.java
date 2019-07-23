@@ -47,7 +47,7 @@ public class SetupController implements ApplicationContextAware {
         BrokerInfoServiceClient client = new BrokerInfoServiceClient(brokerSocket);
 
         client.streamGroupEvents(Group.newBuilder()
-                                      .setGroup("game-client")
+                                      .setGroup("com.netifi.game.client")
                                       .build())
               .log()
               .concatMap(event -> {
@@ -61,12 +61,12 @@ public class SetupController implements ApplicationContextAware {
                                             .get();
                   UUID uuid = UUID.fromString(destinationName.getValue());
 
-                  if(event.getType() == Event.Type.LEAVE) {
+                  if (event.getType() == Event.Type.LEAVE) {
                       return playerService.disconnectPlayer()
                                           .subscriberContext(Context.of("uuid", uuid));
                   } else {
                       BrokerSocket sendingRSocket = brokerClient.groupServiceSocket(
-                          "game-client",
+                          "com.netifi.game.client",
                           Tags.of(destinationName.getKey(), destinationName.getValue()));
                       return new MapServiceClient(sendingRSocket).setup(mapService.getMap())
                                                                  .then(Mono.empty());

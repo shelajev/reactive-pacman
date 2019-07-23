@@ -6,6 +6,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.coinen.pacman.Player;
+import reactor.core.publisher.Flux;
 
 public interface PlayerRepository {
 
@@ -18,4 +19,10 @@ public interface PlayerRepository {
     Player save(UUID uuid, Supplier<? extends Player> playerSupplier);
 
     Player delete(UUID uuid);
+
+    int count();
+
+    default Flux<Player> remotePlayers() {
+        return Flux.empty();
+    }
 }
