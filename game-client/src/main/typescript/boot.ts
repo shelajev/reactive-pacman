@@ -122,7 +122,7 @@ export class Boot extends Scene {
                         accessToken: '9+Rf47DP8SuoRAM7Fne39ULQlEo='
                     },
                     transport: {
-                        url: urlParams.get('endpoint') || 'wss://dinoman-broker.netifi.com:8101'
+                        url: urlParams.get('endpoint') || 'ws://dinoman-broker.netifi.com:8101'
                     }
                 });
 
