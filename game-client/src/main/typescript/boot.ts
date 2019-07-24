@@ -116,13 +116,13 @@ export class Boot extends Scene {
                 localStorage.setItem("uuid", uuid);
                 const brokerClient = Netifi.create({
                     setup: {
-                        group: 'com.netifi.game.client',
+                        group: 'demo.netifi.game.client',
                         destination: uuid,
-                        accessKey: 9007199254740991,
-                        accessToken: 'kTBDVtfRBO4tHOnZzSyY5ym2kfY='
+                        accessKey: 2055365755149001,
+                        accessToken: '9+Rf47DP8SuoRAM7Fne39ULQlEo='
                     },
                     transport: {
-                        url: urlParams.get('endpoint') || 'wss://ravenmancer.test.ent.netifi.com:443'
+                        url: urlParams.get('endpoint') || 'wss://dinoman-broker.netifi.com:8101'
                     }
                 });
 
@@ -132,7 +132,7 @@ export class Boot extends Scene {
                         setup: (map: Map) => {
                             if (!once) {
                                 once = true;
-                                const brokerRSocket = brokerClient.group("com.netifi.game.server");
+                                const brokerRSocket = brokerClient.group("demo.netifi.game.server");
                                 this.scene.start('Menu', {
                                     sizeData: config,
                                     maze: map.toObject(),
