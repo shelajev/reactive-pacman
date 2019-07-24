@@ -7,7 +7,23 @@
 
     <serialization>
         <serializers>
-            <serializer type-class="org.coinen.pacman.Player" class-name="org.coinen.reactive.pacman.config.hazelcast.PlayerProtoSerializer"/>
+            <serializer type-class="org.coinen.pacman.Player"
+                        class-name="org.coinen.reactive.pacman.config.hazelcast.PlayerProtoSerializer"/>
         </serializers>
     </serialization>
+    <network>
+        <port port-count="20">5701</port>
+        <join>
+            <multicast enabled="false">
+<!--                <multicast-group></multicast-group>-->
+<!--                <multicast-port>54327</multicast-port>-->
+<!--                <trusted-interfaces>-->
+<!--                    <interface>18.194.218.75</interface>-->
+<!--                </trusted-interfaces>-->
+            </multicast>
+            <tcp-ip enabled="true">
+<!--                <interface>dinoman.netifi.com</interface>-->
+            </tcp-ip>
+        </join>
+    </network>
 </hazelcast>
