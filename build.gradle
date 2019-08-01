@@ -28,7 +28,7 @@ subprojects {
 	dependencyManagement {
 		imports {
 			mavenBom 'org.springframework.boot:spring-boot-dependencies:2.1.5.RELEASE'
-			mavenBom 'com.google.protobuf:protobuf-bom:3.8.0'
+			mavenBom 'com.google.protobuf:protobuf-bom:3.9.0'
 		}
 
 		dependencies {
@@ -41,7 +41,7 @@ subprojects {
 				entry 'protoc-gen-grpc-java'
 			}
 
-			dependencySet (group: 'io.rsocket', version: '0.12.2-RC4') {
+			dependencySet (group: 'io.rsocket', version: '1.0.0-RC2-SNAPSHOT') {
 				entry 'rsocket-core'
 				entry 'rsocket-transport-netty'
 			}
@@ -60,7 +60,7 @@ subprojects {
 
 			dependency group: 'org.roaringbitmap', name: 'RoaringBitmap', version: '0.7.42'
 
-			dependency group: 'com.google.protobuf', name: 'protoc', version: '3.8.0'
+			dependency group: 'com.google.protobuf', name: 'protoc', version: '3.9.0'
 
 			dependency group: 'org.jctools', name: 'jctools-core', version: '2.1.2'
 			dependency group: 'com.salesforce.servicelibs', name: 'reactor-grpc-stub', version: '0.10.0-SNAPSHOT'
