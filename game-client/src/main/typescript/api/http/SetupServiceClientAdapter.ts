@@ -8,7 +8,7 @@ export default class SetupServiceClientAdapter {
         const endpoint = urlParams.get('endpoint');
         return new Single(subject => {
             subject.onSubscribe(undefined); //TODO: FIXME
-            fetch(`${endpoint || "http://localhost:3000"}/http/setup`, {
+            fetch(`${endpoint || "http://dinoman.netifi.com:3000"}/http/setup`, {
                 credentials: "include"
             })
             .then(res => {

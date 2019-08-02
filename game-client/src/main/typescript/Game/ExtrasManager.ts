@@ -49,11 +49,7 @@ export default class ExtrasManager implements SceneSupport {
 
             const normalizedPosition = Math.abs(position);
 
-            try {
-                this.extraSprites.get(normalizedPosition).destroy();
-            } catch (e) {
-                // FIXME: it should not be empty
-            }
+            this.extraSprites.get(normalizedPosition).destroy();
             this.extraSprites.delete(normalizedPosition);
         }
     }
