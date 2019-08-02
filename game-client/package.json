@@ -11,10 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/rsocket-flowable": "^0.0.3",
+    "@types/rsocket-types": "^0.0.1",
+    "@types/rsocket-websocket-client": "^0.0.3",
     "reactor-core-js": "^0.5.0",
-    "rsocket-flowable": "^0.0.10",
-    "rsocket-types": "^0.0.10",
-    "rsocket-websocket-client": "0.0.10"
+    "rsocket-flowable": "^0.0.14",
+    "rsocket-types": "^0.0.16",
+    "rsocket-websocket-client": "0.0.16"
   },
   "devDependencies": {
     "async": "^3.1.0",

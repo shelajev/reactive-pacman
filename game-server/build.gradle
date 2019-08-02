@@ -3,17 +3,11 @@ apply plugin: 'com.bmuschko.docker-spring-boot-application'
 
 dependencies {
 
-  implementation project(':game-idl')
   //RSocket Dependencies
   implementation 'io.rsocket:rsocket-core'
   implementation 'io.rsocket:rsocket-transport-netty'
 
   implementation 'org.springframework.boot:spring-boot-starter'
-  implementation 'org.roaringbitmap:RoaringBitmap'
-  implementation 'org.jctools:jctools-core'
-  implementation 'io.projectreactor.addons:reactor-extra'
-  implementation "io.micrometer:micrometer-core"
-  implementation 'com.google.protobuf:protobuf-java'
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'io.projectreactor:reactor-test'
