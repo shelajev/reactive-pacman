@@ -1,0 +1,27 @@
+apply plugin: 'org.springframework.boot'
+apply plugin: 'com.bmuschko.docker-spring-boot-application'
+
+dependencies {
+
+  implementation project(':admin-idl')
+  implementation project(':game-idl')
+  implementation 'org.jctools:jctools-core'
+  implementation 'io.rsocket:rsocket-core'
+  implementation 'io.rsocket:rsocket-transport-netty'
+  implementation 'io.rsocket.rpc:rsocket-rpc-core'
+  implementation 'com.google.protobuf:protobuf-java'
+  implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'io.projectreactor:reactor-test'
+}
+
+docker {
+  springBootApplication {
+    baseImage = 'adoptopenjdk/openjdk11'
+    ports = [4000, 9095]
+    tag = "reactive-pacman-admin-server:${project.version}"
+  }
+}
