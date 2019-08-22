@@ -40,12 +40,12 @@ subprojects {
 				entry 'protoc-gen-grpc-java'
 			}
 
-			dependencySet (group: 'io.rsocket', version: '1.0.0-RC2') {
+			dependencySet (group: 'io.rsocket', version: '1.0.0-RC3-SNAPSHOT') {
 				entry 'rsocket-core'
 				entry 'rsocket-transport-netty'
 			}
 
-			dependencySet (group: 'io.rsocket.rpc', version: '0.2.18') {
+			dependencySet (group: 'io.rsocket.rpc', version: '0.2.19') {
 				entry 'rsocket-rpc-core'
 				entry 'rsocket-rpc-protobuf'
 				entry 'rsocket-rpc-protobuf-idl'
