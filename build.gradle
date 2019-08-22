@@ -22,7 +22,6 @@ subprojects {
 		maven { url 'https://repo.spring.io/milestone' }
 		maven { url 'https://oss.jfrog.org/oss-snapshot-local' }
 		maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-		mavenLocal()
 	}
 
 	dependencyManagement {
