@@ -24,12 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class HttpGameController {
 
     final GameService gameService;
-    final MeterRegistry registry;
 
-    public HttpGameController(GameService gameService,
-        @Qualifier("http") MeterRegistry registry) {
+    public HttpGameController(GameService gameService) {
         this.gameService = gameService;
-        this.registry = registry;
     }
 
     @PostMapping("/start")
@@ -37,7 +34,6 @@ public class HttpGameController {
         allowCredentials = "true")
     public Mono<Config> start(@RequestBody Nickname nickname, @CookieValue("uuid") String uuid) {
         return gameService.start(nickname)
-                          .transform(Metrics.<Config>timed(registry, "http.server", "service", org.coinen.pacman.GameService.SERVICE, "method", org.coinen.pacman.GameService.METHOD_START))
                           .subscriberContext(Context.of("uuid", UUID.fromString(uuid)));
     }
 }

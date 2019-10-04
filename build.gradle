@@ -51,7 +51,7 @@ subprojects {
 			dependency group: 'com.corundumstudio.socketio', name: 'netty-socketio', version: '1.7.17'
 			dependency group: 'io.socket', name: 'socket.io-client', version: '1.0.0'
 
-			dependency group: 'org.roaringbitmap', name: 'RoaringBitmap', version: '0.7.42'
+			dependency group: 'org.roaringbitmap', name: 'RoaringBitmap', version: '0.8.11'
 
 			dependency group: 'com.google.protobuf', name: 'protoc', version: '3.11.4'
 
@@ -59,7 +59,7 @@ subprojects {
 			dependency group: 'com.salesforce.servicelibs', name: 'reactor-grpc-stub', version: '0.10.0'
 
 			dependency group:'io.github.lognet', name: 'grpc-spring-boot-starter', version: '3.3.0'
-			dependency group: 'com.github.collaborationinencapsulation.spring-boot-rsocket', name: 'spring-boot-starter-rsocket', version: 'dec35e4a10'
+			dependency group: 'com.github.collaborationinencapsulation.spring-boot-rsocket', name: 'spring-boot-starter-rsocket', version: '57f3acae42'
 		}
 	}
 }

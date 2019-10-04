@@ -15,6 +15,8 @@ public class InMemoryExtrasRepository implements ExtrasRepository {
     final int mapHeight = 60;
     final int offset = 11;
     final int totalSpace = (mapWidth - 2 * offset + 1) * (mapHeight - 2 * offset + 1);
+    final int boundaryHalf = (int) Math.ceil(totalSpace / 360d);
+    final int boundaryQuarter =  (int) Math.ceil(totalSpace / 900d);
 
     final NonBlockingSetInt controlMap = new NonBlockingSetInt();
     final RoaringBitmap bitmap = new RoaringBitmap();
@@ -61,10 +63,10 @@ public class InMemoryExtrasRepository implements ExtrasRepository {
             int nextCnt = initialCnt;
 
             if (size <= 2) {
-                powerUpAllowed = initialCnt < Math.ceil(totalSpace / 360);
+                powerUpAllowed = initialCnt < boundaryHalf;
             }
             else if (size <= 4) {
-                powerUpAllowed = initialCnt < Math.ceil(totalSpace / 900);
+                powerUpAllowed = initialCnt < boundaryQuarter;
             }
             else {
                 powerUpAllowed = initialCnt == 0 && Math.random() < 0.02;

@@ -1,32 +1,18 @@
 package org.coinen.reactive.pacman.controller.socket.io.config;
 
-import java.net.URISyntaxException;
-
 import com.corundumstudio.socketio.AckMode;
-import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.BroadcastOperations;
-import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.Transport;
-import com.corundumstudio.socketio.listener.DataListener;
-import com.corundumstudio.socketio.transport.WebSocketTransport;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.socket.client.IO;
-import io.socket.client.Socket;
 import org.coinen.pacman.Location;
 import org.coinen.pacman.Nickname;
-import org.coinen.reactive.pacman.metrics.ReactiveMetricsRegistry;
 import org.coinen.reactive.pacman.service.ExtrasService;
 import org.coinen.reactive.pacman.service.GameService;
 import org.coinen.reactive.pacman.service.MapService;
 import org.coinen.reactive.pacman.service.PlayerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.UnicastProcessor;
-import reactor.util.context.Context;
-
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.context.event.ApplicationFailedEvent;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -34,6 +20,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextStoppedEvent;
+import reactor.core.publisher.UnicastProcessor;
+import reactor.util.context.Context;
 
 @Configuration
 public class SocketIOGameServerConfig {
@@ -41,38 +29,11 @@ public class SocketIOGameServerConfig {
     private static final String LOCATION_FLUX_KEY = "locationFlux";
 
     static final Logger LOGGER = LoggerFactory.getLogger(SocketIOGameServerConfig.class);
-    @Value("${socket.io.metrics-endpoint}")
-    String uri;
-
-    @Bean
-    @Qualifier("socket.io")
-    public Socket metricsSocketClient() throws URISyntaxException {
-        IO.Options options = new IO.Options();
-        options.transports = new String[] {WebSocketTransport.NAME};
-
-        return IO.socket(uri, options).connect();
-    }
-
-    @Bean
-    @Qualifier("socket.io")
-    public MeterRegistry socketIOMeterRegistry(@Qualifier("socket.io") Socket socket) {
-        ReactiveMetricsRegistry registry = new ReactiveMetricsRegistry("rsocket.game.server");
-
-//        registry.asFlux()
-//                .doOnNext(metricsSnapshot -> socket.emit("streamMetricsSnapshots", (Object) metricsSnapshot.toByteArray()))
-//                .retryWhen(Retry.any()
-//                        .exponentialBackoffWithJitter(Duration.ofSeconds(1), Duration.ofMinutes(1))
-//                        .retryMax(100))
-//                .subscribe();
-
-        return registry;
-    }
 
 
     @Bean
     @Qualifier("socket.io")
     public CommandLineRunner socketIOServerRunner(
-        Socket metricsSocketClient,
         ConfigurableApplicationContext context,
         GameService gameService,
         ExtrasService extrasService,
@@ -141,9 +102,6 @@ public class SocketIOGameServerConfig {
                     locationFlux.onNext(Location.parseFrom(data));
                 }
             });
-
-            server.addEventListener("streamMetricsSnapshots", byte[].class,
-                (client, data, ackSender) -> metricsSocketClient.emit("streamMetricsSnapshots", (Object) data));
 
             server.startAsync();
 

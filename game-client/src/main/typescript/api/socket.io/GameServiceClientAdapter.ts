@@ -1,13 +1,10 @@
 import GameService from "../GameService";
 import {Config, Nickname} from "game-idl";
 import {Single} from "rsocket-flowable";
-import {IMeterRegistry} from "rsocket-rpc-metrics";
 
 export default class GameServiceClientAdapter implements GameService {
 
-    constructor(private readonly socket: SocketIOClient.Socket, meterRegistry: IMeterRegistry) {
-        // this.service = new RSocketRPCServices.GameServiceClient(rSocket, undefined, meterRegistry);
-    }
+    constructor(private readonly socket: SocketIOClient.Socket) {}
 
     start({ value }: Nickname.AsObject): Single<Config.AsObject> {
         const nicknameProto = new Nickname();

@@ -123,6 +123,7 @@ export default class Menu extends Scene {
             $("#canvas-container").show();
             this.gameService.start({value: this.nickname})
                 .then((config: Config.AsObject) => {
+                    localStorage.setItem("nickname", this.nickname);
                     this.scene.start('Game', {
                         ...this.config,
                         player: config.player,
