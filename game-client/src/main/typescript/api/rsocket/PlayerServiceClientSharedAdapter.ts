@@ -9,15 +9,14 @@ import { Point } from "game-idl";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { Disposable } from "reactor-core-js";
 import FlowableAdapter from "../FlowableAdapter";
-import {IMeterRegistry} from "rsocket-rpc-metrics";
 
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
     private service: RSocketRPCServices.PlayerService;
     private sharedPlayersStream: DirectProcessor<Player.AsObject>;
 
-    constructor(rSocket: ReactiveSocket<any, any>, meterRegistry: IMeterRegistry) {
-        this.service = new RSocketRPCServices.PlayerServiceClient(rSocket, undefined, meterRegistry);
+    constructor(rSocket: ReactiveSocket<any, any>) {
+        this.service = new RSocketRPCServices.PlayerServiceClient(rSocket);
     }
 
     locate(locationStream: Flux<Location.AsObject>): Single<void> {

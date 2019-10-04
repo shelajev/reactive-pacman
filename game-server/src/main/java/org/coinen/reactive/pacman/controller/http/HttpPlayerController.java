@@ -30,12 +30,9 @@ public class HttpPlayerController {
 
     final PlayerService                                   playerService;
     final ConcurrentMap<UUID, UnicastProcessor<Location>> locationDirectProcessors;
-    final MeterRegistry                                   registry;
 
-    public HttpPlayerController(PlayerService playerService,
-        @Qualifier("http") MeterRegistry registry) {
+    public HttpPlayerController(PlayerService playerService) {
         this.playerService = playerService;
-        this.registry = registry;
         this.locationDirectProcessors = new NonBlockingHashMap<>();
     }
 
@@ -67,7 +64,6 @@ public class HttpPlayerController {
         return playerService.players()
                             .map(e -> Arrays.toString(e.toByteArray()))
                             .onBackpressureDrop()
-                            .transform(Metrics.<String>timed(registry, "http.server", "service", org.coinen.pacman.PlayerService.SERVICE, "method", org.coinen.pacman.PlayerService.METHOD_PLAYERS))
                             .subscriberContext(Context.of("uuid", UUID.fromString(uuid)));
     }
 }

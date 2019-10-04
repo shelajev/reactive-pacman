@@ -3,14 +3,12 @@ import {Single} from "rsocket-flowable";
 import {Location, Player, Point} from "game-idl";
 import PlayerService from "../PlayerService";
 import {Disposable} from "reactor-core-js";
-import {IMeterRegistry} from "rsocket-rpc-metrics";
 
 export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
     private readonly sharedPlayersStream: DirectProcessor<Player.AsObject>;
 
-    constructor(private readonly socket: SocketIOClient.Socket, meterRegistry: IMeterRegistry) {
-        // this.service = new RSocketRPCServices.PlayerServiceClient(rSocket, undefined, meterRegistry);
+    constructor(private readonly socket: SocketIOClient.Socket) {
         this.sharedPlayersStream = new DirectProcessor<Player.AsObject>();
         socket.on("players", (data: ArrayBuffer) => {
             if (data && data.byteLength) {
@@ -53,13 +51,6 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
     }
 
     players(): Flux<Player.AsObject> {
-        // if (!this.sharedPlayersStream) {
-        //     this.sharedPlayersStream = new DirectProcessor();
-        //     Flux.from<Player>(FlowableAdapter.wrap(this.service.players(new Empty()) as any))
-        //         .map(player => player.toObject())
-        //         .subscribe(this.sharedPlayersStream);
-        // }
-        
         return this.sharedPlayersStream;
     }
 }

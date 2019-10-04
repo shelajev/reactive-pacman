@@ -27,7 +27,7 @@
     "jquery": "^3.4.1",
     "phaser": "^3.18.1",
     "google-protobuf": "^3.9.0",
-    "grpc-web": "^1.0.5",
+    "grpc-web": "^1.0.6",
     "reactor-core-js": "^0.5.0",
     "rsocket-flowable": "^0.0.10",
     "rsocket-rpc-core": "^0.0.5-0",

@@ -20,12 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/http")
 public class HttpExtrasController {
     final ExtrasService extrasService;
-    final MeterRegistry registry;
 
-    public HttpExtrasController(ExtrasService service,
-        @Qualifier("http") MeterRegistry registry) {
+    public HttpExtrasController(ExtrasService service) {
         extrasService = service;
-        this.registry = registry;
     }
 
     @GetMapping("/extras")
@@ -34,7 +31,6 @@ public class HttpExtrasController {
         return extrasService.extras()
                             .map(e -> Arrays.toString(e.toByteArray()))
                             .onBackpressureBuffer()
-                            .transform(Metrics.<String>timed(registry, "http.server", "service", org.coinen.pacman.ExtrasService.SERVICE, "method", org.coinen.pacman.ExtrasService.METHOD_EXTRAS))
                             .subscriberContext(Context.of("uuid", uuid));
     }
 }

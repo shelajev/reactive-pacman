@@ -37,7 +37,7 @@ public class DefaultPlayerService implements PlayerService {
     final FastThreadLocal<Collection<Player>> playersThreadLocal =
         new FastThreadLocal<>() {
             @Override
-            protected Collection<Player> initialValue() throws Exception {
+            protected Collection<Player> initialValue() {
                 return playerRepository.findAll();
             }
         };
@@ -85,13 +85,13 @@ public class DefaultPlayerService implements PlayerService {
                                                   .setTimestamp(time.toEpochMilli())
                                                   .setState(Player.State.ACTIVE)
                                                   .setLocation(location);
-                        var position = location.getPosition();
-                        var isPowerActive = powerRepository.isPowerUp();
-                        var isGhostPlayer = player.getType().equals(Player.Type.GHOST);
-                        var isPacManPlayer = player.getType().equals(Player.Type.PACMAN);
+                        final var position = location.getPosition();
+                        final var isPowerActive = powerRepository.isPowerUp();
+                        final var isGhostPlayer = player.getType().equals(Player.Type.GHOST);
+                        final var isPacManPlayer = player.getType().equals(Player.Type.PACMAN);
+                        final var playerCollection = playersThreadLocal.get();
 
                         if ((isPowerActive && isGhostPlayer) || (!isPowerActive && isPacManPlayer)) {
-                            Collection<Player> playerCollection = playersThreadLocal.get();
                             for (var otherPlayer : playerCollection) {
                                 var isActivePlayer = otherPlayer.getState()
                                                                 .equals(Player.State.ACTIVE);
@@ -118,7 +118,6 @@ public class DefaultPlayerService implements PlayerService {
                             }
                         }
                         else {
-                            var playerCollection = playersThreadLocal.get();
                             var totalScore = 0;
 
                             for (var otherPlayer : playerCollection) {
@@ -196,25 +195,24 @@ public class DefaultPlayerService implements PlayerService {
                 var score = 0;
                 var playerType = generatePlayerType();
                 var playerPosition = findBestStartingPosition(playerType);
-                return Player.newBuilder()
-                             .setLocation(Location.newBuilder()
-                                                  .setDirection(Direction.RIGHT)
-                                                  .setPosition(playerPosition.toBuilder()
-                                                  .setX(playerPosition.getX() * 100)
-                                                  .setY(playerPosition.getY() * 100)))
-                             .setNickname(nickname)
-                             .setState(Player.State.CONNECTED)
-                             .setScore(score)
-                             .setType(playerType)
-                             .setUuid(uuid.toString())
-                             .setTimestamp(Instant.now().toEpochMilli())
-                             .build();
-            }))
-            .doAfterSuccessOrError((player, t) -> {
-                if (player != null) {
-                    playersSink.next(player);
-                }
-            });
+                var player = Player.newBuilder()
+                        .setLocation(Location.newBuilder()
+                                .setDirection(Direction.RIGHT)
+                                .setPosition(playerPosition.toBuilder()
+                                        .setX(playerPosition.getX() * 100)
+                                        .setY(playerPosition.getY() * 100)))
+                        .setNickname(nickname)
+                        .setState(Player.State.CONNECTED)
+                        .setScore(score)
+                        .setType(playerType)
+                        .setUuid(uuid.toString())
+                        .setTimestamp(Instant.now().toEpochMilli())
+                        .build();
+
+                playersSink.next(player);
+
+                return player;
+            }));
     }
 
     @Override
