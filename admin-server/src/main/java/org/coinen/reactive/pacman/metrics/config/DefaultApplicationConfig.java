@@ -35,7 +35,7 @@ public class DefaultApplicationConfig {
                         .connect()
                         .acceptor(r ->
                             new RequestHandlingRSocket(
-                                new MapServiceServer((message, metadata) -> Mono.empty(), Optional.empty(), Optional.empty())
+                                new MapServiceServer((message, metadata) -> Mono.empty(), Optional.empty(), Optional.empty(), Optional.empty())
                             )
                         )
                         .transport(WebsocketClientTransport.create("dinoman.netifi.com", 3000))
