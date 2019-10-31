@@ -4,7 +4,6 @@ import {RpcClient} from 'rsocket-rpc-core';
 import {BufferEncoders} from 'rsocket-core';
 import {ReactiveSocket} from 'rsocket-types';
 import {Map, RSocketRPCServices} from 'game-idl';
-import {ReactiveMetricsRegistry} from 'metrics-client';
 import {GameScene} from './Game';
 import Menu from './menu';
 import {CompassScene} from './Compass';
@@ -42,7 +41,6 @@ export class Boot extends Scene {
         const urlParams = new URLSearchParams(window.location.search);
         const type = urlParams.get('type') || "rsocket";
         if (type === "rsocket") {
-            const meterRegistry: ReactiveMetricsRegistry = new ReactiveMetricsRegistry();
 
             let rSocket: ReactiveSocket<any, any>;
             const clientSupplier = () => new RpcClient({

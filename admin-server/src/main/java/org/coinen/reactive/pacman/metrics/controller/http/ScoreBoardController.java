@@ -5,11 +5,7 @@ import java.util.Map;
 
 import org.coinen.reactive.pacman.metrics.service.ScoreBoardService;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/")
@@ -19,6 +15,13 @@ public class ScoreBoardController {
 
     public ScoreBoardController(ScoreBoardService service) {
         this.scoreBoardService = service;
+    }
+
+
+    @PostMapping("/score/reset")
+    @CrossOrigin(origins = "*", methods = RequestMethod.POST, allowedHeaders = "*", allowCredentials = "true")
+    public void resetScore() {
+        scoreBoardService.reset();
     }
 
     @GetMapping("/score")

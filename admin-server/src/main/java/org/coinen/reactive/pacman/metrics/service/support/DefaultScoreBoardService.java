@@ -1,10 +1,11 @@
 package org.coinen.reactive.pacman.metrics.service.support;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.google.protobuf.Empty;
 import org.coinen.pacman.Player;
@@ -14,16 +15,22 @@ import reactor.core.publisher.BaseSubscriber;
 
 public class DefaultScoreBoardService extends BaseSubscriber<Player> implements ScoreBoardService {
 
-
     final Map<String, Integer> lastScoreStatistic;
     final Map<String, Integer> scoreBoard;
 
     public DefaultScoreBoardService(PlayerServiceClient playerServiceClient) {
-        lastScoreStatistic = new HashMap<>();
-        scoreBoard = new HashMap<>();
+        lastScoreStatistic = new ConcurrentHashMap<>();
+        scoreBoard = new ConcurrentHashMap<>();
 
         playerServiceClient.players(Empty.getDefaultInstance())
+                           .retryBackoff(Long.MAX_VALUE, Duration.ofSeconds(1), Duration.ofSeconds(5))
                            .subscribe(this);
+    }
+
+    @Override
+    public void reset() {
+        scoreBoard.clear();
+        lastScoreStatistic.clear();
     }
 
     @Override

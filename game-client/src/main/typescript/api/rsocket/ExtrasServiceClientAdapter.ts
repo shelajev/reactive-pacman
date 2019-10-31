@@ -15,7 +15,7 @@ export default class ExtrasServiceClientAdapter implements ExtrasService {
     }
 
     extras(): Flux<Extra.AsObject> {
-        return Flux.from<Extra>(FlowableAdapter.wrap(this.service.extras(new Empty()) as any))
+        return Flux.from<Extra>(FlowableAdapter.wrap(this.service.extras(new Empty() as any) as any))
             .map(extra => extra.toObject());
     }
 }

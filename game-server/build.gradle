@@ -4,8 +4,6 @@ apply plugin: 'com.bmuschko.docker-spring-boot-application'
 dependencies {
 
   implementation project(':game-idl')
-  implementation project(':metrics-idl')
-  implementation project(':metrics-client')
   implementation 'com.corundumstudio.socketio:netty-socketio'
   implementation 'io.socket:socket.io-client'
   implementation 'io.grpc:grpc-stub'

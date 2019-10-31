@@ -1,10 +1,7 @@
 {
   "packages": [
     "game-idl",
-    "game-client",
-    "game-server",
-    "metrics-idl",
-    "metrics-client"
+    "game-client"
   ],
   "version": "0.0.1"
 }
