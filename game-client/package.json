@@ -12,8 +12,6 @@
   "license": "ISC",
   "dependencies": {
     "game-idl": "^0.0.1",
-    "metrics-idl": "^0.0.1",
-    "metrics-client": "^0.0.1",
     "@types/rsocket-types": "^0.0.2",
     "@types/rsocket-core": "^0.0.5",
     "@types/rsocket-flowable": "^0.0.5",

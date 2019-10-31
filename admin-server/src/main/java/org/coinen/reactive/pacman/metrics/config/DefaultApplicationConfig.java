@@ -1,5 +1,9 @@
 package org.coinen.reactive.pacman.metrics.config;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.URI;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -14,6 +18,7 @@ import org.coinen.pacman.MapServiceServer;
 import org.coinen.pacman.PlayerServiceClient;
 import org.coinen.reactive.pacman.metrics.config.support.ReconnectingRSocket;
 import org.coinen.reactive.pacman.metrics.service.support.DefaultScoreBoardService;
+import org.springframework.beans.factory.annotation.Value;
 import reactor.core.publisher.Mono;
 
 import org.springframework.context.annotation.Bean;
@@ -21,6 +26,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DefaultApplicationConfig {
+
+    @Value("${game.server.address}")
+    URI gameServerAddress;
 
     @Bean
     public DefaultScoreBoardService scoreBoardService(
@@ -38,7 +46,7 @@ public class DefaultApplicationConfig {
                                 new MapServiceServer((message, metadata) -> Mono.empty(), Optional.empty(), Optional.empty(), Optional.empty())
                             )
                         )
-                        .transport(WebsocketClientTransport.create("dinoman.netifi.com", 3000))
+                        .transport(WebsocketClientTransport.create(gameServerAddress))
                         ::start
                 )
                 .build();

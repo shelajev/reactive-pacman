@@ -51,7 +51,7 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
     players(): Flux<Player.AsObject> {
         if (!this.sharedPlayersStream) {
             this.sharedPlayersStream = new DirectProcessor();
-            Flux.from<Player>(FlowableAdapter.wrap(this.service.players(new Empty()) as any))
+            Flux.from<Player>(FlowableAdapter.wrap(this.service.players(new Empty() as any) as any))
                 .map(player => player.toObject())
                 .subscribe(this.sharedPlayersStream);
         }

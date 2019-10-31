@@ -21,7 +21,7 @@ export default class SetupServiceClientAdapter {
             const myId = uuid.v4();
             localStorage.setItem("uuid", myId)
             subject.onSubscribe(() => stream.cancel());
-            stream = this.service.get(new Empty(), {"uuid": myId}, (err, response) => {
+            stream = this.service.get((new Empty() as any), {"uuid": myId}, (err, response) => {
                 if (err) {
                     subject.onError(new Error(`An Grpc Error was thrown. Code: [${err.code}]. Message: ${err.message}`));
                     return;

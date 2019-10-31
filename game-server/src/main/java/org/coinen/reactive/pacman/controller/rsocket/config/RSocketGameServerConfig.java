@@ -35,19 +35,19 @@ public class RSocketGameServerConfig {
     public ExtrasServiceServer extrasServiceServer(
         ExtrasService extrasService
     ) {
-        return new ExtrasServiceServer(new ExtrasController(extrasService), Optional.empty(), Optional.empty());
+        return new ExtrasServiceServer(new ExtrasController(extrasService), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     @Bean
     public GameServiceServer gameServiceServer(
         GameService gameService
     ) {
-        return new GameServiceServer(new GameController(gameService), Optional.empty(), Optional.empty());
+        return new GameServiceServer(new GameController(gameService), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     @Bean
     public PlayerServiceServer playerServiceServer(PlayerService playerService) {
-        return new PlayerServiceServer(new PlayerController(playerService), Optional.empty(), Optional.empty());
+        return new PlayerServiceServer(new PlayerController(playerService), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
     @Bean

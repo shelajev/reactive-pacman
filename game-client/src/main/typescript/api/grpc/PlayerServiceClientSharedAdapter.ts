@@ -58,9 +58,9 @@ export default class PlayerServiceClientSharedAdapter implements PlayerService {
 
     players(): Flux<Player.AsObject> {
         if (!this.sharedPlayersStream) {
-            this.sharedPlayersStream = new DirectProcessor()
+            this.sharedPlayersStream = new DirectProcessor();
             Flux.from<Player>(FlowableAdapter.wrap(new Flowable(subscriber => {
-                    const clientReadableStream = this.service.players(new Empty(), {"uuid": localStorage.getItem("uuid")});
+                    const clientReadableStream = this.service.players((new Empty() as any), {"uuid": localStorage.getItem("uuid")});
 
                     subscriber.onSubscribe({
                         request: (): void => {},
