@@ -34,9 +34,10 @@ subprojects {
 
 		dependencies {
 
-			dependencySet (group: 'io.rsocket', version: '0.12.2-RC3-SNAPSHOT-TEST') {
+			dependencySet (group: 'io.rsocket', version: '1.0.0-RC5') {
 				entry 'rsocket-core'
 				entry 'rsocket-transport-netty'
+				entry 'rsocket-transport-local'
 			}
 
 			dependencySet (group: 'io.rsocket.rpc', version: '0.2.18') {

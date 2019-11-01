@@ -11,10 +11,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/rsocket-types": "^0.0.1",
+    "@types/rsocket-core": "^0.0.2",
+    "@types/rsocket-flowable": "^0.0.2",
+    "@types/rsocket-websocket-client": "^0.0.1",
     "reactor-core-js": "^0.5.0",
-    "rsocket-flowable": "^0.0.10",
-    "rsocket-types": "^0.0.10",
-    "rsocket-websocket-client": "0.0.10"
+    "rsocket-flowable": "^0.0.14",
+    "rsocket-types": "^0.0.16",
+    "rsocket-websocket-client": "0.0.16"
   },
   "devDependencies": {
     "async": "^3.1.0",
@@ -25,7 +29,7 @@
     "livereload": "^0.8.0",
     "style-loader": "^0.23.1",
     "ts-loader": "^6.0.4",
-    "typescript": "^3.5.3",
+    "typescript": "^3.6.4",
     "webpack": "^4.37.0",
     "webpack-cli": "^3.3.6",
     "webpack-dev-server": "^3.7.2"
