@@ -167,19 +167,33 @@ public class DefaultMapService implements MapService {
 
     static List<Tile> generateTiles(Integer[][] data, int width, int height, int offset) {
         List<TileInner> tiles = new ArrayList<>();
-        for (var i = 0; i < data.length - 1; i++) {
-            for (var j = 0; j < data[i].length - 1; j++) {
+        for (var i = 0; i < data.length; i++) {
+            for (var j = 0; j < data[i].length; j++) {
                 var walls = new Boolean[] {false, false, false, false};
-                if (data[i][j].equals(data[i + 1][j]) && data[i][j] != null && data[i + 1][j] != null) {
+                if (i < data.length - 1) {
+                    if (data[i][j].equals(data[i + 1][j]) && data[i][j] != null && data[i + 1][j] != null) {
+                        walls[0] = true;
+                    }
+                } else {
                     walls[0] = true;
                 }
-                if (data[i][j].equals(data[i][j + 1]) && data[i][j] != null && data[i][j + 1] != null) {
+                if (j < data.length - 1) {
+                    if (data[i][j].equals(data[i][j + 1]) && data[i][j] != null && data[i][j + 1] != null) {
+                        walls[1] = true;
+                    }
+                } else {
                     walls[1] = true;
                 }
-                if (data[i][j + 1].equals(data[i + 1][j + 1]) && data[i][j + 1] != null && data[i + 1][j + 1] != null) {
+                if (j < data.length - 1 && i < data.length - 1) {
+                    if (data[i][j + 1].equals(data[i + 1][j + 1]) && data[i][j + 1] != null && data[i + 1][j + 1] != null) {
+                        walls[2] = true;
+                    }
+
+                    if (data[i + 1][j].equals(data[i + 1][j + 1]) && data[i + 1][j] != null && data[i + 1][j + 1] != null) {
+                        walls[3] = true;
+                    }
+                } else {
                     walls[2] = true;
-                }
-                if (data[i + 1][j].equals(data[i + 1][j + 1]) && data[i + 1][j] != null && data[i + 1][j + 1] != null) {
                     walls[3] = true;
                 }
                 var tile = new TileInner();

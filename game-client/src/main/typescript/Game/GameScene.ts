@@ -112,15 +112,15 @@ export default class GameScene extends Phaser.Scene {
         setInterval(() => {
             const { players } = this.state;
 
-            Object.keys(players).forEach(uuid => {
-                const player = players[uuid];
-
-                if (Date.now() - player.timestamp > 10000) {
-                    player.state = Player.State.DISCONNECTED;
-                    delete players[uuid];
-                    (config.playerService.players() as DirectProcessor<Player.AsObject>).onNext(player);
-                }
-            });
+            // Object.keys(players).forEach(uuid => {
+            //     const player = players[uuid];
+            //
+            //     if (Date.now() - player.timestamp > 10000) {
+            //         player.state = Player.State.DISCONNECTED;
+            //         delete players[uuid];
+            //         (config.playerService.players() as DirectProcessor<Player.AsObject>).onNext(player);
+            //     }
+            // });
         }, 5000);
 
         this.managers = [

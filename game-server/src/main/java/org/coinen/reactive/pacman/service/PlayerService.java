@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 public interface PlayerService {
 
-    Mono<Player> createPlayer(String nickname);
+    Mono<Player> createPlayer(String nickname, Player.Type type);
 
     Mono<Void> disconnectPlayer();
 

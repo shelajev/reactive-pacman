@@ -3,8 +3,11 @@ package org.coinen.reactive.pacman.controller.rsocket;
 import io.netty.buffer.ByteBuf;
 import org.coinen.pacman.Config;
 import org.coinen.pacman.Nickname;
+import org.coinen.pacman.Player;
 import org.coinen.reactive.pacman.service.GameService;
 import reactor.core.publisher.Mono;
+
+import java.nio.charset.Charset;
 
 public class GameController implements org.coinen.pacman.GameService {
 
@@ -16,7 +19,7 @@ public class GameController implements org.coinen.pacman.GameService {
 
     @Override
     public Mono<Config> start(Nickname message, ByteBuf metadata) {
-        return gameService.start(message);
+        return gameService.start(message, Player.Type.valueOf(metadata.toString(Charset.defaultCharset()).toUpperCase()));
     }
 
 }

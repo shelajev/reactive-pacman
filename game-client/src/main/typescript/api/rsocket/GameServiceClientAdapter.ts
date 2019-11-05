@@ -18,7 +18,7 @@ export default class GameServiceClientAdapter implements GameService {
 
         nicknameProto.setValue(value);
 
-        return this.service.start(nicknameProto)
+        return this.service.start(nicknameProto, Buffer.from("ghost"))
             .map((c: Config) => c.toObject());
     }
 }

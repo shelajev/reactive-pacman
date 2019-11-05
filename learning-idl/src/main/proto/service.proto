@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package org.coinen.pacman;
+
+import "google/protobuf/empty.proto";
+import "rsocket/options.proto";
+
+option java_package = "org.coinen.pacman.learning";
+option java_multiple_files = true;
+
+service LearningService {
+    rpc Study(stream CaseStudy) returns (stream StudyAggregate) {}
+}
+
+message StudyAggregate {
+    repeated CaseStudy studies = 1;
+}
+
+message CaseStudy {
+    GameState gameState = 1;
+    QualityState qualityState = 2;
+}
+
+message QualityState {
+    float f1 = 1;
+    float f2 = 2;
+    float f3 = 3;
+    float f4 = 4;
+}
+
+message GameState {
+    int32 pillUp = 1;
+    int32 pillDown = 2;
+    int32 pillRight = 3;
+    int32 pillLeft = 4;
+    int32 powerPillUp = 5;
+    int32 powerPillDown = 6;
+    int32 powerPillRight = 7;
+    int32 powerPillLeft = 8;
+    int32 ghostUp = 9;
+    int32 ghostDown = 10;
+    int32 ghostRight = 11;
+    int32 ghostLeft = 12;
+    int32 edibleGhostUp = 13;
+    int32 edibleGhostDown = 14;
+    int32 edibleGhostRight = 15;
+    int32 edibleGhostLeft = 16;
+    int32 intersectionUp = 17;
+    int32 intersectionDown = 18;
+    int32 intersectionRight = 19;
+    int32 intersectionLeft = 20;
+}

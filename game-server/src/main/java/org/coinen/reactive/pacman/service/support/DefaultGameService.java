@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 
 import org.coinen.pacman.Config;
 import org.coinen.pacman.Nickname;
+import org.coinen.pacman.Player;
 import org.coinen.pacman.Score;
 import org.coinen.reactive.pacman.repository.ExtrasRepository;
 import org.coinen.reactive.pacman.repository.PlayerRepository;
@@ -30,7 +31,7 @@ public class DefaultGameService implements GameService {
     }
 
     @Override
-    public Mono<Config> start(Nickname nickname) {
+    public Mono<Config> start(Nickname nickname, Player.Type type) {
 
         if (nickname.getValue()
                     .length() <= 13) {
@@ -41,7 +42,7 @@ public class DefaultGameService implements GameService {
             }
 
             return playerService
-                .createPlayer(name)
+                .createPlayer(name, type)
                 .map(player -> Config.newBuilder()
                                      .setPlayer(player)
                                      .addAllPlayers(
