@@ -6,6 +6,7 @@ dependencies {
     implementation 'com.google.protobuf:protobuf-java'
     implementation 'com.google.protobuf:protobuf-java-util'
     implementation 'io.grpc:grpc-protobuf'
+    implementation 'io.rsocket.rpc:rsocket-ipc-core'
     implementation 'io.rsocket.rpc:rsocket-rpc-core'
 	implementation "com.salesforce.servicelibs:reactor-grpc-stub"
 	

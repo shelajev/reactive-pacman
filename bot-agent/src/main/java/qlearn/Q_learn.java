@@ -1,24 +1,20 @@
 package qlearn;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.lang.*;
-import java.util.concurrent.CountDownLatch;
 
-import game.PacManSimulator;
-import game.controllers.Direction;
-import game.controllers.pacman.PacManAction;
-import game.controllers.pacman.PacManHijackController;
-import game.core.G;
-import game.core.Game;
-import game.core.GameState;
+import org.coinen.reactive.pacman.agent.controllers.pacman.PacManAction;
+import org.coinen.reactive.pacman.agent.core.G;
+import org.coinen.reactive.pacman.agent.core.Game;
+import org.coinen.reactive.pacman.agent.model.GameState;
 import org.coinen.pacman.learning.CaseStudy;
 import org.coinen.pacman.learning.QualityState;
+import org.coinen.reactive.pacman.agent.model.Knowledge;
+import org.coinen.reactive.pacman.agent.model.Outcome;
+import org.coinen.reactive.pacman.agent.service.utils.GameUtils;
 import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.FluxProcessor;
 
@@ -61,7 +57,7 @@ public class Q_learn {
     public static final int MAX_CASES = Integer.MAX_VALUE;                                                // Max. number of cases allowed in case base
     public static final int CASES_TO_DELETE = 10000;                                                    // Number of cases to delete when case base is full.
     public static final float newCaseThreshold = 0.025f;                                                // Case threshold used to distinguish two cases.
-    public static final int MAX_MAP_DISTANCE = GameState.DISCRETE_FAR;
+    public static final int MAX_MAP_DISTANCE = GameUtils.DISCRETE_FAR;
     public static final int MAX_STATE_DISTANCE = 4;
     public static float currSimilarity = 0;
     public static float comp = MAX_STATE_DISTANCE;
@@ -201,11 +197,11 @@ public class Q_learn {
 //
 //            System.out.println("Finished calculation");
             prevAction = game.getPossiblePacManDirs(true)[0];
-            initState = new GameState(0, GameState.getNextPill(game, Game.UP), GameState.getNextPill(game, Game.RIGHT), GameState.getNextPill(game, Game.DOWN), GameState.getNextPill(game, Game.LEFT),
-                    GameState.getNextGhost(game, Game.UP), GameState.getNextGhost(game, Game.RIGHT), GameState.getNextGhost(game, Game.DOWN), GameState.getNextGhost(game, Game.LEFT),
-                    GameState.getNextPowerPill(game, Game.UP), GameState.getNextPowerPill(game, Game.RIGHT), GameState.getNextPowerPill(game, Game.DOWN), GameState.getNextPowerPill(game, Game.LEFT),
-                    GameState.getNextEdibleGhost(game, Game.UP), GameState.getNextEdibleGhost(game, Game.RIGHT), GameState.getNextEdibleGhost(game, Game.DOWN), GameState.getNextEdibleGhost(game, Game.LEFT),
-                    GameState.getNextIntersection(game, Game.UP), GameState.getNextIntersection(game, Game.RIGHT), GameState.getNextIntersection(game, Game.DOWN), GameState.getNextIntersection(game, Game.LEFT));
+            initState = new GameState(0, GameUtils.getNextPill(game, Game.UP), GameUtils.getNextPill(game, Game.RIGHT), GameUtils.getNextPill(game, Game.DOWN), GameUtils.getNextPill(game, Game.LEFT),
+                    GameUtils.getNextGhost(game, Game.UP), GameUtils.getNextGhost(game, Game.RIGHT), GameUtils.getNextGhost(game, Game.DOWN), GameUtils.getNextGhost(game, Game.LEFT),
+                    GameUtils.getNextPowerPill(game, Game.UP), GameUtils.getNextPowerPill(game, Game.RIGHT), GameUtils.getNextPowerPill(game, Game.DOWN), GameUtils.getNextPowerPill(game, Game.LEFT),
+                    GameUtils.getNextEdibleGhost(game, Game.UP), GameUtils.getNextEdibleGhost(game, Game.RIGHT), GameUtils.getNextEdibleGhost(game, Game.DOWN), GameUtils.getNextEdibleGhost(game, Game.LEFT),
+                    GameUtils.getNextIntersection(game, Game.UP), GameUtils.getNextIntersection(game, Game.RIGHT), GameUtils.getNextIntersection(game, Game.DOWN), GameUtils.getNextIntersection(game, Game.LEFT));
 
 
 			/*
@@ -257,11 +253,11 @@ public class Q_learn {
 				GameState.getClosestPillDir(game), GameState.getClosestGhostDir(game),GameState.getClosestPowerPillDir(game),GameState.getClosestEdibleGhostDir(game));*/
 
 
-        nextState = new GameState(-1, GameState.getNextPill(game, Game.UP), GameState.getNextPill(game, Game.RIGHT), GameState.getNextPill(game, Game.DOWN), GameState.getNextPill(game, Game.LEFT),
-                GameState.getNextGhost(game, Game.UP), GameState.getNextGhost(game, Game.RIGHT), GameState.getNextGhost(game, Game.DOWN), GameState.getNextGhost(game, Game.LEFT),
-                GameState.getNextPowerPill(game, Game.UP), GameState.getNextPowerPill(game, Game.RIGHT), GameState.getNextPowerPill(game, Game.DOWN), GameState.getNextPowerPill(game, Game.LEFT),
-                GameState.getNextEdibleGhost(game, Game.UP), GameState.getNextEdibleGhost(game, Game.RIGHT), GameState.getNextEdibleGhost(game, Game.DOWN), GameState.getNextEdibleGhost(game, Game.LEFT),
-                GameState.getNextIntersection(game, Game.UP), GameState.getNextIntersection(game, Game.RIGHT), GameState.getNextIntersection(game, Game.DOWN), GameState.getNextIntersection(game, Game.LEFT));
+        nextState = new GameState(-1, GameUtils.getNextPill(game, Game.UP), GameUtils.getNextPill(game, Game.RIGHT), GameUtils.getNextPill(game, Game.DOWN), GameUtils.getNextPill(game, Game.LEFT),
+                GameUtils.getNextGhost(game, Game.UP), GameUtils.getNextGhost(game, Game.RIGHT), GameUtils.getNextGhost(game, Game.DOWN), GameUtils.getNextGhost(game, Game.LEFT),
+                GameUtils.getNextPowerPill(game, Game.UP), GameUtils.getNextPowerPill(game, Game.RIGHT), GameUtils.getNextPowerPill(game, Game.DOWN), GameUtils.getNextPowerPill(game, Game.LEFT),
+                GameUtils.getNextEdibleGhost(game, Game.UP), GameUtils.getNextEdibleGhost(game, Game.RIGHT), GameUtils.getNextEdibleGhost(game, Game.DOWN), GameUtils.getNextEdibleGhost(game, Game.LEFT),
+                GameUtils.getNextIntersection(game, Game.UP), GameUtils.getNextIntersection(game, Game.RIGHT), GameUtils.getNextIntersection(game, Game.DOWN), GameUtils.getNextIntersection(game, Game.LEFT));
 		
 		/*
 		nextState = new GameState(-1, GameState.getNextPill(game,Game.UP), GameState.getNextPill(game,Game.RIGHT),GameState.getNextPill(game,Game.DOWN),GameState.getNextPill(game,Game.LEFT),
@@ -282,10 +278,10 @@ public class Q_learn {
         if (/*compareCases(currState, nextState) > 0*/normalizedDistance(compareCases(currState, nextState)) > newCaseThreshold) {    // If agent is in a different case than in previous step
             if (S.size() <= 500) {
                 //index = indexOf(nextState);	 		// This search is for RL algorithms
-                index = searchCase(game, nextState);    // This search is for CBR/RL algorithms
+                index = searchCase(nextState);    // This search is for CBR/RL algorithms
             } else {
                 try {
-                    index = searchCaseWithThreads(game, nextState);
+                    index = searchCaseWithThreads(nextState);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -345,7 +341,6 @@ public class Q_learn {
             }
         } else {
             nextState.index = currState.index;
-
         }
 
 
@@ -426,6 +421,10 @@ public class Q_learn {
         return Collections.max(currQ.get(index));
     }
 
+    public static float maxQRow(org.coinen.reactive.pacman.agent.model.CaseStudy caseStudy) {
+        return Math.max(Math.max(Math.max(caseStudy.q1, caseStudy.q2), caseStudy.q3), caseStudy.q4);
+    }
+
     // Returns the index of maximum value in 'index'th row of Q matrix
     public static int maxQRowIndex(int index) {
         if (max(Q.get(index).get(0), Q.get(index).get(1), Q.get(index).get(2), Q.get(index).get(3)) == Q.get(index).get(0)) {
@@ -468,6 +467,60 @@ public class Q_learn {
         }
 
         return res;
+    }
+
+    /*
+     * Returns i such as Q[index,i] is the maximum value in that row and i is in directions[].
+     *
+     * @directions: Possible directions for PacMan
+     * @index: State index
+     *
+     * */
+    public static int maxQRowDirIndex(int[] directions, Knowledge outcome) {
+        var caseStudy = outcome.caseStudy;
+        float max = resolveWeightFromCaseStudy(caseStudy, directions[0]);
+        int bestDirection = directions[0];
+
+        for (int i = 1; i < directions.length; i++) {
+            int possibleBestDirection = directions[i];
+            float possibleMax = resolveWeightFromCaseStudy(caseStudy, possibleBestDirection);
+            if (possibleMax > max) {
+                max = possibleMax;
+                bestDirection = possibleBestDirection;
+            }
+        }
+
+        return bestDirection;
+    }
+
+    public static float resolveWeightFromCaseStudy(org.coinen.reactive.pacman.agent.model.CaseStudy caseStudy, int direction) {
+        switch (direction) {
+            case 0:
+                return caseStudy.q1;
+            case 1:
+                return caseStudy.q2;
+            case 2:
+                return caseStudy.q3;
+            case 3:
+                return caseStudy.q4;
+        }
+
+        throw new IllegalArgumentException("Unsupported Direction");
+    }
+
+    public static org.coinen.reactive.pacman.agent.model.CaseStudy updateWeightForCaseStudy(org.coinen.reactive.pacman.agent.model.CaseStudy caseStudy, int direction, float weight) {
+        switch (direction) {
+            case 0:
+                return new org.coinen.reactive.pacman.agent.model.CaseStudy(weight, caseStudy.q2, caseStudy.q3, caseStudy.q4);
+            case 1:
+                return new org.coinen.reactive.pacman.agent.model.CaseStudy(caseStudy.q1, weight, caseStudy.q3, caseStudy.q4);
+            case 2:
+                return new org.coinen.reactive.pacman.agent.model.CaseStudy(caseStudy.q1, caseStudy.q2, weight, caseStudy.q4);
+            case 3:
+                return new org.coinen.reactive.pacman.agent.model.CaseStudy(caseStudy.q1, caseStudy.q2, caseStudy.q3, weight);
+        }
+
+        throw new IllegalArgumentException("Unsupported Direction");
     }
 
     /*
@@ -522,7 +575,7 @@ public class Q_learn {
     /*
      * Returns index of most similar case to case s given, as long as it's close enough, depending on the threshold.
      * */
-    public static int searchCase(Game game, GameState s) {
+    public static int searchCase(GameState s) {
         int result = -1;
         comp = Q_learn.MAX_STATE_DISTANCE;
         currBest = Q_learn.MAX_STATE_DISTANCE;
@@ -553,7 +606,7 @@ public class Q_learn {
      * Multithreaded search of similar cases in casebase. Returns most similar case if it is close enough.
      * Otherwise it returns -1.
      * */
-    public static int searchCaseWithThreads(Game game, GameState s) throws InterruptedException {
+    public static int searchCaseWithThreads(GameState s) throws InterruptedException {
 
         int result;
         comp = Q_learn.MAX_STATE_DISTANCE;
@@ -651,7 +704,7 @@ public class Q_learn {
 
 
     public static void correctIndexes() {
-        for (int i = 0; i < S.size(); i++) S.get(i).index = i;
+//        for (int i = 0; i < S.size(); i++) S.get(i).index = i;
     }
 
 
@@ -777,14 +830,14 @@ public class Q_learn {
     public static boolean closeGhost() {
 
 
-        if ((currState.ghostUp == GameState.DISCRETE_VERY_CLOSE) || (currState.ghostUp == GameState.DISCRETE_CLOSE) ||
-                (currState.ghostRight == GameState.DISCRETE_VERY_CLOSE) || (currState.ghostRight == GameState.DISCRETE_CLOSE) ||
-                (currState.ghostDown == GameState.DISCRETE_VERY_CLOSE) || (currState.ghostDown == GameState.DISCRETE_CLOSE) ||
-                (currState.ghostLeft == GameState.DISCRETE_VERY_CLOSE) || (currState.ghostLeft == GameState.DISCRETE_CLOSE)/* ||
-				(currState.edibleGhostUp <= GameState.DISCRETE_VERY_CLOSE && currState.edibleGhostUp >= 0) || 
-				(currState.edibleGhostRight <= GameState.DISCRETE_VERY_CLOSE && currState.edibleGhostRight >= 0) || 
-				(currState.edibleGhostDown <= GameState.DISCRETE_VERY_CLOSE && currState.edibleGhostDown >= 0) ||
-				(currState.edibleGhostLeft <= GameState.DISCRETE_VERY_CLOSE && currState.edibleGhostLeft >= 0)*/)
+        if ((currState.ghostUp == GameUtils.DISCRETE_VERY_CLOSE) || (currState.ghostUp == GameUtils.DISCRETE_CLOSE) ||
+                (currState.ghostRight == GameUtils.DISCRETE_VERY_CLOSE) || (currState.ghostRight == GameUtils.DISCRETE_CLOSE) ||
+                (currState.ghostDown == GameUtils.DISCRETE_VERY_CLOSE) || (currState.ghostDown == GameUtils.DISCRETE_CLOSE) ||
+                (currState.ghostLeft == GameUtils.DISCRETE_VERY_CLOSE) || (currState.ghostLeft == GameUtils.DISCRETE_CLOSE)/* ||
+				(currState.edibleGhostUp <= GameUtils.DISCRETE_VERY_CLOSE && currState.edibleGhostUp >= 0) || 
+				(currState.edibleGhostRight <= GameUtils.DISCRETE_VERY_CLOSE && currState.edibleGhostRight >= 0) || 
+				(currState.edibleGhostDown <= GameUtils.DISCRETE_VERY_CLOSE && currState.edibleGhostDown >= 0) ||
+				(currState.edibleGhostLeft <= GameUtils.DISCRETE_VERY_CLOSE && currState.edibleGhostLeft >= 0)*/)
             return true;
 
         return false;

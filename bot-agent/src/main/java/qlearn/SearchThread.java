@@ -1,7 +1,6 @@
 package qlearn;
 
-import game.core.Game;
-import game.core.GameState;
+import org.coinen.reactive.pacman.agent.model.GameState;
 import java.lang.*;
 
 public class SearchThread extends Thread {

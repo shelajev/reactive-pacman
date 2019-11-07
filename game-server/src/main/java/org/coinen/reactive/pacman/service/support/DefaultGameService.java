@@ -31,10 +31,10 @@ public class DefaultGameService implements GameService {
     }
 
     @Override
-    public Mono<Config> start(Nickname nickname, Player.Type type) {
+    public Mono<Config> start(Nickname nickname) {
 
         if (nickname.getValue()
-                    .length() <= 13) {
+                    .length() <= 9999) {
             var name = nickname.getValue()
                                .replaceAll("/[^a-zA-Z0-9. ]/g", "");
             if (name.isBlank()) {
@@ -42,7 +42,7 @@ public class DefaultGameService implements GameService {
             }
 
             return playerService
-                .createPlayer(name, type)
+                .createPlayer(name)
                 .map(player -> Config.newBuilder()
                                      .setPlayer(player)
                                      .addAllPlayers(

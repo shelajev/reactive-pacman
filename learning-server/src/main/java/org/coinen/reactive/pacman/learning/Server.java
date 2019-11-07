@@ -7,7 +7,6 @@ import akka.stream.javadsl.AsPublisher;
 import akka.stream.javadsl.Flow;
 import akka.stream.javadsl.Sink;
 import akka.stream.javadsl.Source;
-import io.netty.buffer.ByteBuf;
 import io.rsocket.RSocketFactory;
 import io.rsocket.transport.netty.server.CloseableChannel;
 import io.rsocket.transport.netty.server.TcpServerTransport;

@@ -1,10 +1,9 @@
 package qlearn;
 
-import game.PacManSimulator;
-import game.controllers.pacman.PacManHijackController;
-import game.core.G;
-import game.core.Game;
-import game.core.GameState;
+import org.coinen.reactive.pacman.agent.controllers.pacman.PacManHijackController;
+import org.coinen.reactive.pacman.agent.core.G;
+import org.coinen.reactive.pacman.agent.core.Game;
+import org.coinen.reactive.pacman.agent.model.GameState;
 
 
 /* This class implements the learning agent for PacMan game. It chooses a direction every time it gets to an intersection, and also if it
@@ -12,8 +11,6 @@ import game.core.GameState;
  * */
 public class QLearnDirPacMan extends PacManHijackController {
 
-    public static boolean greedy = false;
-    public static int greedyDir, prevDir;
     GameState lastState = null;
 
     @Override
@@ -39,19 +36,15 @@ public class QLearnDirPacMan extends PacManHijackController {
         Q_learn.reward = 0;
     }
 
-    public static int getAction(Game game, boolean reversal) {
+    public int getAction(Game game, boolean reversal) {
         int[] directions = game.getPossiblePacManDirs(reversal);        //set flag as true to include reversals
         int nextDir;
 
         if (G.rnd.nextFloat() < Q_learn.eps) {                        // Eps. greedy
-            greedy = true;
             nextDir = directions[G.rnd.nextInt(directions.length)];
-            greedyDir = nextDir;
-            prevDir = nextDir;
             //System.out.println("Random move!!  Now greedy direction is: " + greedyDir);
         } else {
             nextDir = Q_learn.maxQRowDirIndex(directions, Q_learn.currState.index);
-            prevDir = nextDir;
         }
 
         return nextDir;

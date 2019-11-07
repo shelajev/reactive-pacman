@@ -33,15 +33,8 @@ subprojects {
 
 		dependencies {
 
-			dependencySet (group: 'io.grpc', version: '1.28.1') {
-				entry 'grpc-stub'
-				entry 'grpc-netty'
-				entry 'grpc-okhttp'
-				entry 'grpc-protobuf'
-				entry 'protoc-gen-grpc-java'
-			}
-
-			dependencySet (group: 'io.rsocket.rpc', version: '0.2.18') {
+			dependencySet (group: 'io.rsocket.rpc', version: '0.2.20-SNAPSHOT') {
+				entry 'rsocket-ipc-core'
 				entry 'rsocket-rpc-core'
 				entry 'rsocket-rpc-protobuf'
 				entry 'rsocket-rpc-protobuf-idl'

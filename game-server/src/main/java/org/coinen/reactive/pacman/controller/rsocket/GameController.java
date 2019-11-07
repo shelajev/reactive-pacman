@@ -19,7 +19,7 @@ public class GameController implements org.coinen.pacman.GameService {
 
     @Override
     public Mono<Config> start(Nickname message, ByteBuf metadata) {
-        return gameService.start(message, Player.Type.valueOf(metadata.toString(Charset.defaultCharset()).toUpperCase()));
+        return gameService.start(message);
     }
 
 }

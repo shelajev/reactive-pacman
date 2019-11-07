@@ -187,14 +187,14 @@ public class DefaultPlayerService implements PlayerService {
     }
 
     @Override
-    public Mono<Player> createPlayer(String nickname, Player.Type type) {
+    public Mono<Player> createPlayer(String nickname) {
         return Mono
             .subscriberContext()
             .map(c -> c.<UUID>get("uuid"))
             .map((uuid) -> playerRepository.save(uuid, () -> {
                 var score = 0;
-//                var playerType = generatePlayerType();
-                var playerPosition = findBestStartingPosition(type);
+                var playerType = generatePlayerType();
+                var playerPosition = findBestStartingPosition(playerType);
                 var player = Player.newBuilder()
                         .setLocation(Location.newBuilder()
                                 .setDirection(Direction.RIGHT)
@@ -204,7 +204,7 @@ public class DefaultPlayerService implements PlayerService {
                         .setNickname(nickname)
                         .setState(Player.State.CONNECTED)
                         .setScore(score)
-                        .setType(type)
+                        .setType(playerType)
                         .setUuid(uuid.toString())
                         .setTimestamp(Instant.now().toEpochMilli())
                         .build();

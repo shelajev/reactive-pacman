@@ -7,5 +7,5 @@ import reactor.core.publisher.Mono;
 
 public interface GameService {
 
-    Mono<Config> start(Nickname nickname, Player.Type playerType);
+    Mono<Config> start(Nickname nickname);
 }
