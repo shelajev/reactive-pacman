@@ -109,7 +109,8 @@ public class _G_ extends G {
             }
         }
 
-        lastPacManDir = getPossiblePacManDirs(true)[0];
+        curPacManLoc = maze.initialPacPosition;
+        lastPacManDir = getPossiblePacManDirs()[0];
         //for replays
         this.sb = new StringBuilder();
     }

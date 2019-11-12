@@ -1,33 +1,41 @@
 package org.coinen.reactive.pacman.agent;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.rsocket.ConnectionSetupPayload;
 import io.rsocket.RSocket;
 import io.rsocket.RSocketFactory;
 import io.rsocket.SocketAcceptor;
 import io.rsocket.frame.decoder.PayloadDecoder;
+import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.transport.netty.client.WebsocketClientTransport;
-import org.coinen.pacman.ExtrasServiceClient;
-import org.coinen.pacman.GameServiceClient;
-import org.coinen.pacman.MapServiceServer;
-import org.coinen.pacman.PlayerServiceClient;
+import org.coinen.pacman.*;
+import org.coinen.pacman.learning.KnowledgeService;
+import org.coinen.pacman.learning.KnowledgeServiceClient;
 import org.coinen.reactive.pacman.agent.core.G;
 import org.coinen.reactive.pacman.agent.core._G_;
 import org.coinen.reactive.pacman.agent.model.GameState;
-import org.coinen.reactive.pacman.agent.repository.InMemoryKnowledgeRepository;
+import org.coinen.reactive.pacman.agent.repository.TemporaryHistoryRepository;
+import org.coinen.reactive.pacman.agent.repository.impl.InMemoryKnowledgeRepository;
 import org.coinen.reactive.pacman.agent.repository.KnowledgeRepository;
-import org.coinen.reactive.pacman.agent.service.DefaultGameEngineService;
+import org.coinen.reactive.pacman.agent.repository.impl.InMemoryTemporaryHistoryRepositoryImpl;
+import org.coinen.reactive.pacman.agent.repository.impl.RemoteKnowledgeRepository;
+import org.coinen.reactive.pacman.agent.service.DecisionService;
+import org.coinen.reactive.pacman.agent.service.impl.DefaultGameEngineService;
 import org.coinen.reactive.pacman.agent.service.GameEngineService;
-import org.coinen.reactive.pacman.agent.service.KnowledgeBaseService;
-import org.coinen.reactive.pacman.agent.service.QLearningKnowledgeBaseService;
+import org.coinen.reactive.pacman.agent.service.LearningService;
+import org.coinen.reactive.pacman.agent.service.impl.QLearningDecisionService;
+import org.coinen.reactive.pacman.agent.service.impl.QLearningLearningService;
 import qlearn.Q_learn;
-import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * One simulator can run one instance of PacMan-vs-Ghosts game.
@@ -37,6 +45,13 @@ import java.util.Random;
  * @author Jimmy
  */
 public class PacManSimulator {
+
+    static final ByteBuf PACMAN_PLAYER;
+    static {
+        ByteBuf buffer = Unpooled.buffer();
+        buffer.writeCharSequence(Player.Type.PACMAN.name(), Charset.defaultCharset());
+        PACMAN_PLAYER = buffer.retain();
+    }
 
     public static class GameConfig {
 
@@ -498,7 +513,7 @@ public class PacManSimulator {
                 il = Integer.parseInt(numbers[20].trim());
                 //ng = Integer.valueOf(numbers[3].trim());
 
-                Q_learn.S.add(new GameState(index, pu, pr, pd, pl, gu, gr, gd, gl, ppu, ppr, ppd, ppl, egu, egr, egd, egl
+                Q_learn.S.add(new GameState(pu, pr, pd, pl, gu, gr, gd, gl, ppu, ppr, ppd, ppl, egu, egr, egd, egl
                         , iu, ir, id, il));
             }
 
@@ -718,8 +733,14 @@ public class PacManSimulator {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        KnowledgeRepository knowledgeRepository = new InMemoryKnowledgeRepository();
-        RSocketFactory.connect()
+        RSocket remoteServerKnowledgeBase = RSocketFactory.connect()
+                .frameDecoder(PayloadDecoder.ZERO_COPY)
+                .transport(TcpClientTransport.create(9099))
+                .start()
+                .block();
+        TemporaryHistoryRepository temporaryHistoryRepository = new InMemoryTemporaryHistoryRepositoryImpl();
+        KnowledgeRepository knowledgeRepository = new RemoteKnowledgeRepository(new KnowledgeServiceClient(remoteServerKnowledgeBase));
+        RSocket rSocket = RSocketFactory.connect()
                 .frameDecoder(PayloadDecoder.ZERO_COPY)
                 .acceptor(new SocketAcceptor() {
                     @Override
@@ -729,22 +750,38 @@ public class PacManSimulator {
                             GameServiceClient gameServiceClient = new GameServiceClient(sendingSocket);
                             PlayerServiceClient locationServiceClient = new PlayerServiceClient(sendingSocket);
                             ExtrasServiceClient extrasService = new ExtrasServiceClient(sendingSocket);
-                            GameEngineService gameEngineService = new DefaultGameEngineService(map, knowledgeRepository, locationServiceClient, gameServiceClient, extrasService);
-                            KnowledgeBaseService knowledgeBaseService = new QLearningKnowledgeBaseService(knowledgeRepository);
+                            LearningService learningService = new QLearningLearningService(knowledgeRepository, temporaryHistoryRepository);
 
-                            // RESET INSTANCE & SAVE CONFIG
+                            var disposable = Mono.defer(() -> gameServiceClient
+                                    .start(
+                                        Nickname.newBuilder()
+                                                .setValue("MsPacMan" + ThreadLocalRandom.current().nextInt(0, Integer.MAX_VALUE))
+                                                .build(),
+                                        PACMAN_PLAYER.retainedSlice()
+                                    ))
+                                    .flatMapMany(config -> {
+                                        var game = new _G_();
+                                        game.newGame(map, config);
+                                        DecisionService decisionService = new QLearningDecisionService(temporaryHistoryRepository, knowledgeRepository, game);
+                                        GameEngineService gameEngineService = new DefaultGameEngineService(map, config, game, locationServiceClient, gameServiceClient, extrasService);
 
-                            // INIT RANDOMNESS
-                            G.rnd = new Random();
+                                        // INIT RANDOMNESS
+                                        G.rnd = new Random();
 
-                            Disposable subscribe = Mono.defer(() ->
-                                    gameEngineService.start()
-                                            .as(knowledgeBaseService::learn)
-                            )
-//                                    .repeat()
-                                    .subscribe(obj -> System.out.print(obj), x -> {
-                                        System.out.println(x);
-                                    });
+                                        return decisionService
+                                                .decide()
+                                                .transform(gameEngineService::run)
+                                                .transform(learningService::learn)
+                                                .as(knowledgeRepository::educate);
+
+                                    })
+                                    .doOnEach(System.out::println)
+                                    .repeat()
+                                    .subscribe(System.out::print, Throwable::printStackTrace, () -> System.out.println("done"));
+
+                            sendingSocket.onClose()
+                                    .doOnTerminate(disposable::dispose)
+                                    .subscribe();
 
                             // INITIALIZE THE SIMULATION
 
@@ -757,6 +794,6 @@ public class PacManSimulator {
                 .start()
                 .block();
 
-        Thread.sleep(99999999);
+        rSocket.onClose().block();
     }
 }

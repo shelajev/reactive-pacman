@@ -9,9 +9,7 @@ public interface KnowledgeRepository {
 
     Mono<Void> educate(Flux<Knowledge> outcomeFlux);
 
-    Knowledge leastRecent();
-
-    Knowledge mostRecent();
-
     Knowledge searchCase(GameState s);
+
+    int size();
 }

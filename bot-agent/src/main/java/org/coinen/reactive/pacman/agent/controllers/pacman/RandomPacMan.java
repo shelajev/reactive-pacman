@@ -13,7 +13,7 @@ public final class RandomPacMan extends PacManHijackController
 	
 	@Override
 	public void tick(Game game, long timeDue) {
-		int[] directions=game.getPossiblePacManDirs(true);		//set flag as true to include reversals		
+		int[] directions=game.getPossiblePacManDirs();		//set flag as true to include reversals
 		
 		
 		

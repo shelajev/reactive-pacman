@@ -31,7 +31,7 @@ public class DefaultGameService implements GameService {
     }
 
     @Override
-    public Mono<Config> start(Nickname nickname) {
+    public Mono<Config> start(Nickname nickname, Player.Type playerType) {
 
         if (nickname.getValue()
                     .length() <= 9999) {
@@ -41,8 +41,17 @@ public class DefaultGameService implements GameService {
                 name = "Unnamed";
             }
 
-            return playerService
-                .createPlayer(name)
+            Mono<Player> playerMono;
+
+            if (playerType == null) {
+                playerMono = playerService.createRandomPlayer(name);
+            } else if (playerType == Player.Type.GHOST) {
+                playerMono = playerService.createGhostPlayer(name);
+            } else {
+                playerMono = playerService.createPacManPlayer(name);
+            }
+
+            return playerMono
                 .map(player -> Config.newBuilder()
                                      .setPlayer(player)
                                      .addAllPlayers(

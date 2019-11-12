@@ -7,7 +7,11 @@ import reactor.core.publisher.Mono;
 
 public interface PlayerService {
 
-    Mono<Player> createPlayer(String nickname);
+    Mono<Player> createRandomPlayer(String nickname);
+
+    Mono<Player> createGhostPlayer(String nickname);
+
+    Mono<Player> createPacManPlayer(String nickname);
 
     Mono<Void> disconnectPlayer();
 

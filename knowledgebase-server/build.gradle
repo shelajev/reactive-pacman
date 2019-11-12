@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(":learning-idl")
+    implementation project(":knowledgebase-idl")
     compile group: 'com.typesafe.akka', name: 'akka-stream_2.13', version: '2.5.26'
     compile group: 'com.typesafe.akka', name: 'akka-http_2.13', version: '10.1.10'
     compile group: 'com.typesafe.akka', name: 'akka-stream_2.13', version: '2.6.0-RC2'

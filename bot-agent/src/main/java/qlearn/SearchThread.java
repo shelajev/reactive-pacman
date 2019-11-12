@@ -26,10 +26,10 @@ public class SearchThread extends Thread {
 		
 		for(int i = begin; i< end; i++){
 			comp = Q_learn.compareCases(state, Q_learn.S.get(i));
-			if(comp < currBest && state.index != Q_learn.S.get(i).index) {
-				currBest = comp;
-				result = i;
-			}
+//			if(comp < currBest && state.index != Q_learn.S.get(i).index) {
+//				currBest = comp;
+//				result = i;
+//			}
 		}
 		
 		//System.out.println("Comparison before division:" + currBest);

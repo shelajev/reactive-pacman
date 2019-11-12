@@ -187,32 +187,45 @@ public class DefaultPlayerService implements PlayerService {
     }
 
     @Override
-    public Mono<Player> createPlayer(String nickname) {
+    public Mono<Player> createRandomPlayer(String nickname) {
+        return doCreatePlayer(nickname, generatePlayerType());
+    }
+
+    @Override
+    public Mono<Player> createGhostPlayer(String nickname) {
+        return doCreatePlayer(nickname, Player.Type.GHOST);
+    }
+
+    @Override
+    public Mono<Player> createPacManPlayer(String nickname) {
+        return doCreatePlayer(nickname, Player.Type.PACMAN);
+    }
+
+    private Mono<Player> doCreatePlayer(String nickname, Player.Type playerType) {
         return Mono
-            .subscriberContext()
-            .map(c -> c.<UUID>get("uuid"))
-            .map((uuid) -> playerRepository.save(uuid, () -> {
-                var score = 0;
-                var playerType = generatePlayerType();
-                var playerPosition = findBestStartingPosition(playerType);
-                var player = Player.newBuilder()
-                        .setLocation(Location.newBuilder()
-                                .setDirection(Direction.RIGHT)
-                                .setPosition(playerPosition.toBuilder()
-                                        .setX(playerPosition.getX() * 100)
-                                        .setY(playerPosition.getY() * 100)))
-                        .setNickname(nickname)
-                        .setState(Player.State.CONNECTED)
-                        .setScore(score)
-                        .setType(playerType)
-                        .setUuid(uuid.toString())
-                        .setTimestamp(Instant.now().toEpochMilli())
-                        .build();
+                .subscriberContext()
+                .map(c -> c.<UUID>get("uuid"))
+                .map((uuid) -> playerRepository.save(uuid, () -> {
+                    var score = 0;
+                    var playerPosition = findBestStartingPosition(playerType);
+                    var player = Player.newBuilder()
+                            .setLocation(Location.newBuilder()
+                                    .setDirection(Direction.RIGHT)
+                                    .setPosition(playerPosition.toBuilder()
+                                            .setX(playerPosition.getX() * 100)
+                                            .setY(playerPosition.getY() * 100)))
+                            .setNickname(nickname)
+                            .setState(Player.State.CONNECTED)
+                            .setScore(score)
+                            .setType(playerType)
+                            .setUuid(uuid.toString())
+                            .setTimestamp(Instant.now().toEpochMilli())
+                            .build();
 
-                playersSink.next(player);
+                    playersSink.next(player);
 
-                return player;
-            }));
+                    return player;
+                }));
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.coinen.reactive.pacman.agent.model;
 import org.coinen.reactive.pacman.agent.controllers.Direction;
 
 public class Decision {
-    public static Decision UNCHENGED;
+    public static final Decision UNCHANGED = new Decision(Direction.NONE);
 
     final Direction direction;
 
@@ -13,5 +13,12 @@ public class Decision {
 
     public Direction getDirection() {
         return direction;
+    }
+
+    @Override
+    public String toString() {
+        return "Decision{" +
+                "direction=" + direction +
+                '}';
     }
 }

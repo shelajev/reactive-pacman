@@ -3,29 +3,31 @@ syntax = "proto3";
 package org.coinen.pacman;
 
 import "google/protobuf/empty.proto";
-import "rsocket/options.proto";
 
 option java_package = "org.coinen.pacman.learning";
 option java_multiple_files = true;
 
-service LearningService {
-    rpc Study(stream CaseStudy) returns (stream StudyAggregate) {}
+service KnowledgeService {
+    rpc Enrich(stream Knowledge) returns (stream KnowledgeBaseSnapshot) {}
+
+    rpc RetrieveLatest(google.protobuf.Empty) returns (KnowledgeBaseSnapshot) {}
 }
 
-message StudyAggregate {
-    repeated CaseStudy studies = 1;
+message KnowledgeBaseSnapshot {
+    repeated Knowledge knowledgeBase = 1;
+}
+
+message Knowledge {
+    string uuid = 1;
+    GameState gameState = 2;
+    CaseStudy caseStudy = 3;
 }
 
 message CaseStudy {
-    GameState gameState = 1;
-    QualityState qualityState = 2;
-}
-
-message QualityState {
-    float f1 = 1;
-    float f2 = 2;
-    float f3 = 3;
-    float f4 = 4;
+    float weightUp = 1;
+    float weightRight = 2;
+    float weightDown = 3;
+    float weightLeft = 4;
 }
 
 message GameState {

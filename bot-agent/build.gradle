@@ -2,7 +2,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'com.bmuschko.docker-spring-boot-application'
 
 dependencies {
-  implementation project(":learning-idl")
+  implementation project(":knowledgebase-idl")
   implementation project(':game-idl')
   implementation 'org.jctools:jctools-core'
   implementation 'io.rsocket:rsocket-core'
@@ -10,6 +10,7 @@ dependencies {
   implementation 'io.rsocket.rpc:rsocket-ipc-core'
   implementation 'io.rsocket.rpc:rsocket-rpc-core'
   implementation 'com.google.protobuf:protobuf-java'
+  implementation 'com.fasterxml.uuid:java-uuid-generator:3.2.0'
 
   testImplementation 'io.projectreactor:reactor-test'
 }

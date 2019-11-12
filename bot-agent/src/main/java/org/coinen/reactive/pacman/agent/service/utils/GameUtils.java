@@ -19,7 +19,7 @@ public final class GameUtils {
 
 
     public static GameState captureState(Game game) {
-        return new GameState(-1, GameUtils.getNextPill(game, Game.UP), GameUtils.getNextPill(game, Game.RIGHT), GameUtils.getNextPill(game, Game.DOWN), GameUtils.getNextPill(game, Game.LEFT),
+        return new GameState(GameUtils.getNextPill(game, Game.UP), GameUtils.getNextPill(game, Game.RIGHT), GameUtils.getNextPill(game, Game.DOWN), GameUtils.getNextPill(game, Game.LEFT),
                 GameUtils.getNextGhost(game, Game.UP), GameUtils.getNextGhost(game, Game.RIGHT), GameUtils.getNextGhost(game, Game.DOWN), GameUtils.getNextGhost(game, Game.LEFT),
                 GameUtils.getNextPowerPill(game, Game.UP), GameUtils.getNextPowerPill(game, Game.RIGHT), GameUtils.getNextPowerPill(game, Game.DOWN), GameUtils.getNextPowerPill(game, Game.LEFT),
                 GameUtils.getNextEdibleGhost(game, Game.UP), GameUtils.getNextEdibleGhost(game, Game.RIGHT), GameUtils.getNextEdibleGhost(game, Game.DOWN), GameUtils.getNextEdibleGhost(game, Game.LEFT),
@@ -455,7 +455,7 @@ public final class GameUtils {
 
     /*Returns true if d is one of the possible directions for pacman to take, false otherwise*/
     public static boolean possibleDir(Game game, int d) {
-        int[] directions = game.getPossiblePacManDirs(true);
+        int[] directions = game.getPossiblePacManDirs();
 
         for (int dir : directions) {
             if (dir == d) return true;

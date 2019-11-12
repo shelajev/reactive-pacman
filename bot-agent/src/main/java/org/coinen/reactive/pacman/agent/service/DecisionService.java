@@ -1,9 +1,9 @@
 package org.coinen.reactive.pacman.agent.service;
 
-import org.coinen.reactive.pacman.agent.controllers.Direction;
 import org.coinen.reactive.pacman.agent.model.Decision;
+import reactor.core.publisher.Flux;
 
 public interface DecisionService {
 
-    Decision decide();
+    Flux<Decision> decide();
 }

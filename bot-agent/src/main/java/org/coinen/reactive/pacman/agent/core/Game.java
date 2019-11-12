@@ -108,7 +108,8 @@ public interface Game
 	double getEuclideanDistance(int from, int to);			//returns the Euclidean distance between two nodes
 	int getManhattenDistance(int from, int to);				//returns the Manhatten distance between two nodes
 	
-	int[] getPossiblePacManDirs(boolean includeReverse);		//returns the set of possible directions for Ms Pac-Man, with or without the direction opposite to the last direction taken
+	int[] getPossiblePacManDirs();		//returns the set of possible directions for Ms Pac-Man, with or without the direction opposite to the last direction taken
+	int[] getPossiblePacManDirs(Decision lastDecision);		//returns the set of possible directions for Ms Pac-Man, with or without the direction opposite to the last direction taken
 
 	int[] getPath(int from, int to);										//returns the path from one node to another (e.g., [1,2,5,7,9] for 1 to 9)
 	int[] getGhostPath(String whichGhost, int to);							//returns the path from one node to another, taking into account that reversals are not possible

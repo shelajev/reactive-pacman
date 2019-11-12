@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 /*
  * Simple implementation of Ms Pac-Man. The class Game contains all code relating to the
@@ -257,7 +258,7 @@ public class G implements Game {
     //Updates the location of Ms Pac-Man
     protected void updatePacMan(Decision pacMan) {
         int direction;
-        if (pacMan == Decision.UNCHENGED) {
+        if (pacMan == Decision.UNCHANGED) {
             direction = lastPacManDir;
         } else {
             direction = checkPacManDir(pacMan.getDirection().index);
@@ -280,7 +281,7 @@ public class G implements Game {
             if (neighbours[lastPacManDir] != -1)
                 direction = lastPacManDir;
             else {
-                int[] options = getPossiblePacManDirs(true);
+                int[] options = getPossiblePacManDirs();
                 direction = options[G.rnd.nextInt(options.length)];
             }
 
@@ -342,26 +343,35 @@ public class G implements Game {
 
         if (pillIndex >= 0 && pills.get(pillIndex)) {
             score += PILL;
-            pills.clear(pillIndex);
+            synchronized (pills) {
+                pills.clear(pillIndex);
+            }
             return PILL;
         }
 
         return 0;
     }
 
+    long powerStopTick;
     //Eats a power pill - turns ghosts edible (blue)
     protected boolean eatPowerPill() {
         boolean reverse = false;
         int powerPillIndex = getPowerPillIndex(curPacManLoc);
 
+        if (isPowerUpEnabled && System.nanoTime() > powerStopTick) {
+            isPowerUpEnabled = false;
+        }
+
         if (powerPillIndex >= 0 && powerPills.get(powerPillIndex)) {
             score += POWER_PILL;
             ghostEatMultiplier = 1;
-            powerPills.clear(powerPillIndex);
+            synchronized (powerPills) {
+                powerPills.clear(powerPillIndex);
+            }
 
 
             //This ensures that only ghosts outside the lair (i.e., inside the maze) turn edible
-            int newEdibleTime = (int) (EDIBLE_TIME * (Math.pow(EDIBLE_TIME_REDUCTION, totLevel)));
+            powerStopTick = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
             isPowerUpEnabled = true;
 //            for (int i = 0; i < NUM_GHOSTS; i++)
 //                if (lairTimes[i] == 0)
@@ -381,6 +391,9 @@ public class G implements Game {
 
     //This is where the characters of the game eat one another if possible
     public int feast() {
+        if (gameOver) {
+            return Integer.MIN_VALUE;
+        }
         int gain = 0;
         for (var ghost : curGhosts.values()) {
             int distance = getPathDistance(curPacManLoc, ghost.location);
@@ -687,8 +700,43 @@ public class G implements Game {
     }
 
     //Returns the actual directions Ms Pac-Man can take
-    public int[] getPossiblePacManDirs(boolean includeReverse) {
-        return getPossibleDirs(curPacManLoc, lastPacManDir, includeReverse);
+    public int[] getPossiblePacManDirs() {
+        return getPossibleDirs(curPacManLoc, lastPacManDir, true);
+    }
+    //Returns the actual directions Ms Pac-Man can take
+    public int[] getPossiblePacManDirs(Decision lastDecision) {
+        return getPossibleDirs(curPacManLoc, lastDecision.getDirection().index);
+    }
+
+    private int[] getPossibleDirs(int curLoc, int directionToExclude) {
+        int numNeighbours = maze.graph[curLoc].numNeighbours;
+
+        if (numNeighbours == 0)
+            return new int[0];
+
+        int[] nodes = maze.graph[curLoc].neighbours;
+        int[] directions;
+
+        if (numNeighbours == 1)
+            directions = new int[numNeighbours];
+        else
+            directions = new int[numNeighbours - 1];
+
+        int index = 0;
+
+        for (int i = 0; i < nodes.length; i++)
+            if (nodes[i] != -1) {
+                if (numNeighbours == 1)
+                    directions[index++] = i;
+                else if (i != getReverse(directionToExclude))
+                    try {
+                        directions[index++] = i;
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        e.printStackTrace();
+                    }
+            }
+
+        return directions;
     }
 
     //Computes the directions to be taken given the current location

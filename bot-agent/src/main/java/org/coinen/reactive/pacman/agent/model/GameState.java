@@ -6,7 +6,6 @@ package org.coinen.reactive.pacman.agent.model;
  */
 public final class GameState {
 
-    public int index;
     public final int pillUp, pillDown, pillRight, pillLeft;                                    // Distance to pills in every direction
     public final int ghostUp, ghostDown, ghostRight, ghostLeft;                                // Distance to ghosts in every direction
     public final int edibleGhostUp, edibleGhostRight, edibleGhostDown, edibleGhostLeft;        // Distance to edible ghosts in every direction
@@ -15,10 +14,9 @@ public final class GameState {
 
 
     /* Game state/case representation. This info is both used in RL and CBR/RL systems.*/
-    public GameState(int i, int pu, int pr, int pd, int pl, int gu, int gr, int gd, int gl,
+    public GameState(int pu, int pr, int pd, int pl, int gu, int gr, int gd, int gl,
                      int ppu, int ppr, int ppd, int ppl, int egu, int egr, int egd, int egl,
                      int iu, int ir, int id, int il) {
-        index = i;
         pillUp = pu;
         pillRight = pr;
         pillDown = pd;
@@ -44,7 +42,7 @@ public final class GameState {
     /*Returns readable string with state data*/
     public String toString() {
 
-        return " Index: " + index + " - Pills: " + pillUp + ", " + pillRight + ", " + pillDown + ", " + pillLeft +
+        return " Pills: " + pillUp + ", " + pillRight + ", " + pillDown + ", " + pillLeft +
                 " - Ghosts: " + ghostUp + ", " + ghostRight + ", " + ghostDown + ", " + ghostLeft +
                 " - Power Pills: " + powerPillUp + ", " + powerPillRight + ", " + powerPillDown + ", " + powerPillLeft +
                 " - Edible Ghosts: " + edibleGhostUp + ", " + edibleGhostRight + ", " + edibleGhostDown + ", " + edibleGhostLeft +
@@ -54,7 +52,7 @@ public final class GameState {
     /* Returns string with state data. Used for data storing*/
     public String data() {
 
-        return index + " " + pillUp + " " + pillRight + " " + pillDown + " " + pillLeft +
+        return pillUp + " " + pillRight + " " + pillDown + " " + pillLeft +
                 " " + ghostUp + " " + ghostRight + " " + ghostDown + " " + ghostLeft +
                 " " + powerPillUp + " " + powerPillRight + " " + powerPillDown + " " + powerPillLeft +
                 " " + edibleGhostUp + " " + edibleGhostRight + " " + edibleGhostDown + " " + edibleGhostLeft +

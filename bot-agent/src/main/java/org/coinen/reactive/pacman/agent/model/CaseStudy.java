@@ -1,15 +1,25 @@
 package org.coinen.reactive.pacman.agent.model;
 
 public class CaseStudy {
-    public final float q1;
-    public final float q2;
-    public final float q3;
-    public final float q4;
+    public final float upWeight;
+    public final float rightWeight;
+    public final float downWeight;
+    public final float leftWeight;
 
-    public CaseStudy(float q1, float q2, float q3, float q4) {
-        this.q1 = q1;
-        this.q2 = q2;
-        this.q3 = q3;
-        this.q4 = q4;
+    public CaseStudy(float upWeight, float rightWeight, float downWeight, float leftWeight) {
+        this.upWeight = upWeight;
+        this.rightWeight = rightWeight;
+        this.downWeight = downWeight;
+        this.leftWeight = leftWeight;
+    }
+
+    @Override
+    public String toString() {
+        return "CaseStudy{" +
+                "upWeight=" + upWeight +
+                ", rightWeight=" + rightWeight +
+                ", downWeight=" + downWeight +
+                ", leftWeight=" + leftWeight +
+                '}';
     }
 }

@@ -6,14 +6,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.lang.*;
 
-import org.coinen.reactive.pacman.agent.controllers.pacman.PacManAction;
 import org.coinen.reactive.pacman.agent.core.G;
 import org.coinen.reactive.pacman.agent.core.Game;
 import org.coinen.reactive.pacman.agent.model.GameState;
 import org.coinen.pacman.learning.CaseStudy;
-import org.coinen.pacman.learning.QualityState;
 import org.coinen.reactive.pacman.agent.model.Knowledge;
-import org.coinen.reactive.pacman.agent.model.Outcome;
 import org.coinen.reactive.pacman.agent.service.utils.GameUtils;
 import reactor.core.publisher.DirectProcessor;
 import reactor.core.publisher.FluxProcessor;
@@ -196,8 +193,8 @@ public class Q_learn {
 //            }
 //
 //            System.out.println("Finished calculation");
-            prevAction = game.getPossiblePacManDirs(true)[0];
-            initState = new GameState(0, GameUtils.getNextPill(game, Game.UP), GameUtils.getNextPill(game, Game.RIGHT), GameUtils.getNextPill(game, Game.DOWN), GameUtils.getNextPill(game, Game.LEFT),
+            prevAction = game.getPossiblePacManDirs()[0];
+            initState = new GameState(GameUtils.getNextPill(game, Game.UP), GameUtils.getNextPill(game, Game.RIGHT), GameUtils.getNextPill(game, Game.DOWN), GameUtils.getNextPill(game, Game.LEFT),
                     GameUtils.getNextGhost(game, Game.UP), GameUtils.getNextGhost(game, Game.RIGHT), GameUtils.getNextGhost(game, Game.DOWN), GameUtils.getNextGhost(game, Game.LEFT),
                     GameUtils.getNextPowerPill(game, Game.UP), GameUtils.getNextPowerPill(game, Game.RIGHT), GameUtils.getNextPowerPill(game, Game.DOWN), GameUtils.getNextPowerPill(game, Game.LEFT),
                     GameUtils.getNextEdibleGhost(game, Game.UP), GameUtils.getNextEdibleGhost(game, Game.RIGHT), GameUtils.getNextEdibleGhost(game, Game.DOWN), GameUtils.getNextEdibleGhost(game, Game.LEFT),
@@ -233,179 +230,6 @@ public class Q_learn {
 
     }
 
-    /**
-     * Implements Q-learning algorithm, and stores learned info. in Q matrix (action-state matrix)
-     */
-    public synchronized static void learn(Game game, PacManAction pacManAction) {
-        // setup next state
-		/* 
-        nextState = new GameState(-1, game.getCurPacManLoc(), game.getNumActivePills(), game.getPowerPillIndicesActive(), 
-        	min(game.getPathDistance(game.getCurGhostDir(0), game.getCurPacManLoc()), game.getPathDistance(game.getCurGhostDir(1), game.getCurPacManLoc()), game.getPathDistance(game.getCurGhostDir(2), game.getCurPacManLoc()), game.getPathDistance(game.getCurGhostDir(3), game.getCurPacManLoc())));  					// TODO: introduce parameters in new State
-		 */
-        //int current = game.getCurPacManLoc();
-
-
-        /*This is for the behavioral agent*/
-        //nextState = new GameState(-1, game.getPathDistance(game.getCurPacManLoc(), GameState.getNearestPill(game)),game.getPathDistance(game.getCurPacManLoc(), GameState.getNearestPowerPill(game)) , GameState.nearGhosts(game), GameState.edibleGhost(game));
-
-        /*This is for the directions agent*/
-		/*nextState = new GameState(-1, GameState.possibleDir(game,Game.UP), GameState.possibleDir(game,Game.RIGHT),GameState.possibleDir(game,Game.DOWN),GameState.possibleDir(game,Game.LEFT), 
-				GameState.getClosestPillDir(game), GameState.getClosestGhostDir(game),GameState.getClosestPowerPillDir(game),GameState.getClosestEdibleGhostDir(game));*/
-
-
-        nextState = new GameState(-1, GameUtils.getNextPill(game, Game.UP), GameUtils.getNextPill(game, Game.RIGHT), GameUtils.getNextPill(game, Game.DOWN), GameUtils.getNextPill(game, Game.LEFT),
-                GameUtils.getNextGhost(game, Game.UP), GameUtils.getNextGhost(game, Game.RIGHT), GameUtils.getNextGhost(game, Game.DOWN), GameUtils.getNextGhost(game, Game.LEFT),
-                GameUtils.getNextPowerPill(game, Game.UP), GameUtils.getNextPowerPill(game, Game.RIGHT), GameUtils.getNextPowerPill(game, Game.DOWN), GameUtils.getNextPowerPill(game, Game.LEFT),
-                GameUtils.getNextEdibleGhost(game, Game.UP), GameUtils.getNextEdibleGhost(game, Game.RIGHT), GameUtils.getNextEdibleGhost(game, Game.DOWN), GameUtils.getNextEdibleGhost(game, Game.LEFT),
-                GameUtils.getNextIntersection(game, Game.UP), GameUtils.getNextIntersection(game, Game.RIGHT), GameUtils.getNextIntersection(game, Game.DOWN), GameUtils.getNextIntersection(game, Game.LEFT));
-		
-		/*
-		nextState = new GameState(-1, GameState.getNextPill(game,Game.UP), GameState.getNextPill(game,Game.RIGHT),GameState.getNextPill(game,Game.DOWN),GameState.getNextPill(game,Game.LEFT),
-				GameState.closeGhostInDirection(game, Game.UP), GameState.closeGhostInDirection(game, Game.RIGHT), GameState.closeGhostInDirection(game, Game.DOWN), GameState.closeGhostInDirection(game, Game.LEFT),
-				GameState.getNextPowerPill(game, Game.UP), GameState.getNextPowerPill(game, Game.RIGHT),GameState.getNextPowerPill(game, Game.DOWN),GameState.getNextPowerPill(game, Game.LEFT),
-				GameState.getNextEdibleGhost(game, Game.UP), GameState.getNextEdibleGhost(game, Game.RIGHT),GameState.getNextEdibleGhost(game, Game.DOWN),GameState.getNextEdibleGhost(game, Game.LEFT),
-				GameState.getNextIntersection(game, Game.UP), GameState.getNextIntersection(game, Game.RIGHT),GameState.getNextIntersection(game, Game.DOWN),GameState.getNextIntersection(game, Game.LEFT));
-		*/
-        /*This is for CBR*/
-        //nextState = new GameState(-1, game.getCurPacManLoc(), ghostLocs(game), game.getPillIndicesActive(), game.getPowerPillIndicesActive());
-
-
-        //nextState.index = indexOf(nextState);  					// 'indexOf()' search 'nextState' in state list S and returns its index (-1 if not found)
-        int index = -1;
-        //index = indexOf(nextState);
-
-
-        if (/*compareCases(currState, nextState) > 0*/normalizedDistance(compareCases(currState, nextState)) > newCaseThreshold) {    // If agent is in a different case than in previous step
-            if (S.size() <= 500) {
-                //index = indexOf(nextState);	 		// This search is for RL algorithms
-                index = searchCase(nextState);    // This search is for CBR/RL algorithms
-            } else {
-                try {
-                    index = searchCaseWithThreads(nextState);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
-
-            if (index == -1) {                                // if 'nextState' is not close to any state reached before. We add it to state list
-                nextState.index = S.size();
-                S.add(nextState);
-                stateCounter.add(1);
-                currAdded++;
-
-                Random rnd = new Random();
-                float f1 = rnd.nextFloat(), f2 = rnd.nextFloat(), f3 = rnd.nextFloat(), f4 = rnd.nextFloat();
-                Q.add(new ArrayList<>(Arrays.asList(f1, f2, f3, f4)));
-                currQ.add(new ArrayList<>(Arrays.asList(f1, f2, f3, f4)));
-                caseStudyFluxProcessor.onNext(
-                    CaseStudy
-                        .newBuilder()
-                        .setGameState(
-                            org.coinen.pacman.learning.GameState
-                                .newBuilder()
-                                .setPillUp(nextState.pillUp)
-                                .setPillDown(nextState.pillDown)
-                                .setPillLeft(nextState.pillLeft)
-                                .setPillRight(nextState.pillRight)
-                                .setGhostUp(nextState.ghostUp)
-                                .setGhostDown(nextState.ghostDown)
-                                .setGhostRight(nextState.ghostRight)
-                                .setGhostLeft(nextState.ghostLeft)
-                                .setEdibleGhostUp(nextState.edibleGhostUp)
-                                .setEdibleGhostDown(nextState.edibleGhostDown)
-                                .setEdibleGhostLeft(nextState.edibleGhostLeft)
-                                .setEdibleGhostRight(nextState.edibleGhostRight)
-                                .setIntersectionUp(nextState.intersectionUp)
-                                .setIntersectionDown(nextState.intersectionDown)
-                                .setIntersectionLeft(nextState.intersectionLeft)
-                                .setIntersectionRight(nextState.intersectionRight)
-                                .build()
-                        )
-                        .setQualityState(
-                            QualityState.newBuilder()
-                                .setF1(f1)
-                                .setF2(f2)
-                                .setF3(f3)
-                                .setF4(f4)
-                                .build()
-                        )
-                        .build()
-                );
-
-            } else {                                            // Otherwise a case is retrieved from case base
-                nextState.index = index;
-                currRetrieved++;
-                stateCounter.set(index, stateCounter.get(index) + 1);
-            }
-        } else {
-            nextState.index = currState.index;
-        }
-
-
-        // Different rewards are commented
-        //reward =  (int) (w1*(game.getScore() - prevScore) +  w2*(game.getTotalTime() - prevTime));
-        reward = game.getScore() - prevScore;
-        //reward = game.getTotalTime() - prevTime;
-        totalReward += reward;
-
-
-        prevScore = game.getScore();
-        prevTime = game.getTotalTime();
-
-
-        if (nextState.index != currState.index) {
-            float max = maxQRow(currState.index);
-            if (justEaten) {
-                max = 0;
-                totalReward = 0;
-                justEaten = false;
-            }
-            //currQ.get(currState.index).set(currAction, currQ.get(currState.index).get(currAction) + alpha*(totalReward + gamma*maxQRow(nextState.index) - currQ.get(currState.index).get(currAction) ));
-
-
-            if (update) {
-                float v = currQ.get(prevState.index).get(prevAction) + alpha * ((1 - currSimilarity) * totalReward + gamma * max - currQ.get(prevState.index).get(prevAction));
-                currQ.get(prevState.index).set(prevAction, v);
-            }
-            totalReward = 0;
-            prevState = currState;
-            prevAction = currAction;
-
-            if (eaten) {
-                eaten = false;
-                justEaten = true;
-            }
-	        
-	        /*currQ.get(currState.index).set(pmState, 
-	            	currQ.get(currState.index).get(pmState) + alpha*((1-currSimilarity)*reward + gamma*maxQRow(nextState.index) - currQ.get(currState.index).get(pmState) ));*/
-	        
-	        /*
-	        if(currQ.get(currState.index).get(pmState) < 0) 
-	        	currQ.get(currState.index).set(pmState,0f);*/
-
-
-
-            /*YOU CAN USE THESE PRINTS FOR DEBUG PURPOSES*/
-            //System.out.println("- Change to state: " + Q_learn.nextState.index);
-            //System.out.println(Q_learn.nextState.toString());
-            //System.out.println("Corner: " + game.isCorner(game.getCurPacManLoc()) + " -Junction: " + game.isJunction(game.getCurPacManLoc()));
-            //System.out.println("R:" + totalReward + "-D:  " + pmState + " -S: " + currState.index);
-
-
-            //System.out.println("Q:" + Q.get(nextState.index).get(0) + "-" + Q.get(nextState.index).get(1) + "-" + Q.get(nextState.index).get(2) + "-" + Q.get(nextState.index).get(3));
-            //System.out.println("Q:" + Q.get(0).get(0) + "-" + Q.get(0).get(1) + "-" + Q.get(0).get(2) + "-" + Q.get(0).get(3));
-            //System.out.println(Q.get(currState.index).get(pmState) + " = " + Q.get(currState.index).get(pmState) + " + alpha*[" + reward + " + gamma*" + maxQRow(nextState.index) +" - " + Q.get(currState.index).get(pmState));
-
-            //System.out.println("R:" + reward);
-            //}
-
-        }
-        currState = nextState;
-
-    }
-
     // Max. function with 4 elements
     public static float max(float a, float b, float c, float d) {
         return Math.max(Math.max(a, b), Math.max(c, d));
@@ -422,7 +246,7 @@ public class Q_learn {
     }
 
     public static float maxQRow(org.coinen.reactive.pacman.agent.model.CaseStudy caseStudy) {
-        return Math.max(Math.max(Math.max(caseStudy.q1, caseStudy.q2), caseStudy.q3), caseStudy.q4);
+        return Math.max(Math.max(Math.max(caseStudy.upWeight, caseStudy.rightWeight), caseStudy.downWeight), caseStudy.leftWeight);
     }
 
     // Returns the index of maximum value in 'index'th row of Q matrix
@@ -496,13 +320,13 @@ public class Q_learn {
     public static float resolveWeightFromCaseStudy(org.coinen.reactive.pacman.agent.model.CaseStudy caseStudy, int direction) {
         switch (direction) {
             case 0:
-                return caseStudy.q1;
+                return caseStudy.upWeight;
             case 1:
-                return caseStudy.q2;
+                return caseStudy.rightWeight;
             case 2:
-                return caseStudy.q3;
+                return caseStudy.downWeight;
             case 3:
-                return caseStudy.q4;
+                return caseStudy.leftWeight;
         }
 
         throw new IllegalArgumentException("Unsupported Direction");
@@ -511,61 +335,16 @@ public class Q_learn {
     public static org.coinen.reactive.pacman.agent.model.CaseStudy updateWeightForCaseStudy(org.coinen.reactive.pacman.agent.model.CaseStudy caseStudy, int direction, float weight) {
         switch (direction) {
             case 0:
-                return new org.coinen.reactive.pacman.agent.model.CaseStudy(weight, caseStudy.q2, caseStudy.q3, caseStudy.q4);
+                return new org.coinen.reactive.pacman.agent.model.CaseStudy(weight, caseStudy.rightWeight, caseStudy.downWeight, caseStudy.leftWeight);
             case 1:
-                return new org.coinen.reactive.pacman.agent.model.CaseStudy(caseStudy.q1, weight, caseStudy.q3, caseStudy.q4);
+                return new org.coinen.reactive.pacman.agent.model.CaseStudy(caseStudy.upWeight, weight, caseStudy.downWeight, caseStudy.leftWeight);
             case 2:
-                return new org.coinen.reactive.pacman.agent.model.CaseStudy(caseStudy.q1, caseStudy.q2, weight, caseStudy.q4);
+                return new org.coinen.reactive.pacman.agent.model.CaseStudy(caseStudy.upWeight, caseStudy.rightWeight, weight, caseStudy.leftWeight);
             case 3:
-                return new org.coinen.reactive.pacman.agent.model.CaseStudy(caseStudy.q1, caseStudy.q2, caseStudy.q3, weight);
+                return new org.coinen.reactive.pacman.agent.model.CaseStudy(caseStudy.upWeight, caseStudy.rightWeight, caseStudy.downWeight, weight);
         }
 
         throw new IllegalArgumentException("Unsupported Direction");
-    }
-
-    /*
-     * Returns index of s in state list S, -1 otherwise
-     * There are different state representation comparisons implemented here. You can change them by changing commented lines below
-     * */
-    public static int indexOf(GameState s) {
-        int result = -1;
-		/*
-		for(int i=0; i<S.size(); i++){
-			if(s.currPacLoc == S.get(i).currPacLoc && s.numActivePills == S.get(i).numActivePills && s.powerPillIndicesActive == S.get(i).powerPillIndicesActive && s.ghostDistance == S.get(i).ghostDistance)
-				result = S.get(i).index;
-		}
-		*/
-		
-		/*
-		for(int i=0; i<S.size(); i++){
-			if(s.nearestPillDistance == S.get(i).nearestPillDistance && s.nearestPowerPillDistance == S.get(i).nearestPowerPillDistance && s.nearGhosts == S.get(i).nearGhosts)
-				result = S.get(i).index;
-		}
-		*/
-        /*
-         * This is for directions agent*/
-		/*
-		for(int i=0; i<S.size(); i++){
-			if(s.pillUp == S.get(i).pillUp && s.pillRight == S.get(i).pillRight && s.pillDown == S.get(i).pillDown && s.pillLeft == S.get(i).pillLeft &&
-					s.ghostUp == S.get(i).ghostUp && s.ghostRight == S.get(i).ghostRight && s.ghostDown == S.get(i).ghostDown && s.ghostLeft == S.get(i).ghostLeft) result = S.get(i).index;
-			
-		}*/
-
-        for (int i = 0; i < S.size(); i++) {
-			/*if(s.u == S.get(i).u && s.r == S.get(i).r && s.d == S.get(i).d && s.l == S.get(i).l && 
-					s.cp == S.get(i).cp && s.cg == S.get(i).cg && s.cpp == S.get(i).cpp && s.ceg == S.get(i).ceg) result = S.get(i).index;*/
-
-            if (/*s.pillUp == S.get(i).pillUp && s.pillRight == S.get(i).pillRight && s.pillDown == S.get(i).pillDown && s.pillLeft == S.get(i).pillLeft && */
-                    s.ghostUp == S.get(i).ghostUp && s.ghostRight == S.get(i).ghostRight && s.ghostDown == S.get(i).ghostDown && s.ghostLeft == S.get(i).ghostLeft //&&
-                //s.powerPillUp == S.get(i).powerPillUp && s.powerPillRight == S.get(i).powerPillRight && s.powerPillDown == S.get(i).powerPillDown && s.powerPillLeft == S.get(i).powerPillLeft &&
-                /*s.edibleGhostUp == S.get(i).edibleGhostUp && s.edibleGhostRight == S.get(i).edibleGhostRight && s.edibleGhostDown == S.get(i).edibleGhostDown && s.edibleGhostLeft == S.get(i).edibleGhostLeft*/ //&&
-                /*s.intersectionUp == S.get(i).intersectionUp && s.intersectionRight == S.get(i).intersectionRight && s.intersectionDown == S.get(i).intersectionDown && s.intersectionLeft == S.get(i).intersectionLeft*/)
-                result = S.get(i).index;
-
-        }
-
-
-        return result;
     }
 
     public static float normalizedDistance(float f) {
@@ -843,6 +622,22 @@ public class Q_learn {
         return false;
     }
 
+    public static boolean closeGhost(GameState currState) {
+
+
+        if ((currState.ghostUp == GameUtils.DISCRETE_VERY_CLOSE) || (currState.ghostUp == GameUtils.DISCRETE_CLOSE) ||
+                (currState.ghostRight == GameUtils.DISCRETE_VERY_CLOSE) || (currState.ghostRight == GameUtils.DISCRETE_CLOSE) ||
+                (currState.ghostDown == GameUtils.DISCRETE_VERY_CLOSE) || (currState.ghostDown == GameUtils.DISCRETE_CLOSE) ||
+                (currState.ghostLeft == GameUtils.DISCRETE_VERY_CLOSE) || (currState.ghostLeft == GameUtils.DISCRETE_CLOSE)/* ||
+				(currState.edibleGhostUp <= GameUtils.DISCRETE_VERY_CLOSE && currState.edibleGhostUp >= 0) ||
+				(currState.edibleGhostRight <= GameUtils.DISCRETE_VERY_CLOSE && currState.edibleGhostRight >= 0) ||
+				(currState.edibleGhostDown <= GameUtils.DISCRETE_VERY_CLOSE && currState.edibleGhostDown >= 0) ||
+				(currState.edibleGhostLeft <= GameUtils.DISCRETE_VERY_CLOSE && currState.edibleGhostLeft >= 0)*/)
+            return true;
+
+        return false;
+    }
+
 
     /* Adds average value between score provided and previous scores*/
     public static void addNewScore(int score) {
@@ -958,18 +753,6 @@ public class Q_learn {
             sum += s.get(i);
         }
         return sum / s.size();
-    }
-
-    public static String Qvalues(int index) {
-        return Q.get(index).get(0) + "  " + Q.get(index).get(1) + "  " + Q.get(index).get(2) + "  " + Q.get(index).get(3);
-
-    }
-
-    public static void printLearning() {
-
-        System.out.println("Current State: " + currState.toString());
-        System.out.println("Q: " + Qvalues(currState.index));
-        System.out.println("----------------------------------");
     }
 
     /*Calculates distances from each node to all of them in current level*/
