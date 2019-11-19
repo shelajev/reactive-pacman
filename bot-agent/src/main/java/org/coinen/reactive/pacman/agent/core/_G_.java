@@ -13,7 +13,6 @@
  */
 package org.coinen.reactive.pacman.agent.core;
 
-import org.coinen.reactive.pacman.agent.PacManSimulator.GameConfig;
 import org.coinen.reactive.pacman.agent.controllers.Direction;
 import org.coinen.pacman.*;
 import qlearn.Q_learn;

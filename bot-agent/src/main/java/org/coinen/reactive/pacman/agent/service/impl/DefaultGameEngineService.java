@@ -72,24 +72,25 @@ public class DefaultGameEngineService implements GameEngineService {
     }
 
     Flux<Outcome> doStartActing(Flux<Decision> decisionFlux) {
-        return decisionFlux.handle((decision, sink) -> {
-            G.Node lastNode = G.maze.graph[game.getCurPacManLoc()];
+        return
+decisionFlux.handle((decision, sink) -> {
+    G.Node lastNode = G.maze.graph[game.getCurPacManLoc()];
 
-            int gain = game.advanceGame(decision);
+    int gain = game.advanceGame(decision);
 
-            G.Node node = G.maze.graph[game.getCurPacManLoc()];
-            org.coinen.reactive.pacman.agent.controllers.Direction direction = org.coinen.reactive.pacman.agent.controllers.Direction.forIndex(game.getCurPacManDir());
+    G.Node node = G.maze.graph[game.getCurPacManLoc()];
+    org.coinen.reactive.pacman.agent.controllers.Direction direction = org.coinen.reactive.pacman.agent.controllers.Direction.forIndex(game.getCurPacManDir());
 
-            // VISUALIZE GAME
-            movePacMan(direction, lastNode, node);
+    // VISUALIZE GAME
+    movePacMan(direction, lastNode, node);
 
-            if (gain == Integer.MIN_VALUE) {
-                sink.next(new Outcome(GameUtils.captureState(game), Integer.MIN_VALUE, decision, Outcome.Type.KILLED));
-                sink.complete();
-            } else {
-                sink.next(new Outcome(GameUtils.captureState(game), gain, decision, Outcome.Type.PILL_EATEN));
-            }
-        });
+    if (gain == Integer.MIN_VALUE) {
+        sink.next(new Outcome(GameUtils.captureState(game), Integer.MIN_VALUE, decision, Outcome.Type.KILLED));
+        sink.complete();
+    } else {
+        sink.next(new Outcome(GameUtils.captureState(game), gain, decision, Outcome.Type.PILL_EATEN));
+    }
+});
     }
 
     void movePacMan(org.coinen.reactive.pacman.agent.controllers.Direction direction, G.Node from, G.Node to) {

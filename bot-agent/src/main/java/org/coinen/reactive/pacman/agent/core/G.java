@@ -13,7 +13,6 @@
  */
 package org.coinen.reactive.pacman.agent.core;
 
-import org.coinen.reactive.pacman.agent.PacManSimulator.GameConfig;
 import org.coinen.reactive.pacman.agent.controllers.Direction;
 import org.coinen.reactive.pacman.agent.controllers.pacman.PacManAction;
 import org.coinen.pacman.Tile;
@@ -35,8 +34,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class G implements Game {
     public static Random rnd = new Random();
-
-    protected GameConfig config;
 
 
     protected int remainingLevels;
@@ -111,14 +108,6 @@ public class G implements Game {
             pills.set(0, getNumberPills());
             powerPills = new BitSet(getNumberPowerPills());
             powerPills.set(0, getNumberPowerPills());
-
-            if (!config.powerPillsEnabled) {
-                powerPills.clear();
-            }
-            if (config.totalPills < 1) {
-                int number = (int) Math.ceil(pills.length() * (1 - (config.totalPills > 0 ? config.totalPills : 0)));
-                decimatePills(number);
-            }
         }
 
         Q_learn.changeDistances(curMaze);
