@@ -20,15 +20,15 @@
   "main": "build/src/main/typescript/index.js",
   "types": "build/src/main/typescript/index.d.ts",
   "dependencies": {
-    "@types/rsocket-types": "^0.0.1",
-    "@types/rsocket-core": "^0.0.2",
+    "@types/rsocket-types": "^0.0.2",
+    "@types/rsocket-core": "^0.0.3",
     "@types/rsocket-flowable": "^0.0.2",
     "@types/google-protobuf": "^3.7.2",
-    "@types/node": "^12.12.3",
-    "google-protobuf": "^3.10.0",
+    "@types/node": "^12.12.14",
+    "google-protobuf": "^3.11.0",
     "grpc-tools": "^1.8.0",
-    "grpc-web": "^1.0.6",
-    "grpc": "^1.24.1",
+    "grpc-web": "^1.0.7",
+    "grpc": "^1.24.2",
     "rsocket-flowable": "^0.0.14",
     "rsocket-rpc-core": "^0.1.6",
     "rsocket-rpc-metrics": "^0.1.6",
@@ -36,11 +36,11 @@
     "rsocket-types": "^0.0.16"
   },
   "devDependencies": {
-    "grpc_tools_node_protoc_ts": "^2.5.5",
+    "grpc_tools_node_protoc_ts": "^2.5.8",
     "ncp": "^2.0.0",
     "follow-redirects": "^1.9.0",
-    "@grpc/proto-loader": "^0.5.2",
+    "@grpc/proto-loader": "^0.5.3",
     "rsocket-rpc-protobuf": "^0.1.6",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
   }
 }
