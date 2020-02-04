@@ -33,7 +33,7 @@ subprojects {
 
 		dependencies {
 
-			dependencySet (group: 'io.rsocket.rpc', version: '0.2.20-SNAPSHOT') {
+			dependencySet (group: 'io.rsocket.rpc', version: '0.3.0-SNAPSHOT') {
 				entry 'rsocket-ipc-core'
 				entry 'rsocket-rpc-core'
 				entry 'rsocket-rpc-protobuf'

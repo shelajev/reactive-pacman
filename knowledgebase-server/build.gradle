@@ -1,4 +1,5 @@
 apply plugin: 'java-library'
+apply plugin: 'application'
 
 dependencies {
     compile project(":knowledgebase-idl")
@@ -20,4 +21,9 @@ jar {
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+}
+
+run {
+    mainClassName = 'org.coinen.reactive.pacman.learning.Server'
+    standardInput = System.in
 }
