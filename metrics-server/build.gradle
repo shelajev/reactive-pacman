@@ -31,6 +31,6 @@ docker {
   springBootApplication {
     baseImage = 'adoptopenjdk/openjdk11'
     ports = [4000, 9095]
-    tag = "reactive-pacman-metrics-server:${project.version}"
+    mainClassName = 'org.coinen.reactive.pacman.metrics.ReactiveMetricsApplication'
   }
 }

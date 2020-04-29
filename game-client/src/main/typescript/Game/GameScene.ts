@@ -169,7 +169,7 @@ export default class GameScene extends Phaser.Scene {
 
     notification(text: string) {
         var overlay = this.overlay;
-        var target = overlay.find(".notification-tray");
+        var target = overlay.find(".notification-tray") as JQuery<HTMLElement>;
         var elem = $("<div></div>");
         var p = $("<p></p>");
         p.text(text);

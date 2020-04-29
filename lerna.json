@@ -2,7 +2,6 @@
   "packages": [
     "game-idl",
     "game-client",
-    "game-server",
     "metrics-idl",
     "metrics-client"
   ],

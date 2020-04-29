@@ -34,6 +34,6 @@ docker {
   springBootApplication {
     baseImage = 'adoptopenjdk/openjdk11'
     ports = [3000, 9090]
-    tag = "reactive-pacman-game-server:${project.version}"
+    mainClassName = 'org.coinen.reactive.pacman.ReactivePacManApplication'
   }
 }

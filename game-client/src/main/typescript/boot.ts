@@ -61,7 +61,7 @@ export class Boot extends Scene {
                 transport: new RSocketWebSocketClient(
                     {
                         url: urlParams.get('endpoint') || 'ws://dinoman.netifi.com:3000',
-                    } as any,//TODO: FIXME
+                    },
                     BufferEncoders
                 ),
                 setup: {
@@ -120,7 +120,7 @@ export class Boot extends Scene {
 
             this.showLoadingCircle(() =>
             new GrpcApi.SetupServiceClientAdapter()
-            .map()
+                .map()
                 .then(map => this.scene.start('Menu', { sizeData: config, maze: map, playerService: new GrpcApi.PlayerServiceClientSharedAdapter(), extrasService: new GrpcApi.ExtrasServiceClientAdapter(), gameService: new GrpcApi.GameServiceClientAdapter() }))
             );
         } else if (type === "socket.io") {
