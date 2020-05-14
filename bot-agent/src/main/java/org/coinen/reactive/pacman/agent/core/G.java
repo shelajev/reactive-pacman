@@ -979,7 +979,6 @@ public class G implements Game {
             this.height = height;
 //			loadNodes(nodeNames[index]);
 //			loadDistances(distNames[index]);
-			System.out.println("asdas");
         }
 
         //Loads all the nodes from files and initialises all maze-specific information.

@@ -21,7 +21,6 @@ import org.coinen.reactive.pacman.agent.core.GameUtils;
 import org.coinen.reactive.pacman.agent.core._G_;
 import org.coinen.reactive.pacman.agent.repository.KnowledgeRepository;
 import org.coinen.reactive.pacman.agent.repository.TemporaryHistoryRepository;
-import org.coinen.reactive.pacman.agent.repository.impl.InMemoryKnowledgeRepository;
 import org.coinen.reactive.pacman.agent.repository.impl.InMemoryTemporaryHistoryRepositoryImpl;
 import org.coinen.reactive.pacman.agent.repository.impl.RemoteKnowledgeRepository;
 import org.coinen.reactive.pacman.agent.service.DecisionService;
@@ -31,7 +30,6 @@ import org.coinen.reactive.pacman.agent.service.impl.DefaultGameEngineService;
 import org.coinen.reactive.pacman.agent.service.impl.QLearningDecisionService;
 import org.coinen.reactive.pacman.agent.service.impl.QLearningLearningService;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.Charset;
@@ -60,7 +58,7 @@ public class PacManSimulator {
     public static void main(String[] args) throws InterruptedException {
         RSocket remoteServerKnowledgeBase = RSocketFactory.connect()
                 .frameDecoder(PayloadDecoder.ZERO_COPY)
-                .transport(TcpClientTransport.create(9099))
+                .transport(TcpClientTransport.create("dinoman.rsocket.cloud", 9099))
                 .start()
                 .block();
         TemporaryHistoryRepository temporaryHistoryRepository = new InMemoryTemporaryHistoryRepositoryImpl();
@@ -120,7 +118,7 @@ public class PacManSimulator {
                         }, Optional.empty(), Optional.empty(), Optional.empty()));
                     }
                 })
-                .transport(WebsocketClientTransport.create("dinoman.netifi.com", 3000))
+                .transport(WebsocketClientTransport.create("dinoman.rsocket.cloud", 3000))
                 .start()
                 .block();
 
@@ -132,7 +130,8 @@ public class PacManSimulator {
             GameEngineService gameEngineService,
             LearningService learningService,
             KnowledgeRepository knowledgeRepository) {
-        return decisionService.decide()
+        return decisionService
+                .decide()
                 .transform(gameEngineService::run)
                 .transform(learningService::learn)
                 .as(knowledgeRepository::educate);

@@ -34,7 +34,7 @@ export class Boot extends Scene {
         this.load.spritesheet('ghost', 'asset/ghost2.png', {frameWidth: 60, frameHeight: 60});
         this.load.spritesheet('man', 'asset/pacman-sprite.png', {frameWidth: 60, frameHeight: 60});
 
-        this.load.spritesheet('tiles', 'asset/tile2.png', {frameWidth: 100, frameHeight: 100});
+        this.load.spritesheet('tiles', 'asset/tile3.png', {frameWidth: 100, frameHeight: 100});
     }
 
     create(config: any) {
@@ -54,7 +54,7 @@ export class Boot extends Scene {
                 // ),
                 transport: new RSocketWebSocketClient(
                     {
-                        url: urlParams.get('endpoint') || 'ws://dinoman.netifi.com:3000',
+                        url: urlParams.get('endpoint') || `ws://${window.location.host}:3000`,
                     },
                     BufferEncoders
                 ),

@@ -5,10 +5,8 @@ plugins {
 dependencies {
     implementation 'com.google.protobuf:protobuf-java'
     implementation 'com.google.protobuf:protobuf-java-util'
-    implementation 'io.grpc:grpc-protobuf'
     implementation 'io.rsocket.rpc:rsocket-rpc-core'
-	implementation "com.salesforce.servicelibs:reactor-grpc-stub"
-	
+
     protobuf 'io.rsocket.rpc:rsocket-rpc-protobuf-idl'
 }
 
@@ -26,12 +24,6 @@ protobuf {
 	}
 
 	plugins {
-		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java"
-		}
-		reactorGRpc {
-			artifact = "com.salesforce.servicelibs:reactor-grpc:0.10.0-RC1:jdk8@jar"
-		}
 		rsocketRpc {
 			artifact = "io.rsocket.rpc:rsocket-rpc-protobuf"
 		}
@@ -39,9 +31,7 @@ protobuf {
 
 	generateProtoTasks {
 		ofSourceSet('main')*.plugins {
-			grpc {}
 			rsocketRpc  {}
-			reactorGRpc {}
 		}
 	}
 }
@@ -50,13 +40,9 @@ idea {
     module {
         sourceDirs += file("src/main/proto")
         sourceDirs += file("src/generated/main/java")
-        sourceDirs += file("src/generated/main/grpc")
-        sourceDirs += file("src/generated/main/reactorGRpc")
         sourceDirs += file("src/generated/main/rsocketRpc")
 
         generatedSourceDirs += file('src/generated/main/java')
-        generatedSourceDirs += file("src/generated/main/grpc")
-        generatedSourceDirs += file("src/generated/main/reactorGRpc")
         generatedSourceDirs += file("src/generated/main/rsocketRpc")
     }
 }
