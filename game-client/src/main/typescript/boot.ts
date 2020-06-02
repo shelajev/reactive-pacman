@@ -10,10 +10,6 @@ import {CompassScene} from './Compass';
 
 import * as $ from 'jquery';
 import * as RSocketApi from './api/rsocket';
-import * as HttpApi from './api/http';
-import * as GrpcApi from './api/grpc';
-import * as SocketIOApi from './api/socket.io';
-import * as io from "socket.io-client";
 
 export class Boot extends Scene {
 
@@ -39,105 +35,52 @@ export class Boot extends Scene {
 
     create(config: any) {
         const urlParams = new URLSearchParams(window.location.search);
-        const type = urlParams.get('type') || "rsocket";
-        if (type === "rsocket") {
-
-            let rSocket: ReactiveSocket<any, any>;
-            const clientSupplier = () => new RpcClient({
-                // transport: new RSocketResumableTransport(
-                //     () =>  rSocketWebSocketClient, // provider for low-level transport instances
-                //     {
-                //         bufferSize: 99999999, // max number of sent & pending frames to
-                //         // buffer before failing
-                //         resumeToken: uuid.v4(), // string to uniquely identify the session across connections
-                //     }
-                // ),
-                transport: new RSocketWebSocketClient(
-                    {
-                        url: urlParams.get('endpoint') || `ws://${window.location.host}:3000`,
-                    },
-                    BufferEncoders
-                ),
-                setup: {
-                    keepAlive: 5000,
-                    lifetime: 60000,
+        let rSocket: ReactiveSocket<any, any>;
+        const clientSupplier = () => new RpcClient({
+            transport: new RSocketWebSocketClient(
+                {
+                    url: urlParams.get('endpoint') || `ws://${window.location.hostname}:3000`,
                 },
-                responder: new RSocketRPCServices.MapServiceServer({
-                    setup: (map: Map) => {
-                        this.scene.start('Menu', {
-                            sizeData: config,
-                            maze: map.toObject(),
-                            playerService: new RSocketApi.PlayerServiceClientSharedAdapter(rSocket),
-                            extrasService: new RSocketApi.ExtrasServiceClientAdapter(rSocket),
-                            gameService: new RSocketApi.GameServiceClientAdapter(rSocket)
-                        });
-                    }
-                })
-            });
-
-            let client: RpcClient<any, any> = undefined;
-
-            let rSocketReconnectionNumber = 0;
-
-            const connect = () => {
-                client = clientSupplier();
-                this.showLoadingCircle(() => {
-                    client
-                        .connect()
-                        .then(preparedRSocket => {
-                            rSocketReconnectionNumber = 0;
-                            rSocket = preparedRSocket;
-                        }, () => {
-                            client.close();
-                            setTimeout(() => connect(), ++rSocketReconnectionNumber * 1000)
-                        });
-                });
-            };
-
-            connect();
-        } else if (type === "grpc") {
-
-            this.showLoadingCircle(() =>
-                new GrpcApi.SetupServiceClientAdapter()
-                    .map()
-                    .then(map => this.scene.start('Menu', {
-                        sizeData: config,
-                        maze: map,
-                        playerService: new GrpcApi.PlayerServiceClientSharedAdapter(),
-                        extrasService: new GrpcApi.ExtrasServiceClientAdapter(),
-                        gameService: new GrpcApi.GameServiceClientAdapter()
-                    }))
-            );
-        } else if (type === "socket.io") {
-            this.showLoadingCircle(() => {
-                const socket: SocketIOClient.Socket = io(urlParams.get('endpoint') || 'ws://dinoman.netifi.com:3000', {
-                    transports: ["websocket"]
-                });
-
-                socket.on('setup', (data: Buffer) => {
-                    const map = Map.deserializeBinary(data);
+                BufferEncoders
+            ),
+            setup: {
+                keepAlive: 5000,
+                lifetime: 60000,
+            },
+            responder: new RSocketRPCServices.MapServiceServer({
+                setup: (map: Map) => {
                     this.scene.start('Menu', {
                         sizeData: config,
                         maze: map.toObject(),
-                        playerService: new SocketIOApi.PlayerServiceClientSharedAdapter(socket),
-                        extrasService: new SocketIOApi.ExtrasServiceClientAdapter(socket),
-                        gameService: new SocketIOApi.GameServiceClientAdapter(socket)
+                        playerService: new RSocketApi.PlayerServiceClientSharedAdapter(rSocket),
+                        extrasService: new RSocketApi.ExtrasServiceClientAdapter(rSocket),
+                        gameService: new RSocketApi.GameServiceClientAdapter(rSocket)
                     });
-                });
+                }
+            })
+        });
+
+        let client: RpcClient<any, any> = undefined;
+
+        let rSocketReconnectionNumber = 0;
+
+        const connect = () => {
+            client = clientSupplier();
+            this.showLoadingCircle(() => {
+                client
+                    .connect()
+                    .then(preparedRSocket => {
+                        rSocketReconnectionNumber = 0;
+                        rSocket = preparedRSocket;
+                    }, (e) => {
+                        console.error(e);
+                        client.close();
+                        setTimeout(() => connect(), ++rSocketReconnectionNumber * 1000)
+                    });
             });
-        } else {
-            this.showLoadingCircle(() =>
-                new HttpApi.SetupServiceClientAdapter()
-                    .map()
-                    .then(map => this.scene.start('Menu', {
-                        sizeData: config,
-                        maze: map,
-                        playerService: new HttpApi.PlayerServiceClientSharedAdapter(),
-                        extrasService: new HttpApi.ExtrasServiceClientAdapter(),
-                        gameService: new HttpApi.GameServiceClientAdapter()
-                    }))
-            );
-        }
+        };
+
+        connect();
     }
 
     showLoadingCircle(callback: () => void) {

@@ -10,11 +10,7 @@ export * from '../../generated/main/javascript/extra_pb';
 export * from '../../generated/main/javascript/config_pb';
 
 import * as RSocketRPCServices from '../../generated/main/javascript/service_rsocket_pb';
-import * as GRPCWebServices from '../../generated/main/javascript/service_grpc_web_pb';
-import * as GRPCServices from '../../generated/main/javascript/service_grpc_pb';
 
 export {
-    GRPCServices,
-    GRPCWebServices,
     RSocketRPCServices
 }

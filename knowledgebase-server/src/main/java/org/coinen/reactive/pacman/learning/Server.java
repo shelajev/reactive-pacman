@@ -48,6 +48,7 @@ public class Server {
                             return Flux
                                     .from(
                                             Source.fromPublisher(messages)
+                                                .ask()
                                                     .via(handleRequest())
                                                     .runWith(sink, Materializer.createMaterializer(ActorSystem.create()))
                                     )

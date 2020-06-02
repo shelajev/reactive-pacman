@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.2.6.RELEASE' apply false
+	id 'org.springframework.boot' version '2.4.0' apply false
 	id 'com.bmuschko.docker-spring-boot-application' version '6.4.0' apply false
 	id 'com.google.protobuf' version '0.8.12' apply false
 }
@@ -26,14 +26,14 @@ subprojects {
 
 	dependencyManagement {
 		imports {
-			mavenBom 'org.springframework.boot:spring-boot-dependencies:2.2.6.RELEASE'
-			mavenBom 'io.rsocket:rsocket-bom:1.0.0-RC7'
+			mavenBom 'org.springframework.boot:spring-boot-dependencies:2.4.0'
+			mavenBom 'io.rsocket:rsocket-bom:1.1.0'
 			mavenBom 'com.google.protobuf:protobuf-bom:3.11.4'
 		}
 
 		dependencies {
 
-			dependencySet (group: 'io.rsocket.rpc', version: '0.3.0-SNAPSHOT') {
+			dependencySet (group: 'io.rsocket.rpc', version: '0.3.0') {
 				entry 'rsocket-ipc-core'
 				entry 'rsocket-rpc-core'
 				entry 'rsocket-rpc-protobuf'
@@ -41,17 +41,12 @@ subprojects {
 			}
 
 
-			dependency group: 'com.corundumstudio.socketio', name: 'netty-socketio', version: '1.7.17'
-			dependency group: 'io.socket', name: 'socket.io-client', version: '1.0.0'
-
 			dependency group: 'org.roaringbitmap', name: 'RoaringBitmap', version: '0.8.11'
 
 			dependency group: 'com.google.protobuf', name: 'protoc', version: '3.11.4'
 
 			dependency group: 'org.jctools', name: 'jctools-core', version: '3.0.0'
-			dependency group: 'com.salesforce.servicelibs', name: 'reactor-grpc-stub', version: '0.10.0'
 
-			dependency group:'io.github.lognet', name: 'grpc-spring-boot-starter', version: '3.3.0'
 			dependency group: 'com.github.collaborationinencapsulation.spring-boot-rsocket', name: 'spring-boot-starter-rsocket', version: '57f3acae42'
 		}
 	}

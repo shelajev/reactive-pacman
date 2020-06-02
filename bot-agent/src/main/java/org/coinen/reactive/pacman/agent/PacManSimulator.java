@@ -6,6 +6,7 @@ import io.rsocket.ConnectionSetupPayload;
 import io.rsocket.RSocket;
 import io.rsocket.RSocketFactory;
 import io.rsocket.SocketAcceptor;
+import io.rsocket.core.RSocketConnector;
 import io.rsocket.frame.decoder.PayloadDecoder;
 import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.transport.netty.client.WebsocketClientTransport;
@@ -64,9 +65,9 @@ public class PacManSimulator {
         TemporaryHistoryRepository temporaryHistoryRepository = new InMemoryTemporaryHistoryRepositoryImpl();
         KnowledgeRepository knowledgeRepository = new RemoteKnowledgeRepository(new KnowledgeServiceClient(remoteServerKnowledgeBase));
 //        KnowledgeRepository knowledgeRepository = new InMemoryKnowledgeRepository();
-        RSocket rSocket = RSocketFactory.connect()
-                .frameDecoder(PayloadDecoder.ZERO_COPY)
-                .keepAlive(Duration.ofDays(1), Duration.ofDays(1), 10000)
+        RSocket rSocket = RSocketConnector.create()
+                .payloadDecoder(PayloadDecoder.ZERO_COPY)
+                .keepAlive(Duration.ofSeconds(1), Duration.ofDays(1))
                 .acceptor(new SocketAcceptor() {
                     @Override
                     public Mono<RSocket> accept(ConnectionSetupPayload setup, RSocket sendingSocket) {
@@ -118,8 +119,7 @@ public class PacManSimulator {
                         }, Optional.empty(), Optional.empty(), Optional.empty()));
                     }
                 })
-                .transport(WebsocketClientTransport.create("dinoman.rsocket.cloud", 3000))
-                .start()
+                .connect(WebsocketClientTransport.create("dinoman.rsocket.cloud", 3000))
                 .block();
 
         rSocket.onClose().block();

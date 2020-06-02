@@ -16,13 +16,15 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Netifi Pac-Man',
+            title: 'Multiplayer Pac-Man on RSocket',
             template: path.join(__dirname, 'src/main/resources/public/index.html'),
             favicon: path.join(__dirname, 'src/main/resources/public/favicon.ico')
         }),
-        new CopyPlugin([
-            { from: 'src/main/resources/public', to: './' },
-        ]),
+        new CopyPlugin({
+            patterns: [
+                { from: 'src/main/resources/public', to: './' },
+            ]
+        }),
         new CompressionPlugin(),
         new webpack.HotModuleReplacementPlugin()
     ],
@@ -33,7 +35,6 @@ module.exports = {
                 use: 'ts-loader',
                 exclude: [
                     /node_modules/,
-
                 ]
             },
             {
@@ -43,9 +44,6 @@ module.exports = {
                 ]
             }
         ]
-    },
-    externals: {
-        grpc: 'grpc'
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js']

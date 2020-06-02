@@ -8,12 +8,9 @@
     "create-gen-dir": "node ../scripts/make-local-generated-dir.js",
     "copy-generated": "ncp ./src/generated ./build/src/generated",
     "copy-template": "node ../scripts/copy-template.js ./src/main/resources/service_rsocket_pb.d.ts.template ./src/generated/main/javascript/service_rsocket_pb.d.ts",
-    "protocall": "npm run protocgrpcnode ; npm run protocgrpcnodets ; npm run protocrpc ; npm run protocgrpc ; npm run protocts ; node ../scripts/postprocess-generated-ts.js ./src/generated/main/javascript/service_pb.d.ts",
+    "protocall": "npm run protocrpc ; npm run protocts ; node ../scripts/postprocess-generated-ts.js ./src/generated/main/javascript/service_pb.d.ts",
     "protocts": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/main/proto --js_out=import_style=commonjs,binary:src/generated/main/javascript --ts_out=service=false:src/generated/main/javascript --plugin=protoc-gen-ts=node_modules/.bin/protoc-gen-ts src/main/proto/*.proto node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto",
-    "protocrpc": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/main/proto --js_out=import_style=commonjs,binary:src/generated/main/javascript --rsocket_rpc_out=src/generated/main/javascript --plugin=protoc-gen-rsocket_rpc=node_modules/.bin/rsocket_rpc_js_protoc_plugin src/main/proto/*.proto node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto",
-    "protocgrpc": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/main/proto -I=src/main/proto service.proto --plugin=protoc-gen-grpc-web=node_modules/.bin/protoc-gen-grpc-web.exe --grpc-web_out=import_style=commonjs+dts,mode=grpcwebtext:src/generated/main/javascript",
-    "protocgrpcnode": "grpc_tools_node_protoc --proto_path=src/main/proto --proto_path=node_modules/rsocket-rpc-protobuf/proto --js_out=import_style=commonjs,binary:src/generated/main/javascript --grpc_out=src/generated/main/javascript --plugin=protoc-gen-grpc=node_modules/.bin/grpc_tools_node_protoc_plugin node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto src/main/proto/*.proto",
-    "protocgrpcnodets": "protoc --proto_path=./src/main/proto --proto_path=./node_modules/rsocket-rpc-protobuf/proto --proto_path=./node_modules/rsocket-rpc-protobuf/proto/rsocket --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts --ts_out=./src/generated/main/javascript ./node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto ./src/main/proto/*.proto"
+    "protocrpc": "protoc --proto_path=node_modules/rsocket-rpc-protobuf/proto --proto_path=src/main/proto --js_out=import_style=commonjs,binary:src/generated/main/javascript --rsocket_rpc_out=src/generated/main/javascript --plugin=protoc-gen-rsocket_rpc=node_modules/.bin/rsocket_rpc_js_protoc_plugin src/main/proto/*.proto node_modules/rsocket-rpc-protobuf/proto/rsocket/*.proto"
   },
   "author": "Oleh Dokuka",
   "license": "ISC",
@@ -26,9 +23,6 @@
     "@types/google-protobuf": "^3.7.2",
     "@types/node": "^13.13.4",
     "google-protobuf": "^3.11.4",
-    "grpc-tools": "^1.8.1",
-    "grpc-web": "^1.0.7",
-    "grpc": "^1.24.2",
     "rsocket-flowable": "^0.0.14",
     "rsocket-types": "^0.0.16",
     "rsocket-rpc-core": "^0.1.6",
@@ -36,11 +30,11 @@
     "rsocket-rpc-tracing": "^0.1.6"
   },
   "devDependencies": {
-    "grpc_tools_node_protoc_ts": "^3.0.0",
+    "grpc_tools_node_protoc_ts": "^4.0.0",
     "ncp": "^2.0.0",
     "follow-redirects": "^1.11.0",
     "@grpc/proto-loader": "^0.5.4",
     "rsocket-rpc-protobuf": "^0.1.6",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.3"
   }
 }
