@@ -84,7 +84,7 @@ export default class Menu extends Scene {
 
         $(".avgrund-popup input[type='submit']").off("click");
         $(document).off("keypress");
-        this.nickname = $(".avgrund-popup input[type='text']").val() as string;
+        this.nickname = $(".avgrund-popup.login input[type='text']").val() as string;
         //$(".avgrund-popup").remove();
         this.closeAvgrund();
 

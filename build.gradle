@@ -33,14 +33,6 @@ subprojects {
 
 		dependencies {
 
-			dependencySet (group: 'io.grpc', version: '1.28.1') {
-				entry 'grpc-stub'
-				entry 'grpc-netty'
-				entry 'grpc-okhttp'
-				entry 'grpc-protobuf'
-				entry 'protoc-gen-grpc-java'
-			}
-
 			dependencySet (group: 'io.rsocket.rpc', version: '0.2.18') {
 				entry 'rsocket-rpc-core'
 				entry 'rsocket-rpc-protobuf'
@@ -56,9 +48,6 @@ subprojects {
 			dependency group: 'com.google.protobuf', name: 'protoc', version: '3.11.4'
 
 			dependency group: 'org.jctools', name: 'jctools-core', version: '3.0.0'
-			dependency group: 'com.salesforce.servicelibs', name: 'reactor-grpc-stub', version: '0.10.0'
-
-			dependency group:'io.github.lognet', name: 'grpc-spring-boot-starter', version: '3.3.0'
 			dependency group: 'com.github.collaborationinencapsulation.spring-boot-rsocket', name: 'spring-boot-starter-rsocket', version: '57f3acae42'
 		}
 	}

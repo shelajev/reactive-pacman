@@ -1,5 +1,4 @@
 apply plugin: 'org.springframework.boot'
-apply plugin: 'com.bmuschko.docker-spring-boot-application'
 
 dependencies {
 
@@ -7,12 +6,6 @@ dependencies {
   implementation project(':metrics-idl')
   implementation project(':metrics-client')
   implementation 'com.corundumstudio.socketio:netty-socketio'
-  implementation 'io.socket:socket.io-client'
-  implementation 'io.grpc:grpc-stub'
-  implementation 'io.grpc:grpc-okhttp'
-  implementation 'io.grpc:grpc-netty'
-  implementation 'io.grpc:grpc-protobuf'
-  implementation 'com.salesforce.servicelibs:reactor-grpc-stub'
   implementation 'org.roaringbitmap:RoaringBitmap'
   implementation 'org.jctools:jctools-core'
   implementation 'io.projectreactor.addons:reactor-extra'
@@ -21,19 +14,10 @@ dependencies {
   implementation "io.micrometer:micrometer-core"
   implementation 'io.rsocket.rpc:rsocket-rpc-core'
   implementation 'com.google.protobuf:protobuf-java'
-  implementation 'io.github.lognet:grpc-spring-boot-starter'
   implementation 'com.github.collaborationinencapsulation.spring-boot-rsocket:spring-boot-starter-rsocket'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'io.projectreactor:reactor-test'
-}
-
-docker {
-  springBootApplication {
-    baseImage = 'adoptopenjdk/openjdk11'
-    ports = [3000, 9090]
-    mainClassName = 'org.coinen.reactive.pacman.ReactivePacManApplication'
-  }
 }

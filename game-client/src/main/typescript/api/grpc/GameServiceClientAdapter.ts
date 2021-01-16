@@ -12,7 +12,7 @@ export default class GameServiceClientAdapter implements GameService {
     constructor() {
         const urlParams = new URLSearchParams(window.location.search);
         const endpoint = urlParams.get('endpoint');
-        this.service = new GRPCWebServices.GameServiceClient(endpoint || "http://dinoman.netifi.com:8000", {}, {});
+        this.service = new GRPCWebServices.GameServiceClient(endpoint || "http://URL_REPLACE_ME:8000", {}, {});
     }
 
     start({ value }: Nickname.AsObject): Single<Config.AsObject> {

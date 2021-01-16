@@ -56,13 +56,13 @@ export class Boot extends Scene {
                 // ),
                 transport: new RSocketWebSocketClient(
                     {
-                        url: urlParams.get('endpoint') || 'ws://dinoman.netifi.com:3000',
+                        url: urlParams.get('endpoint') || 'ws://URL_REPLACE_ME:3000',
                     },
                     BufferEncoders
                 ),
                 setup: {
                     keepAlive: 5000,
-                    lifetime: 60000,
+                    lifetime: 300000,
                 },
                 responder: new RSocketRPCServices.MapServiceServer({
                     setup: (map: Map) => {
@@ -112,7 +112,7 @@ export class Boot extends Scene {
             );
         } else if (type === "socket.io") {
             this.showLoadingCircle(() => {
-                const socket: SocketIOClient.Socket = io(urlParams.get('endpoint') || 'ws://dinoman.netifi.com:3000', {
+                const socket: SocketIOClient.Socket = io(urlParams.get('endpoint') || 'ws://URL_REPLACE_ME:3000', {
                     transports: ["websocket"]
                 });
 

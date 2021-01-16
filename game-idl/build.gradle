@@ -5,9 +5,7 @@ plugins {
 dependencies {
     implementation 'com.google.protobuf:protobuf-java'
     implementation 'com.google.protobuf:protobuf-java-util'
-    implementation 'io.grpc:grpc-protobuf'
     implementation 'io.rsocket.rpc:rsocket-rpc-core'
-	implementation "com.salesforce.servicelibs:reactor-grpc-stub"
 	
     protobuf 'io.rsocket.rpc:rsocket-rpc-protobuf-idl'
 }
@@ -26,12 +24,6 @@ protobuf {
 	}
 
 	plugins {
-		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java"
-		}
-		reactorGRpc {
-			artifact = "com.salesforce.servicelibs:reactor-grpc:0.10.0-RC1:jdk8@jar"
-		}
 		rsocketRpc {
 			artifact = "io.rsocket.rpc:rsocket-rpc-protobuf"
 		}
@@ -39,9 +31,7 @@ protobuf {
 
 	generateProtoTasks {
 		ofSourceSet('main')*.plugins {
-			grpc {}
 			rsocketRpc  {}
-			reactorGRpc {}
 		}
 	}
 }
